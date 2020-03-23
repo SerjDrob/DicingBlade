@@ -1,0 +1,109 @@
+﻿<Window x:Class="DicingBlade.Views.WaferSettingsView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"       
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" 
+        xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"        
+        xmlns:local="clr-namespace:DicingBlade.Classes"        
+        xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Platform"        
+        mc:Ignorable="d"
+        Title="Подложка" SizeToContent="WidthAndHeight" WindowStyle="ToolWindow" ResizeMode="NoResize"
+        
+        >
+    <Window.Resources>
+
+    </Window.Resources>
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closing">
+            <cmd:EventToCommand Command="{Binding CloseCmd, Mode=OneWay}" PassEventArgsToCommand="True"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="0.5*"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel>            
+            <Grid>
+                <Button Height="30" Width="30" HorizontalAlignment="Left" Visibility="{Binding ElementName=square, Path=Visibility}">
+                    <Path Fill="Black" Data="M -5 -5 H 15 V 15 H -5"/>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <ei:ChangePropertyAction TargetObject="{Binding ElementName=square}" PropertyName="Visibility"
+                                                 Value="Collapsed"
+                                                 >
+                            </ei:ChangePropertyAction>
+                        </i:EventTrigger>
+                        <i:EventTrigger EventName="Click">
+                            <ei:ChangePropertyAction TargetObject="{Binding ElementName=round}" PropertyName="Visibility"
+                                                 Value="Visible"
+                                                 >
+                            </ei:ChangePropertyAction>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </Button>
+                <Button Height="30" Width="30" HorizontalAlignment="Left" Visibility="{Binding ElementName=round, Path=Visibility}">
+                    <Path Fill="Black" Data="M 15 1 A 10 10 360 1 1 10 0 "/>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <ei:ChangePropertyAction TargetObject="{Binding ElementName=square}" PropertyName="Visibility"
+                                                 Value="Visible"
+                                                 >
+                            </ei:ChangePropertyAction>
+                            <ei:ChangePropertyAction TargetObject="{Binding ElementName=round}" PropertyName="Visibility"
+                                                 Value="Collapsed"
+                                                 >
+                            </ei:ChangePropertyAction>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </Button>
+            </Grid>
+            <GroupBox Width="200">
+                <Grid>
+                    <StackPanel x:Name="square" Visibility="{Binding SquareVisibility, Mode=TwoWay}">
+                        <DockPanel LastChildFill="False">
+                            <Label Content="Длина" DockPanel.Dock="Left"/>
+                            <TextBox Text="{Binding Height}" Width="70" Height="22" DockPanel.Dock="Right"/>
+                        </DockPanel>
+                        <DockPanel LastChildFill="False">
+                            <Label Content="Ширина" DockPanel.Dock="Left"/>
+                            <TextBox Text="{Binding Width}" Width="70" Height="22" DockPanel.Dock="Right"/>
+                        </DockPanel>
+                        <DockPanel LastChildFill="False">
+                            <Label Content="Толщина" DockPanel.Dock="Left"/>
+                            <TextBox Text="{Binding Thickness}" Width="70" Height="22" DockPanel.Dock="Right"/>
+                        </DockPanel>
+                        <DockPanel LastChildFill="False">
+                            <Label Content="Размер чипа по X" DockPanel.Dock="Left"/>
+                            <TextBox Text="{Binding IndexW}" Width="70" Height="22" DockPanel.Dock="Right"/>
+                        </DockPanel>
+                        <DockPanel LastChildFill="False">
+                            <Label Content="Размер чипа по Y" DockPanel.Dock="Left"/>
+                            <TextBox Text="{Binding IndexH}" Width="70" Height="22" DockPanel.Dock="Right"/>
+                        </DockPanel>
+                    </StackPanel>
+                    <StackPanel x:Name="round" Visibility="Collapsed">
+                        <DockPanel LastChildFill="False">
+                            <Label Content="Диаметр" DockPanel.Dock="Left"/>
+                            <TextBox Text="{Binding Diameter}" Width="70" Height="22" DockPanel.Dock="Right"/>
+                        </DockPanel>
+                        <DockPanel LastChildFill="False">
+                            <Label Content="Толщина" DockPanel.Dock="Left"/>
+                            <TextBox Text="{Binding Thickness}" Width="70" Height="22" DockPanel.Dock="Right"/>
+                        </DockPanel>
+                        <DockPanel LastChildFill="False">
+                            <Label Content="Размер чипа по X" DockPanel.Dock="Left"/>
+                            <TextBox Text="{Binding IndexW}" Width="70" Height="22" DockPanel.Dock="Right"/>
+                        </DockPanel>
+                        <DockPanel LastChildFill="False">
+                            <Label Content="Размер чипа по Y" DockPanel.Dock="Left"/>
+                            <TextBox Text="{Binding IndexH}" Width="70" Height="22" DockPanel.Dock="Right"/>
+                        </DockPanel>
+                    </StackPanel>
+                </Grid>
+            </GroupBox>
+        </StackPanel>
+
+    </Grid>
+</Window>
