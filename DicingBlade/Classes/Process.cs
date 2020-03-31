@@ -101,23 +101,23 @@ namespace DicingBlade.Classes
         public bool isAlowed(params string[] pars) // Отвечает разрешено ли запрашиваемое действие
         {
             bool allow = false;
-            foreach(string parameter in pars)
-            {
-                #region Проверка концевиков                
-                if (parameter == "goXP")
-                {
-                    if (machine.xP) allow = false;
-                    else allow = true;
-                }
+            //foreach(string parameter in pars)
+            //{
+            //    #region Проверка концевиков                
+            //    if (parameter == "goXP")
+            //    {
+            //        if (machine.xP) allow = false;
+            //        else allow = true;
+            //    }
 
-                if (parameter == "goXN")
-                {
-                    if (machine.xN) allow = false;
-                    else allow = true;
-                }
-                allow &= allow;
-                #endregion
-            }
+            //    if (parameter == "goXN")
+            //    {
+            //        if (machine.xN) allow = false;
+            //        else allow = true;
+            //    }
+            //    allow &= allow;
+            //    #endregion
+            //}
             return allow;
         }
         #endregion

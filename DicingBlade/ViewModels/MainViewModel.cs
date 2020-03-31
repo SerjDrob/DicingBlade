@@ -28,6 +28,7 @@ namespace DicingBlade.ViewModels
     class MainViewModel:INotifyPropertyChanged
     {
         private Wafer wafer;
+        private Machine machine;
         private int[] cols;
         private int[] rows;
         private bool test;
@@ -92,7 +93,7 @@ namespace DicingBlade.ViewModels
             RotateCmd = new Command(args => Rotate());
             ChangeCmd = new Command(args => Change());
             KeyDownCmd = new Command(args => KeyDown(args));
-            WaferSettingsCmd = new Command(args => WaferSettings());
+            WaferSettingsCmd = new Command(args => WaferSettings());           
         }
 
         private void KeyDown(object args) 

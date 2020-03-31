@@ -12,6 +12,7 @@
         Background="Beige"
         Title="MainWindowView" Height="1024" Width="1280">
     <Window.Resources>
+       
         <local:ScaleConverter x:Key="ScaleCoverterScheme"/>
         <local:TranslateConverter x:Key="TranslateConverterScheme"/>
         <local:TranslateConverterInverse x:Key="TranslateConverterSchemeInverse"/>
