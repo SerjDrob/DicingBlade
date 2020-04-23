@@ -11,6 +11,7 @@ using System.ComponentModel;
 using System.Collections.ObjectModel;
 using PropertyChanged;
 using System.Windows;
+using DicingBlade.Properties;
 
 namespace DicingBlade.ViewModels
 {
@@ -83,6 +84,7 @@ namespace DicingBlade.ViewModels
         public ICommand ChangeCmd { get; set; }
         public ICommand KeyDownCmd { get; set; }
         public ICommand WaferSettingsCmd { get; set; }
+        public ICommand MachineSettingsCmd { get; set; }
         public MainViewModel()
         {
             Test = false;
@@ -93,7 +95,8 @@ namespace DicingBlade.ViewModels
             RotateCmd = new Command(args => Rotate());
             ChangeCmd = new Command(args => Change());
             KeyDownCmd = new Command(args => KeyDown(args));
-            WaferSettingsCmd = new Command(args => WaferSettings());           
+            WaferSettingsCmd = new Command(args => WaferSettings());
+            MachineSettingsCmd = new Command(args => MachineSettings());
         }
 
         private void KeyDown(object args) 
@@ -116,6 +119,14 @@ namespace DicingBlade.ViewModels
             }.ShowDialog();
             Wafer = PropContainer.Wafer;
             Thickness = 1;
+        }
+        private void MachineSettings() 
+        {
+            new DicingBlade.Views.MachineSettingsView()
+            {
+                DataContext = Settings.Default
+            }.ShowDialog();
+            Settings.Default.Save();
         }
         private void Change() 
         {

@@ -178,8 +178,12 @@ namespace DicingBlade.Classes
                 if (CoolantWater) OnCoolWaterWanished(new DIEventArgs());
                 if (ChuckVacuum) OnVacuumWanished(new DIEventArgs());
                 if (Air) OnAirWanished(new DIEventArgs());
+                TrigVar trig = new TrigVar();
+                DIEventArgs dI = new DIEventArgs();
+                //trig.trigger(Air, (dI)=>OnAirWanished);
             }
             Thread.Sleep(100);
+
         }
         #endregion
        
@@ -188,6 +192,8 @@ namespace DicingBlade.Classes
         public event DIEventHandler OnSpinWaterWanished;
         public event DIEventHandler OnAirWanished;
         private void EMGScenario(DIEventArgs eventArgs) { }
+
+       
 
         public void StartCamera()
         {
@@ -813,6 +819,9 @@ namespace DicingBlade.Classes
         public double ActualPosition { get; set; }
         public int DIs { get; set; }
         public int DOs { get; set; }
-        public bool GetDI(DI din) { return true; }
+        public bool GetDI(DI din)
+        {
+            return (DIs & 1 << (int)din) != 0 ? true : false;
+        }
     }
 }

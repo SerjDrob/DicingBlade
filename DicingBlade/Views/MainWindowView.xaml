@@ -56,7 +56,7 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
                         <Button Content="Подложка" Command="{Binding WaferSettingsCmd}" Margin="3"/>
-                        <Button Grid.Column="1" Margin="3"/>
+                        <Button Content="Приводы" Command="{Binding MachineSettingsCmd}" Grid.Column="1" Margin="3"/>
                         <Button Grid.Column="2" Margin="3"/>
                         <Button Grid.Row="1" Margin="3"/>
                         <Button Grid.Column="1" Grid.Row="1" Margin="3"/>

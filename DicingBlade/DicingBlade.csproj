@@ -113,9 +113,13 @@
     <Compile Include="Classes\ScaleConverter.cs" />
     <Compile Include="Classes\StatMethods.cs" />
     <Compile Include="Classes\TranslateConverter.cs" />
+    <Compile Include="Classes\TrigVar.cs" />
     <Compile Include="Classes\VisibilityConverter.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\WaferSettingsViewModel.cs" />
+    <Compile Include="Views\MachineSettingsView.xaml.cs">
+      <DependentUpon>MachineSettingsView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\MainWindowView.xaml.cs">
       <DependentUpon>MainWindowView.xaml</DependentUpon>
     </Compile>
@@ -138,6 +142,10 @@
     <Compile Include="Views\WaferSettingsView.xaml.cs">
       <DependentUpon>WaferSettingsView.xaml</DependentUpon>
     </Compile>
+    <Page Include="Views\MachineSettingsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\MainWindowView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

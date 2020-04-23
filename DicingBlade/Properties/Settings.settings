@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="XVelLow" Type="System.UInt32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">20</Value>
     </Setting>
     <Setting Name="XVelHigh" Type="System.UInt32" Scope="User">
       <Value Profile="(Default)">0</Value>
@@ -18,9 +18,6 @@
       <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="XJerk" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
-    </Setting>
-    <Setting Name="YVelLow" Type="System.UInt32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="YVelHigh" Type="System.UInt32" Scope="User">
@@ -51,7 +48,7 @@
       <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="ZPPU" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">4000</Value>
     </Setting>
     <Setting Name="ZJerk" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
@@ -84,6 +81,9 @@
       <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="UVelService" Type="System.UInt32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="YVelLow" Type="System.UInt32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
   </Settings>
