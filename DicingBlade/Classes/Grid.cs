@@ -8,11 +8,13 @@ using System.Collections.ObjectModel;
 using System;
 using System.Xml.Serialization;
 using System.Runtime.Serialization;
+using PropertyChanged;
 
 
 namespace DicingBlade.Classes
 {    
-    public class Grid:INotifyPropertyChanged
+    [AddINotifyPropertyChangedInterface]
+    public class Grid
     {
         #region Constructors
         public Grid() { }
@@ -20,7 +22,7 @@ namespace DicingBlade.Classes
         {
             Origin = origin;
             this.directions = directions;
-            Lines = new List<(double degree, List<Cut>)>();
+            Lines = new Dictionary<double, List<Cut>>();
             GenerateLines();
             ShapeSize = GetSize();
         }
@@ -29,7 +31,7 @@ namespace DicingBlade.Classes
             Origin = origin;            
             directionsD = directions;
             this.diameter = diameter;
-            Lines = new List<(double degree, List<Cut>)>();            
+            Lines = new Dictionary<double, List<Cut>>();            
             GenerateLinesD();
             ShapeSize = GetSize();
         }
@@ -42,7 +44,7 @@ namespace DicingBlade.Classes
             Origin = new Vector2((xmax - xmin) / 2, (ymax - ymin) / 2);
             var lines = new List<(double degree, Cut line)>();            
             RawLines = new ObservableCollection<Line>(rawLines);
-            Lines = new List<(double degree, List<Cut>)>();
+            Lines = new Dictionary<double, List<Cut>>();
             foreach (var line in RawLines)
             {
                 lines.Add((GetAngle(line), RotateLine(-GetAngle(line), line, Origin)));
@@ -50,7 +52,7 @@ namespace DicingBlade.Classes
 
             foreach (var angle in lines.OrderBy(d => d.degree).Select(d => d.degree).Distinct())
             {
-                Lines.Add((angle, new List<Cut>(lines.Where(d => d.degree == angle).Select(l => l.line))));
+                Lines.Add(angle, new List<Cut>(lines.Where(d => d.degree == angle).Select(l => l.line)));
             }
             ShapeSize = GetSize();
         }
@@ -59,31 +61,13 @@ namespace DicingBlade.Classes
         private (double degree, double length, double side, double index)[] directions;
         private (double degree, double index)[] directionsD;
         private double diameter;
-        private ObservableCollection<Line> rawLines;
-        private double[] shapeSize;
+        
+       
         #endregion
         #region Publics
-        public double[] ShapeSize
-        {
-            get { return shapeSize; }
-            set
-            {
-                shapeSize = value;
-                OnPropertyChanged("ShapeSize");
-            }
-        }
-        [XmlArray]
-        public ObservableCollection<Line> RawLines 
-        {
-            get { return rawLines; }
-            private set 
-            {
-                rawLines = value;
-                OnPropertyChanged("RawLines");
-            }
-        }
-        [XmlIgnore]
-        public List<(double degree, List<Cut> cuts)> Lines { get; }
+        public double[] ShapeSize { get; set; } 
+        public ObservableCollection<Line> RawLines { get; set; }        
+        public Dictionary<double, List<Cut>> Lines { get; }
         public Vector2 Origin { get; set; }
         #endregion
         #region Functions
@@ -102,7 +86,7 @@ namespace DicingBlade.Classes
         /// <param name="angle"></param>
         public void RotateRawLines(double angle)
         {
-            List<Line> tempLines = new List<Line>(rawLines);
+            List<Line> tempLines = new List<Line>(RawLines);
             var translating = new Matrix3(1, 0, -Origin.X, 0, 1, -Origin.Y, 0, 0, 1);
             var returning = new Matrix3(1, 0, Origin.X, 0, 1, Origin.Y, 0, 0, 1);
             var rotating = new Matrix3(Cos(angle), -Sin(angle), 0, Sin(angle), Cos(angle), 0, 0, 0, 1);
@@ -142,15 +126,15 @@ namespace DicingBlade.Classes
                     var dy = Origin.Y - direction.side / 2;
                     tempLines.Add(new Cut(new Vector3(dx, firstStep + direction.index * i + dy, 1), new Vector3(direction.length + dx, firstStep + direction.index * i + dy, 1)));
                 }
-                Lines.Add((direction.degree, tempLines));
+                Lines.Add(direction.degree, tempLines);
 
             }
             var tempRaws = new List<Line>();
-            foreach (var line in Lines)
+            foreach (var degree in Lines.Keys)
             {
-                foreach (var cut in line.cuts)
+                foreach (var cut in Lines[degree])
                 {
-                    var tempLine = RotateLine(line.degree*PI/180, new Line(cut.StartPoint, cut.EndPoint), Origin);
+                    var tempLine = RotateLine(degree*PI/180, new Line(cut.StartPoint, cut.EndPoint), Origin);
                     tempRaws.Add(new Line(tempLine.StartPoint, tempLine.EndPoint));
                 }
             }
@@ -181,25 +165,20 @@ namespace DicingBlade.Classes
                         tempLines.Add(new Cut(new Vector3(x1 + dx, dy + firstStep + direction.index * i, 1), new Vector3(x2 + dx, dy + firstStep + direction.index * i, 1)));
                     }
                 }
-                Lines.Add((direction.degree, tempLines));
+                Lines.Add(direction.degree, tempLines);
             }
 
             var tempRaws = new List<Line>();
-            foreach (var line in Lines)
+            foreach (var degree in Lines.Keys)
             {
-                foreach (var cut in line.cuts)
+                foreach (var cut in Lines[degree])
                 {
-                    var tempLine = RotateLine(line.degree * PI / 180, new Line(cut.StartPoint, cut.EndPoint), Origin);
+                    var tempLine = RotateLine(degree * PI / 180, new Line(cut.StartPoint, cut.EndPoint), Origin);
                     tempRaws.Add(new Line(tempLine.StartPoint, tempLine.EndPoint));
                 }
             }
             RawLines = new ObservableCollection<Line>(tempRaws);
         }
         #endregion
-        public event PropertyChangedEventHandler PropertyChanged;
-        public void OnPropertyChanged(string prop)
-        {
-            if (PropertyChanged != null) PropertyChanged(this, new PropertyChangedEventArgs(prop));
-        }
     }
 }

@@ -358,5 +358,77 @@ namespace DicingBlade.Properties {
                 this["YVelLow"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double XObjective {
+            get {
+                return ((double)(this["XObjective"]));
+            }
+            set {
+                this["XObjective"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double YObjective {
+            get {
+                return ((double)(this["YObjective"]));
+            }
+            set {
+                this["YObjective"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double XDisk {
+            get {
+                return ((double)(this["XDisk"]));
+            }
+            set {
+                this["XDisk"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double DiskShift {
+            get {
+                return ((double)(this["DiskShift"]));
+            }
+            set {
+                this["DiskShift"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double ZTouch {
+            get {
+                return ((double)(this["ZTouch"]));
+            }
+            set {
+                this["ZTouch"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double ZObjective {
+            get {
+                return ((double)(this["ZObjective"]));
+            }
+            set {
+                this["ZObjective"] = value;
+            }
+        }
     }
 }

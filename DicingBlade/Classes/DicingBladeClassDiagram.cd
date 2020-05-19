@@ -3,15 +3,14 @@
   <Class Name="DicingBlade.Classes.Machine" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="9.75" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>nAFQEggkACBJAYEICQEAYJcs0ACAgAAuRAQAQhACYIM=</HashCode>
+      <HashCode>nAEQMggkACBLAYEIDQEAIJUkQACAgAAuRAQAQhACYQM=</HashCode>
       <FileName>Classes\Machine.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Position="0.21" Collapsed="true" />
   </Class>
   <Class Name="DicingBlade.ViewModels.MainViewModel" Collapsed="true">
     <Position X="11.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAEAAEAAADBgGAAIgBAAIAAkACgAEAIIAAACBACEBA=</HashCode>
+      <HashCode>AAAEAAEAAADBgGAAIwBABIAAkACgAEAIIAAAGhACEBA=</HashCode>
       <FileName>ViewModels\MainViewModel.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -50,17 +49,16 @@
   <Class Name="DicingBlade.Classes.Cut" Collapsed="true">
     <Position X="7.75" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AACgAAAEAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAgAA=</HashCode>
+      <HashCode>AACgAAAEAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAgEA=</HashCode>
       <FileName>Classes\Cut.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="DicingBlade.Classes.Grid" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="0.75" Y="1.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>QAAAAAAAAABAQACAIBAAAABAgAQEAAECABIAAAgCAAA=</HashCode>
+      <HashCode>QAAAAAAAAABAQACAABAAAABAAAQEAAECAAAAAAgCAAA=</HashCode>
       <FileName>Classes\Grid.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="DicingBlade.Classes.LineCnv" Collapsed="true">
     <Position X="2.5" Y="1.5" Width="1.5" />
@@ -80,7 +78,7 @@
   <Class Name="DicingBlade.Classes.Process" Collapsed="true">
     <Position X="7.75" Y="1.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAABAAAAAAAAAAIAAEAABAIgQwAAAAAAZIAAAABAQAA=</HashCode>
+      <HashCode>AAAAAAIKAAAAFAAEAAgAAAAAgQAgAAAQAAAAAgBAQAA=</HashCode>
       <FileName>Classes\Process.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -100,7 +98,7 @@
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="DicingBlade.Classes.StatMethods" Collapsed="true">
-    <Position X="2.5" Y="3.75" Width="1.5" />
+    <Position X="2.5" Y="3.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAA=</HashCode>
       <FileName>Classes\StatMethods.cs</FileName>
@@ -112,7 +110,7 @@
       <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Classes\TranslateConverter.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Position="0.2" Collapsed="true" />
+    <Lollipop Position="0.21" Collapsed="true" />
   </Class>
   <Class Name="DicingBlade.Classes.TranslateConverterInverse" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="6" Y="3.5" Width="1.5" />
@@ -133,10 +131,9 @@
   <Class Name="DicingBlade.Classes.Wafer" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="0.75" Y="4.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAgEAAAYAAAAAIAAAACAAwAAAAAAAAgAAAAIAAAA=</HashCode>
+      <HashCode>AAAAAgEAAAQBAAAAAAAAACAAQAAAAAAAAAAAAAIAAAA=</HashCode>
       <FileName>Classes\Wafer.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="DicingBlade.Properties.Resources" Collapsed="true">
     <Position X="2.5" Y="2.5" Width="1.5" />
@@ -147,7 +144,7 @@
   <Class Name="DicingBlade.Properties.Settings" Collapsed="true">
     <Position X="7.75" Y="2.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AEAAEAAASCAAQAHEAgACogAAAAAJAQAABAAEAAAgaAQ=</HashCode>
+      <HashCode>EEAAECEASCABQAHEAgACogEAAAAbAQAABAAEAAAgeAQ=</HashCode>
     </TypeIdentifier>
   </Class>
   <Class Name="DicingBlade.ViewModels.WaferSettingsViewModel" Collapsed="true">
@@ -182,7 +179,7 @@
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="DicingBlade.Views.WaferSettingsView" Collapsed="true" BaseTypeListCollapsed="true">
-    <Position X="2.5" Y="4.5" Width="1.5" />
+    <Position X="2.5" Y="4.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Views\WaferSettingsView.xaml.cs</FileName>
@@ -248,7 +245,7 @@
   <Enum Name="DicingBlade.Classes.Velocity">
     <Position X="12.25" Y="1.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAIAAAAQAAAIAAAAAAABAA=</HashCode>
+      <HashCode>AAgAAAAAAAAAAAAAAAAAAAAIAAAAQAAAIAAAAAAABAA=</HashCode>
       <FileName>Classes\Machine.cs</FileName>
     </TypeIdentifier>
   </Enum>

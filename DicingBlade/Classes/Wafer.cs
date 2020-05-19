@@ -9,66 +9,58 @@ using static System.Math;
 using netDxf.Entities;
 using System.ComponentModel;
 using System.Windows;
+using PropertyChanged;
 
 namespace DicingBlade.Classes
 {
-    public class Wafer:INotifyPropertyChanged
+    [AddINotifyPropertyChangedInterface]
+    public class Wafer
     {
-        private double thickness;
-        private double currentAngle;
+        private double thickness;       
         /// <summary>
         /// Признак выравненности по определённому углу
         /// </summary>
-        private double alligned;
-        private Grid grid;
+        private double alligned;        
         public bool IsRound { get; set; }
-        public double CurrentAngle 
-        {
-            get { return currentAngle; }
-            set 
-            {
-                //RotateWafer(value - currentAngle,new Vector2(25000,25000));
-                currentAngle = value;
-                OnPropertyChanged("CurrentAngle");
-            } 
-        }
-        public Grid Grid
-        {
-            get { return grid; }
-            set 
-            {
-                grid = value;
-                OnPropertyChanged("Grid");
-            }
-        }
+        public double CurrentAngle { get; set; }       
+        public Grid Grid { get; set; }
+        public double Thickness { get; set; }
         public Wafer() { }
         public Wafer(double thickness, DxfDocument dxf, string layer)
         {
             this.thickness = thickness;
-            Grid = new Grid(dxf.Lines.Where(l => l.Layer.Name == layer));           
-        }       
-        public Wafer(Vector2 origin, double thickness, params (double degree, double length, double side, double index)[] directions) 
-        {            
+            Grid = new Grid(dxf.Lines.Where(l => l.Layer.Name == layer));
+        }
+        public Wafer(Vector2 origin, double thickness, params (double degree, double length, double side, double index)[] directions)
+        {
             this.thickness = thickness;
             Grid = new Grid(origin, directions);
             IsRound = false;
         }
-        public Wafer(Vector2 origin, double thickness, double diameter, params (double degree, double index)[] directions) 
+        public Wafer(Vector2 origin, double thickness, double diameter, params (double degree, double index)[] directions)
         {
             this.thickness = thickness;
             Grid = new Grid(origin, diameter, directions);
             IsRound = true;
         }
-        private void RotateWafer(double angle, Vector2 origin) 
+        private void RotateWafer(double angle, Vector2 origin) => Grid.RotateRawLines(angle);
+        public Cut GetNearestCut(double y) 
         {
-            Grid.RotateRawLines(angle);
+            double diff = Math.Abs(Grid.Lines[CurrentAngle].First().StartPoint.Y-y);
+            int index = 0;
+            for (int i = 0; i < Grid.Lines[CurrentAngle].Count; i++)
+            {
+                Cut item = (Cut)Grid.Lines[CurrentAngle][i];
+                if (Math.Abs(Grid.Lines[CurrentAngle][i].StartPoint.Y - y) < diff)
+                {
+                    diff = (Math.Abs(Grid.Lines[CurrentAngle][i].StartPoint.Y - y));
+                    index = i;
+                }
+            }
+            return (Cut)Grid.Lines[CurrentAngle][index];
         }
-        
-        public event PropertyChangedEventHandler PropertyChanged;
-        public void OnPropertyChanged(string prop)
-        {
-            if (PropertyChanged != null) PropertyChanged(this, new PropertyChangedEventArgs(prop));
-        }
+
+
     }
-   
+
 }

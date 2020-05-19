@@ -5,33 +5,48 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DicingBlade.Views"
         mc:Ignorable="d"
-        Title="MachineSettingsView" Height="450" Width="800">
+        Title="Настройки" Height="auto" Width="auto" SizeToContent="WidthAndHeight" ResizeMode="NoResize">
     <Grid>
+        <Grid.Resources>
+            <Style TargetType="TextBox">
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="Width" Value="80"/>
+                <Setter Property="Height" Value="30"/>
+                <Setter Property="Margin" Value="3"/>
+            </Style>
+            <Style TargetType="Label">
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="FontFamily" Value="Arial"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+            </Style>
+            <Style TargetType="GroupBox">
+                <Setter Property="Margin" Value="5"/>
+                <Setter Property="HeaderTemplate">
+                    <Setter.Value>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}" FontWeight="Bold" FontStyle="Italic"/>
+                        </DataTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            
+        </Grid.Resources>
         <Grid.RowDefinitions>
-            <RowDefinition Height="245*"/>
-            <RowDefinition Height="174*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="581*"/>
-            <ColumnDefinition Width="211*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="auto"/>
         </Grid.ColumnDefinitions>
         <GroupBox Header="Приводы">
             <Grid >
-                <Grid.Resources>
-                    <Style TargetType="TextBox">
-                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                        <Setter Property="VerticalContentAlignment" Value="Center"/>
-                        <Setter Property="Width" Value="80"/>
-                        <Setter Property="Height" Value="30"/>
-                        <Setter Property="Margin" Value="3"/>
-                    </Style>
-                    <Style TargetType="Label">
-                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                        <Setter Property="VerticalContentAlignment" Value="Center"/>
-                        <Setter Property="FontFamily" Value="Arial"/>
-                        <Setter Property="FontWeight" Value="Bold"/>
-                    </Style>                   
-                </Grid.Resources>
+                
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
@@ -54,22 +69,82 @@
                 <Label Content="V серв." Grid.Column="2"/>
                 <Label Content="V медл." Grid.Column="3"/>
                 <Label Content="V быстр." Grid.Column="4"/>
-                <TextBox Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" Text="TextBox"/>
+                <TextBox Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" Text="{Binding XAcc}"/>
                 <TextBox Grid.Column="2" Grid.Row="1" TextWrapping="Wrap" Text="{Binding XVelService}"/>
                 <TextBox Grid.Column="3" Grid.Row="1" TextWrapping="Wrap" Text="{Binding XVelLow}"/>
                 <TextBox Grid.Column="4" Grid.Row="1" TextWrapping="Wrap" Text="{Binding XVelHigh}"/>
-                <TextBox Grid.Column="1" Grid.Row="2" TextWrapping="Wrap" Text="TextBox" />
+                <TextBox Grid.Column="1" Grid.Row="2" TextWrapping="Wrap" Text="{Binding YAcc}" />
                 <TextBox Grid.Column="2" Grid.Row="2" TextWrapping="Wrap" Text="{Binding YVelService}"/>
                 <TextBox Grid.Column="3" Grid.Row="2" TextWrapping="Wrap" Text="{Binding YVelLow}"/>
                 <TextBox Grid.Column="4" Grid.Row="2" TextWrapping="Wrap" Text="{Binding YVelHigh}"/>
-                <TextBox Grid.Column="1" Grid.Row="3" TextWrapping="Wrap" Text="TextBox"/>
+                <TextBox Grid.Column="1" Grid.Row="3" TextWrapping="Wrap" Text="{Binding ZAcc}"/>
                 <TextBox Grid.Column="2" Grid.Row="3" TextWrapping="Wrap" Text="{Binding ZVelService}"/>
                 <TextBox Grid.Column="3" Grid.Row="3" TextWrapping="Wrap" Text="{Binding ZVelLow}"/>
                 <TextBox Grid.Column="4" Grid.Row="3" TextWrapping="Wrap" Text="{Binding ZVelHigh}"/>
-                <TextBox Grid.Column="1" Grid.Row="4" TextWrapping="Wrap" Text="TextBox"/>
+                <TextBox Grid.Column="1" Grid.Row="4" TextWrapping="Wrap" Text="{Binding UAcc}"/>
                 <TextBox Grid.Column="2" Grid.Row="4" TextWrapping="Wrap" Text="{Binding UVelService}"/>
                 <TextBox Grid.Column="3" Grid.Row="4" TextWrapping="Wrap" Text="{Binding UVelLow}"/>
                 <TextBox Grid.Column="4" Grid.Row="4" TextWrapping="Wrap" Text="{Binding UVelHigh}"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Центр столика в микроскопе" Grid.Row="1" HorizontalAlignment="Left">
+            <Grid >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <Label Content="X"/>
+                <Label Content="Y" Grid.Row="1"/>
+                <TextBox Text="{Binding XObjective}" Grid.Column="1"/>
+                <TextBox Text="{Binding YObjective}" Grid.Column="1" Grid.Row="1"/>
+                <Button Content="Обучить" Grid.Column="2" Grid.RowSpan="2" Margin="3" Height="30"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Ось диска над центром СП" Grid.Row="2" HorizontalAlignment="Left">
+            <Grid >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    
+                </Grid.RowDefinitions>
+                <Label Content="X"/>                
+                <TextBox Text="{Binding XDisk}" Grid.Column="1"/>                
+                <Button Content="Обучить" Grid.Column="2" Margin="3"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Смещение ОЦ от кромки диска" Grid.Row="3" HorizontalAlignment="Left">           
+            <Grid >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>                    
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <Label Content="H"/>
+                <TextBox Text="{Binding DiskShift}" Grid.Column="1"/>                
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Z диска" Grid.Row="4" HorizontalAlignment="Left">
+            <Grid >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <Label Content="Z"/>
+                <TextBox Text="{Binding ZTouch}" Grid.Column="1"/>
             </Grid>
         </GroupBox>
     </Grid>

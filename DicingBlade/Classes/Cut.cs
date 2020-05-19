@@ -10,6 +10,10 @@ namespace DicingBlade.Classes
 {
     public class Cut:Line
     {
+        public Cut(Cut cut) 
+        {
+            //this.Clone = cut;
+        }
         public Cut(Vector3 startpoint, Vector3 endpoint) 
         {
             StartPoint = startpoint;
@@ -28,13 +32,10 @@ namespace DicingBlade.Classes
         /// true - действует, false - отключен или выполнен
         /// </summary>
         public bool Status { get; set; }
-        public int CutCount { get; set; }          
+        public int CutCount { get; set; }
+        public int CurrentCut { get; set; }
         public double Offset { get; set; }
         public static double CommonOffset { get; set; }
-        
-
-    
-    
     
     }
     public enum Directions

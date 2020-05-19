@@ -104,6 +104,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Classes\Blade.cs" />
     <Compile Include="Classes\Command.cs" />
     <Compile Include="Classes\CrossPositionConverter.cs" />
     <Compile Include="Classes\PropContainer.cs" />

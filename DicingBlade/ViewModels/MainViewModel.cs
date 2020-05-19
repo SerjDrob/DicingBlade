@@ -97,6 +97,13 @@ namespace DicingBlade.ViewModels
             KeyDownCmd = new Command(args => KeyDown(args));
             WaferSettingsCmd = new Command(args => WaferSettings());
             MachineSettingsCmd = new Command(args => MachineSettings());
+           // machine = new Machine();
+          //  machine.OnAirWanished += Machine_OnAirWanished;
+        }
+
+        private void Machine_OnAirWanished(DIEventArgs eventArgs)
+        {
+            throw new NotImplementedException();
         }
 
         private void KeyDown(object args) 
