@@ -27,16 +27,27 @@ namespace DicingBlade.Classes
         /// <summary>
         /// направление резки - встречная, попутная, встречно-попутная        
         /// </summary>
-        public static Directions CutDirection { get; set; }
+        public Directions CutDirection { get; set; }
         /// <summary>
         /// true - действует, false - отключен или выполнен
         /// </summary>
-        public bool Status { get; set; }
+        public bool Status 
+        {
+            get { return CurrentCut / CutCount==1 ? false : true; }
+            private set { }
+        }
+        public bool NextCut() 
+        {
+            if (Status)
+            {
+                CurrentCut++;              
+            }
+            return Status;
+        }
         public int CutCount { get; set; }
-        public int CurrentCut { get; set; }
-        public double Offset { get; set; }
-        public static double CommonOffset { get; set; }
-    
+        public double CutRatio { get { return (CurrentCut+1) / CutCount; } }
+        private int CurrentCut { get; set; } = 0;       
+        public double Offset { get; set; }       
     }
     public enum Directions
     {

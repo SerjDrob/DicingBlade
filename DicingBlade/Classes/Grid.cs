@@ -20,20 +20,20 @@ namespace DicingBlade.Classes
         public Grid() { }
         public Grid(Vector2 origin,  params (double degree, double length, double side, double index)[] directions)
         {
-            Origin = origin;
+            GridCenter = origin;
             this.directions = directions;
             Lines = new Dictionary<double, List<Cut>>();
             GenerateLines();
-            ShapeSize = GetSize();
+            //ShapeSize = GetSize();
         }
         public Grid(Vector2 origin, double diameter, params (double degree, double index)[] directions)
         {
-            Origin = origin;            
+            GridCenter = origin;            
             directionsD = directions;
             this.diameter = diameter;
             Lines = new Dictionary<double, List<Cut>>();            
             GenerateLinesD();
-            ShapeSize = GetSize();
+            //ShapeSize = GetSize();
         }
         public Grid(IEnumerable<Line> rawLines)
         {
@@ -41,34 +41,40 @@ namespace DicingBlade.Classes
             var ymax = rawLines.Max(l => l.EndPoint.Y) > rawLines.Max(l => l.StartPoint.Y) ? rawLines.Max(l => l.EndPoint.Y) : rawLines.Max(l => l.StartPoint.Y);
             var xmin = rawLines.Min(l => l.EndPoint.X) < rawLines.Min(l => l.StartPoint.X) ? rawLines.Min(l => l.EndPoint.X) : rawLines.Min(l => l.StartPoint.X);
             var ymin = rawLines.Min(l => l.EndPoint.Y) < rawLines.Min(l => l.StartPoint.Y) ? rawLines.Min(l => l.EndPoint.Y) : rawLines.Min(l => l.StartPoint.Y);
-            Origin = new Vector2((xmax - xmin) / 2, (ymax - ymin) / 2);
+            GridCenter = new Vector2((xmax - xmin) / 2, (ymax - ymin) / 2);
             var lines = new List<(double degree, Cut line)>();            
             RawLines = new ObservableCollection<Line>(rawLines);
             Lines = new Dictionary<double, List<Cut>>();
             foreach (var line in RawLines)
             {
-                lines.Add((GetAngle(line), RotateLine(-GetAngle(line), line, Origin)));
+                lines.Add((GetAngle(line), RotateLine(-GetAngle(line), line, GridCenter)));
             }
 
             foreach (var angle in lines.OrderBy(d => d.degree).Select(d => d.degree).Distinct())
             {
                 Lines.Add(angle, new List<Cut>(lines.Where(d => d.degree == angle).Select(l => l.line)));
             }
-            ShapeSize = GetSize();
+            //ShapeSize = GetSize();
         }
         #endregion
         #region Privates
         private (double degree, double length, double side, double index)[] directions;
         private (double degree, double index)[] directionsD;
         private double diameter;
-        
-       
+        //private double[] ShapeSize { get; set; }
+        private Vector2 GridCenter { get; set; }
+
         #endregion
         #region Publics
-        public double[] ShapeSize { get; set; } 
+
         public ObservableCollection<Line> RawLines { get; set; }        
         public Dictionary<double, List<Cut>> Lines { get; }
-        public Vector2 Origin { get; set; }
+        
+        public (Vector2 start, Vector2 end) GetCenteredLine(double angle, int line)
+        {
+          //  if (!Lines.Keys.Contains(angle)) throw;
+            return (new Vector2(Lines[angle][line].StartPoint.X - GridCenter.X, Lines[angle][line].StartPoint.Y - GridCenter.Y), new Vector2(Lines[angle][line].EndPoint.X - GridCenter.X, Lines[angle][line].EndPoint.Y - GridCenter.Y));
+        }
         #endregion
         #region Functions
         private Cut RotateLine(double angle, Line line, Vector2 origin)
@@ -84,27 +90,27 @@ namespace DicingBlade.Classes
         /// 
         /// </summary>
         /// <param name="angle"></param>
-        public void RotateRawLines(double angle)
-        {
-            List<Line> tempLines = new List<Line>(RawLines);
-            var translating = new Matrix3(1, 0, -Origin.X, 0, 1, -Origin.Y, 0, 0, 1);
-            var returning = new Matrix3(1, 0, Origin.X, 0, 1, Origin.Y, 0, 0, 1);
-            var rotating = new Matrix3(Cos(angle), -Sin(angle), 0, Sin(angle), Cos(angle), 0, 0, 0, 1);
-            //RawLines = new ObservableCollection<Line>();
-            foreach (var line in tempLines)
-            {                
-                line.StartPoint = returning * rotating * translating * new Vector3(line.StartPoint.X,line.StartPoint.Y,1);
-                line.EndPoint = returning * rotating * translating * new Vector3(line.EndPoint.X,line.EndPoint.Y,1);
-               // RawLines.Add(line);
-            }            
-            RawLines = new ObservableCollection<Line>(tempLines);
-        }
+        //public void RotateRawLines(double angle)
+        //{
+        //    List<Line> tempLines = new List<Line>(RawLines);
+        //    var translating = new Matrix3(1, 0, -GridCenter.X, 0, 1, -GridCenter.Y, 0, 0, 1);
+        //    var returning = new Matrix3(1, 0, GridCenter.X, 0, 1, GridCenter.Y, 0, 0, 1);
+        //    var rotating = new Matrix3(Cos(angle), -Sin(angle), 0, Sin(angle), Cos(angle), 0, 0, 0, 1);
+        //    //RawLines = new ObservableCollection<Line>();
+        //    foreach (var line in tempLines)
+        //    {                
+        //        line.StartPoint = returning * rotating * translating * new Vector3(line.StartPoint.X,line.StartPoint.Y,1);
+        //        line.EndPoint = returning * rotating * translating * new Vector3(line.EndPoint.X,line.EndPoint.Y,1);
+        //       // RawLines.Add(line);
+        //    }            
+        //    RawLines = new ObservableCollection<Line>(tempLines);
+        //}
         private double GetAngle(Line line)
         {
             return Atan2(line.EndPoint.Y - line.StartPoint.Y, line.EndPoint.X - line.StartPoint.X)*(180/PI);
         }
 
-        public double[] GetSize()
+        private double[] GetSize()
         {
             return new double[]
             {
@@ -122,23 +128,36 @@ namespace DicingBlade.Classes
                 double firstStep = (direction.side - direction.index * count) / 2;
                 for (int i = 0; i < count+1; i++)
                 {
-                    var dx = Origin.X - direction.length / 2;
-                    var dy = Origin.Y - direction.side / 2;
+                    var dx = GridCenter.X - direction.length / 2;
+                    var dy = GridCenter.Y - direction.side / 2;
                     tempLines.Add(new Cut(new Vector3(dx, firstStep + direction.index * i + dy, 1), new Vector3(direction.length + dx, firstStep + direction.index * i + dy, 1)));
                 }
                 Lines.Add(direction.degree, tempLines);
 
             }
+            //var tempRaws = new List<Line>();
+            //foreach (var degree in Lines.Keys)
+            //{
+            //    foreach (var cut in Lines[degree])
+            //    {
+            //        var tempLine = RotateLine(degree*PI/180, new Line(cut.StartPoint, cut.EndPoint), GridCenter);
+            //        tempRaws.Add(new Line(tempLine.StartPoint, tempLine.EndPoint));
+            //    }
+            //}
+            //RawLines = new ObservableCollection<Line>(tempRaws);
+        }
+        public WaferView MakeGridView() 
+        {
             var tempRaws = new List<Line>();
             foreach (var degree in Lines.Keys)
             {
                 foreach (var cut in Lines[degree])
                 {
-                    var tempLine = RotateLine(degree*PI/180, new Line(cut.StartPoint, cut.EndPoint), Origin);
+                    var tempLine = RotateLine(degree * PI / 180, new Line(cut.StartPoint, cut.EndPoint), GridCenter);
                     tempRaws.Add(new Line(tempLine.StartPoint, tempLine.EndPoint));
                 }
             }
-            RawLines = new ObservableCollection<Line>(tempRaws);
+            return new WaferView(tempRaws, GridCenter);  
         }
         private void GenerateLinesD()
         {
@@ -160,24 +179,24 @@ namespace DicingBlade.Classes
                     {
                         x1 = (diameter - Sqrt(D)) / 2;
                         x2 = (diameter + Sqrt(D)) / 2;
-                        var dx = Origin.X - diameter / 2;
-                        var dy = Origin.Y - diameter / 2;
+                        var dx = GridCenter.X - diameter / 2;
+                        var dy = GridCenter.Y - diameter / 2;
                         tempLines.Add(new Cut(new Vector3(x1 + dx, dy + firstStep + direction.index * i, 1), new Vector3(x2 + dx, dy + firstStep + direction.index * i, 1)));
                     }
                 }
                 Lines.Add(direction.degree, tempLines);
             }
 
-            var tempRaws = new List<Line>();
-            foreach (var degree in Lines.Keys)
-            {
-                foreach (var cut in Lines[degree])
-                {
-                    var tempLine = RotateLine(degree * PI / 180, new Line(cut.StartPoint, cut.EndPoint), Origin);
-                    tempRaws.Add(new Line(tempLine.StartPoint, tempLine.EndPoint));
-                }
-            }
-            RawLines = new ObservableCollection<Line>(tempRaws);
+            //var tempRaws = new List<Line>();
+            //foreach (var degree in Lines.Keys)
+            //{
+            //    foreach (var cut in Lines[degree])
+            //    {
+            //        var tempLine = RotateLine(degree * PI / 180, new Line(cut.StartPoint, cut.EndPoint), GridCenter);
+            //        tempRaws.Add(new Line(tempLine.StartPoint, tempLine.EndPoint));
+            //    }
+            //}
+            //RawLines = new ObservableCollection<Line>(tempRaws);
         }
         #endregion
     }

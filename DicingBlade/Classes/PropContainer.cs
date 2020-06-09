@@ -11,5 +11,6 @@ namespace DicingBlade.Classes
         public static int counter { get; set; }
         public static bool IsRound { get; set; }
         public static Wafer Wafer { get; set; }
+        public static Technology Technology { get; set; }
     }
 }

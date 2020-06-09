@@ -79,24 +79,27 @@ namespace DicingBlade.Classes
         {
             get { return X.GetDI(DI.IN2); }
         }
+        public bool SwitchOnCoolantWater { get; set; }
         public bool ChuckVacuum
         {
             get { return X.GetDI(DI.IN3); }
         }
+        public bool SwitchOnChuckVacuum { get; set; }
         public bool Air
         {
             get { return Z.GetDI(DI.IN1); }
         }
+        public bool SwitchOnBlowing { get; set; }
         public bool BladeSensor { get; set; }
 
-        public bool xDirP { get; set; } // Разрешение на положительное направление
-        public bool xDirN { get; set; } // Разрешение на отрицательное направление
-        public bool yDirP { get; set; }
-        public bool yDirN { get; set; }
-        public bool zDirP { get; set; }
-        public bool zDirN { get; set; }
-        public bool fDirP { get; set; }
-        public bool fDirN { get; set; }
+        //public bool xDirP { get; set; } // Разрешение на положительное направление
+        //public bool xDirN { get; set; } // Разрешение на отрицательное направление
+        //public bool yDirP { get; set; }
+        //public bool yDirN { get; set; }
+        //public bool zDirP { get; set; }
+        //public bool zDirN { get; set; }
+        //public bool fDirP { get; set; }
+        //public bool fDirN { get; set; }
         public Axis X { get; set; }
         public Axis Y { get; set; }
         public Axis Z { get; set; }
@@ -178,9 +181,9 @@ namespace DicingBlade.Classes
                 if (CoolantWater) OnCoolWaterWanished(new DIEventArgs());
                 if (ChuckVacuum) OnVacuumWanished(new DIEventArgs());
                 if (Air) OnAirWanished?.Invoke(new DIEventArgs());
-                TrigVar trig = new TrigVar();
-                DIEventArgs dI = new DIEventArgs();
-                //trig.trigger(Air, (dI)=>OnAirWanished);
+                //TrigVar trig = new TrigVar();
+                //DIEventArgs dI = new DIEventArgs();
+                ////trig.trigger(Air, (dI)=>OnAirWanished);
             }
             Thread.Sleep(100);
 
@@ -192,7 +195,28 @@ namespace DicingBlade.Classes
         public event DIEventHandler OnSpinWaterWanished;
         public event DIEventHandler OnAirWanished;
         private void EMGScenario(DIEventArgs eventArgs) { }
-
+        public bool SetOnChuck() 
+        {
+            if(!ChuckVacuum) SwitchOnChuckVacuum = true;
+            Thread.Sleep(100);
+            if (!ChuckVacuum)
+            {
+                SayMessage(Messages.SetAndTurnOnVacuum);
+                return false;
+            }
+            else return true;
+        }
+        public void SayMessage(Messages message) 
+        {
+            switch (message)
+            {
+                case Messages.SetAndTurnOnVacuum:
+                    MessageBox.Show("Неустановленна пластина или неисправна вакуумная система");
+                    break;
+                default:
+                    break;
+            }
+        }
         public void StartCamera()
         {
             LocalWebCamsCollection = new FilterInfoCollection(FilterCategory.VideoInputDevice);
@@ -479,7 +503,7 @@ namespace DicingBlade.Classes
             if (velocity!=Velocity.Stop) Motion.mAcm_AxMoveVel(MoveRelParam(direction).Item1, MoveRelParam(direction).Item2);           
         }
 
-        public void GoThere(Place place)
+        public async Task GoThereAsync(Place place)
         {
             switch (place)
             {
@@ -495,7 +519,7 @@ namespace DicingBlade.Classes
                     break;
             }
         }
-        public async Task MoveAxisInPos(Ax axis, double position)
+        public async Task MoveAxisInPosAsync(Ax axis, double position)
         {           
             double accuracy = 0.001;
             double backlash = 0;
@@ -565,7 +589,7 @@ namespace DicingBlade.Classes
             }
             else Motion.mAcm_AxMoveAbs(ax.handle, position);
         }
-        public async Task MoveInPosXY(Vector2 position)
+        public async Task MoveInPosXYAsync(Vector2 position)
         {
             uint ElCount = 2;           
             double accuracy = 0.001;
@@ -873,6 +897,12 @@ namespace DicingBlade.Classes
 
     }
 
+    public enum Messages
+    {
+        [Description ("Установити пластину и включите вакуум")]
+        SetAndTurnOnVacuum
+    }
+    
     public enum AxisDirections
     {
         XP,
