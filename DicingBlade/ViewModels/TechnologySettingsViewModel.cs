@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using DicingBlade.Classes;
 using PropertyChanged;
-using FluentValidation;
 using FluentValidation.Results;
 using System.Windows.Forms;
 using System.ComponentModel;
@@ -13,8 +12,9 @@ using System.Windows.Input;
 
 namespace DicingBlade.ViewModels
 {
+   
     [AddINotifyPropertyChangedInterface]
-    public class TechnologySettingsViewModel:Technology,IDataErrorInfo
+    public class TechnologySettingsViewModel:ITechnology,IDataErrorInfo
     {        
         public TechnologySettingsViewModel() 
         {            
@@ -31,7 +31,7 @@ namespace DicingBlade.ViewModels
                 PassType = Directions.direct;
                 StartControlNum = 3;
                 ControlPeriod = 3;
-
+                PassType = Directions.direct;
             }
         }
         public string FileName { get; set; }
@@ -79,19 +79,5 @@ namespace DicingBlade.ViewModels
             }
         }
        
-    }
-    class TechnologySettingsValidator:AbstractValidator<Technology>
-    {
-        public TechnologySettingsValidator() 
-        {
-            RuleFor(technology => technology.SpindleFreq).NotEmpty().LessThan(60000).GreaterThan(10000);
-            RuleFor(technology => technology.FeedSpeed).NotEmpty().LessThan(20).GreaterThan(0.1);
-            RuleFor(technology => technology.WaferBladeGap).NotEmpty().LessThan(5).GreaterThan(0.5);
-            RuleFor(technology => technology.FilmThickness).NotEmpty().LessThan(0.5).GreaterThan(0);
-            RuleFor(technology => technology.UnterCut).LessThan(3).GreaterThan(t => -t.FilmThickness);
-            RuleFor(technology => technology.StartControlNum).NotEmpty().LessThan(10000).GreaterThan(0);
-            RuleFor(technology => technology.ControlPeriod).NotEmpty().LessThan(10000).GreaterThan(0);
-            RuleFor(technology => technology.PassCount).NotEmpty().LessThan(10).GreaterThan(0);
-        }
     }
 }

@@ -159,14 +159,16 @@
     <Compile Include="Classes\ConditionConverter.cs" />
     <Compile Include="Classes\Grid.cs" />
     <Compile Include="Classes\Map.cs" />
+    <Compile Include="Classes\RadioEnumConverter.cs" />
     <Compile Include="Classes\ScaleConverter.cs" />
     <Compile Include="Classes\StatMethods.cs" />
-    <Compile Include="Classes\Technology.cs" />
+    <Compile Include="Classes\ITechnology.cs" />
     <Compile Include="Classes\TranslateConverter.cs" />
     <Compile Include="Classes\TrigVar.cs" />
     <Compile Include="Classes\VisibilityConverter.cs" />
     <Compile Include="Classes\WaferView.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
+    <Compile Include="Classes\TechnologySettingsValidator.cs" />
     <Compile Include="ViewModels\TechnologySettingsViewModel.cs" />
     <Compile Include="ViewModels\WaferSettingsViewModel.cs" />
     <Compile Include="Views\MachineSettingsView.xaml.cs">

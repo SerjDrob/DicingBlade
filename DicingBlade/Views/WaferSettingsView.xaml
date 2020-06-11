@@ -9,7 +9,7 @@
         xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Platform"        
         mc:Ignorable="d"
         Title="Подложка" SizeToContent="WidthAndHeight" WindowStyle="ToolWindow" ResizeMode="NoResize"
-        
+        WindowStartupLocation="CenterScreen"
         >
     <Window.Resources>
 
@@ -27,7 +27,7 @@
         <StackPanel>            
             <Grid>
                 <Button Height="30" Width="30" HorizontalAlignment="Left" Visibility="{Binding ElementName=square, Path=Visibility}">
-                    <Path Fill="Black" Data="M -5 -5 H 15 V 15 H -5"/>
+                    <Path Fill="Black" Data="M 0 0 H 20 V 20 H 0"/>
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Click">
                             <ei:ChangePropertyAction TargetObject="{Binding ElementName=square}" PropertyName="Visibility"
@@ -64,7 +64,7 @@
                     <StackPanel x:Name="square" Visibility="{Binding SquareVisibility, Mode=TwoWay}">
                         <DockPanel LastChildFill="False">
                             <Label Content="Длина" DockPanel.Dock="Left"/>
-                            <TextBox Text="{Binding Height}" Width="70" Height="22" DockPanel.Dock="Right"/>
+                            <TextBox Text="{Binding Height, StringFormat=G}" Width="70" Height="22" DockPanel.Dock="Right"/>
                         </DockPanel>
                         <DockPanel LastChildFill="False">
                             <Label Content="Ширина" DockPanel.Dock="Left"/>
@@ -72,15 +72,15 @@
                         </DockPanel>
                         <DockPanel LastChildFill="False">
                             <Label Content="Толщина" DockPanel.Dock="Left"/>
-                            <TextBox Text="{Binding Thickness}" Width="70" Height="22" DockPanel.Dock="Right"/>
+                            <TextBox Text="{Binding Thickness, StringFormat=F1}" Width="70" Height="22" DockPanel.Dock="Right"/>
                         </DockPanel>
                         <DockPanel LastChildFill="False">
                             <Label Content="Размер чипа по X" DockPanel.Dock="Left"/>
-                            <TextBox Text="{Binding IndexW}" Width="70" Height="22" DockPanel.Dock="Right"/>
+                            <TextBox Text="{Binding IndexW, StringFormat=F2}" Width="70" Height="22" DockPanel.Dock="Right"/>
                         </DockPanel>
                         <DockPanel LastChildFill="False">
                             <Label Content="Размер чипа по Y" DockPanel.Dock="Left"/>
-                            <TextBox Text="{Binding IndexH}" Width="70" Height="22" DockPanel.Dock="Right"/>
+                            <TextBox Text="{Binding IndexH, StringFormat=F2}" Width="70" Height="22" DockPanel.Dock="Right"/>
                         </DockPanel>
                     </StackPanel>
                     <StackPanel x:Name="round" Visibility="Collapsed">

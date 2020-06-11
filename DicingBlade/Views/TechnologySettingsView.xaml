@@ -3,8 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:DicingBlade.Views"
-        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:local="clr-namespace:DicingBlade.Classes"
+        xmlns:model ="clr-namespace:DicingBlade.ViewModels"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"        
         mc:Ignorable="d"
         Title="Технология резки" Height="auto" Width="auto" WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight"  ResizeMode="NoResize" WindowStyle="ToolWindow">
     <i:Interaction.Triggers>
@@ -12,6 +13,9 @@
             <i:InvokeCommandAction Command="{Binding CloseCmd}"/>            
         </i:EventTrigger>
     </i:Interaction.Triggers>
+    <Window.Resources>
+        <local:RadioEnumConverter x:Key="RadioConverter"/>        
+    </Window.Resources>
     <Grid>
         <Grid.Resources>
             <Style TargetType="TextBox">
@@ -94,9 +98,21 @@
         </GroupBox>
         <GroupBox Header="Направление резки" Grid.Row="8" Grid.ColumnSpan="2">
             <StackPanel Margin="3">
-                <RadioButton Content="Попутная"/>
-                <RadioButton Content="Встречная"/>
-                <RadioButton Content="Встречно-попутная"/>
+                <RadioButton Content="Попутная">
+                    <RadioButton.IsChecked>
+                        <Binding Path="PassType" Converter="{StaticResource RadioConverter}" ConverterParameter="{x:Static local:Directions.direct}"/>
+                    </RadioButton.IsChecked>
+                </RadioButton>
+                <RadioButton Content="Встречная">
+                    <RadioButton.IsChecked>
+                        <Binding Path="PassType" Converter="{StaticResource RadioConverter}" ConverterParameter="{x:Static local:Directions.reverse}"/>
+                    </RadioButton.IsChecked>
+                </RadioButton>
+                <RadioButton Content="Встречно-попутная">
+                    <RadioButton.IsChecked>
+                        <Binding Path="PassType" Converter="{StaticResource RadioConverter}" ConverterParameter="{x:Static local:Directions.both}"/>
+                    </RadioButton.IsChecked>
+                </RadioButton>                
             </StackPanel>
         </GroupBox>
         <DockPanel Grid.Row="9" Grid.ColumnSpan="2" Margin="3">

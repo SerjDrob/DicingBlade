@@ -12,7 +12,7 @@
                 <Setter Property="HorizontalContentAlignment" Value="Center"/>
                 <Setter Property="VerticalContentAlignment" Value="Center"/>
                 <Setter Property="Width" Value="80"/>
-                <Setter Property="Height" Value="30"/>
+                <Setter Property="Height" Value="25"/>
                 <Setter Property="Margin" Value="3"/>
             </Style>
             <Style TargetType="Label">
@@ -31,7 +31,10 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-            
+            <Style TargetType="Button">
+                <Setter Property="Height" Value="25"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+            </Style>
         </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -102,7 +105,7 @@
                 <Label Content="Y" Grid.Row="1"/>
                 <TextBox Text="{Binding XObjective}" Grid.Column="1"/>
                 <TextBox Text="{Binding YObjective}" Grid.Column="1" Grid.Row="1"/>
-                <Button Content="Обучить" Grid.Column="2" Grid.RowSpan="2" Margin="3" Height="30"/>
+                <Button Content="Обучить" Grid.Column="2" Grid.RowSpan="2" />
             </Grid>
         </GroupBox>
         <GroupBox Header="Ось диска над центром СП" Grid.Row="2" HorizontalAlignment="Left">

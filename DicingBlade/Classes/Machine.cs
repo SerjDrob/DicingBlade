@@ -43,6 +43,8 @@ namespace DicingBlade.Classes
     [AddINotifyPropertyChangedInterface]
     class Machine
     {
+        private bool testRegime;
+
         public IntPtr[] m_Axishand = new IntPtr[32];
         UInt32 IOStatus = new UInt32();
         UInt32 Result;
@@ -138,13 +140,16 @@ namespace DicingBlade.Classes
                 default: return (new IntPtr(), 1);
             }
         }
-        public Machine() // В конструкторе происходит инициализация всех устройств, загрузка параметров.
+        public Machine(bool test) // В конструкторе происходит инициализация всех устройств, загрузка параметров.
         {
-            StartCamera();
-            DevicesConnection();
-            SetConfigs();
-            SetVelocity(Velocity.Slow);
-
+            testRegime = test;
+            if (!testRegime)
+            {
+                StartCamera();
+                DevicesConnection();
+                SetConfigs();
+                SetVelocity(Velocity.Slow);
+            }
             axes = new Axis[] { X, Y, Z, U };
             OnAirWanished += EMGScenario;           
             Thread threadCurrentState = new Thread(new ThreadStart(MachineState));
@@ -223,7 +228,7 @@ namespace DicingBlade.Classes
             try { LocalWebCam = new VideoCaptureDevice(LocalWebCamsCollection[1].MonikerString); }
             catch
             {
-               // MessageBox.Show("Включите питание видеокамеры !");
+                MessageBox.Show("Включите питание видеокамеры !");
                 StartCamera();
             }
             finally

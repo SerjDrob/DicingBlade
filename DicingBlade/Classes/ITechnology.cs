@@ -8,7 +8,7 @@ using PropertyChanged;
 namespace DicingBlade.Classes
 {
     //[AddINotifyPropertyChangedInterface]
-    public interface Technology
+    public interface ITechnology
     {
         string FileName { get; set; }
         int SpindleFreq { get; set; }

@@ -80,7 +80,7 @@ namespace DicingBlade.ViewModels
             WaferSettingsCmd = new Command(args => WaferSettings());
             MachineSettingsCmd = new Command(args => MachineSettings());
             TechnologySettingsCmd = new Command(args => TechnologySettings());
-
+            machine = new Machine(true);
             BaseProcess = new Diagram[] {
                 Diagram.goNextCutXY,
                 Diagram.goWaferStartX,
@@ -107,17 +107,17 @@ namespace DicingBlade.ViewModels
             if (key.Key == Key.Q)
             {
                 Condition.Mask ^= (1 << (int)Signals.vacuumValve);
-                machine.SwitchOnChuckVacuum ^=true;
+                //machine.SwitchOnChuckVacuum ^=true;
             }
             if (key.Key == Key.W)
             {
                 Condition.Mask ^= (1 << (int)Signals.waterValve);
-                machine.SwitchOnCoolantWater ^= true;
+                //machine.SwitchOnCoolantWater ^= true;
             }
             if (key.Key == Key.R)
             {
                 Condition.Mask ^= (1 << (int)Signals.blowValve);
-                machine.SwitchOnBlowing ^= true;
+                //machine.SwitchOnBlowing ^= true;
             }
             if (key.Key == Key.D) WaferView.Angle += 0.2;
             if (key.Key == Key.S) WaferView.Angle -= 0.2;
