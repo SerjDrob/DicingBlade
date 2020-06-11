@@ -554,6 +554,7 @@
 
         </GroupBox>
         <Canvas Grid.Column="{Binding Cols[1]}" Grid.RowSpan="{Binding Rows[1]}" Background="Black" Margin="3">
+            <Image Source="{Binding Machine.Bi}"/>
             <Line  Stroke="Red" StrokeThickness="1">
                 <Line.X1>
                     <MultiBinding Converter="{StaticResource CrossConverter}" ConverterParameter="0,3">                        

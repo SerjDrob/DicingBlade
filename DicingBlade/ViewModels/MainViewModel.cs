@@ -30,7 +30,7 @@ namespace DicingBlade.ViewModels
     [AddINotifyPropertyChangedInterface]
     class MainViewModel
     {       
-        private Machine machine;
+        public Machine Machine { get; set; }
         private Process process;
         public Wafer Wafer { get; set; }
         public WaferView WaferView { get; set; }
@@ -80,7 +80,7 @@ namespace DicingBlade.ViewModels
             WaferSettingsCmd = new Command(args => WaferSettings());
             MachineSettingsCmd = new Command(args => MachineSettings());
             TechnologySettingsCmd = new Command(args => TechnologySettings());
-            machine = new Machine(true);
+            Machine = new Machine(false);
             BaseProcess = new Diagram[] {
                 Diagram.goNextCutXY,
                 Diagram.goWaferStartX,
@@ -127,10 +127,10 @@ namespace DicingBlade.ViewModels
             {
                 if (process == null) 
                 {
-                    if (machine.SetOnChuck())
+                    if (Machine.SetOnChuck())
                     {
-                        await machine.GoThereAsync(Place.CameraChuckCenter);
-                        process = new Process(machine, Wafer, new Blade());
+                        await Machine.GoThereAsync(Place.CameraChuckCenter);
+                        process = new Process(Machine, Wafer, new Blade());
                         process.ProcessStatus = Status.StartLearning;                        
                     }
                     
@@ -144,11 +144,11 @@ namespace DicingBlade.ViewModels
                             process.ProcessStatus = Status.Learning;
                             break;
                         case Status.Learning:                            
-                            Wafer.SetCurrentDirectionIndexShift = machine.Y.ActualPosition - Wafer.GetNearestCut(machine.Y.ActualPosition).StartPoint.Y;
-                            Wafer.SetCurrentDirectionAngle = machine.U.ActualPosition;
+                            Wafer.SetCurrentDirectionIndexShift = Machine.Y.ActualPosition - Wafer.GetNearestCut(Machine.Y.ActualPosition).StartPoint.Y;
+                            Wafer.SetCurrentDirectionAngle = Machine.U.ActualPosition;
                             if (Wafer.NextDir()) 
                             {
-                                await machine.MoveAxisInPosAsync(Ax.U, Wafer.GetCurrentDiretionAngle);
+                                await Machine.MoveAxisInPosAsync(Ax.U, Wafer.GetCurrentDiretionAngle);
                                 await process.ProcElementDispatcherAsync(Diagram.goCameraPointLearningXYZ); 
                             }
                             else 
@@ -180,12 +180,12 @@ namespace DicingBlade.ViewModels
                 {
                     if (tempWafer2.point1 == null)
                     {
-                        tempWafer2.point1 = new Vector2(machine.X.ActualPosition, machine.Y.ActualPosition);
+                        tempWafer2.point1 = new Vector2(Machine.X.ActualPosition, Machine.Y.ActualPosition);
                     }
                     else
                     {
-                        tempWafer2.point2 = new Vector2(machine.X.ActualPosition, machine.Y.ActualPosition);
-                        await machine.MoveAxisInPosAsync(Ax.U, machine.U.ActualPosition - tempWafer2.GetAngle());
+                        tempWafer2.point2 = new Vector2(Machine.X.ActualPosition, Machine.Y.ActualPosition);
+                        await Machine.MoveAxisInPosAsync(Ax.U, Machine.U.ActualPosition - tempWafer2.GetAngle());
                     }
                 }
             }

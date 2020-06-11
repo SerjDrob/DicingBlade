@@ -39,7 +39,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AdvMotAPI">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Advantech\Common Motion\Public\AdvMotAPI.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files\Advantech\Common Motion\Public\AdvMotAPI.dll</HintPath>
     </Reference>
     <Reference Include="AForge, Version=2.2.5.0, Culture=neutral, PublicKeyToken=c1db6ff4eaa06aeb, processorArchitecture=MSIL">
       <HintPath>..\packages\AForge.2.2.5\lib\AForge.dll</HintPath>
