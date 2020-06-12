@@ -35,7 +35,7 @@ namespace DicingBlade.Classes
         IN3
     }
     public struct DIEventArgs { }
-    public delegate void DIEventHandler(DIEventArgs eventArgs);
+    public delegate void DIEventHandler(/*DIEventArgs eventArgs*/);
 
 
 
@@ -186,10 +186,12 @@ namespace DicingBlade.Classes
                 Result = Motion.mAcm_AxGetActualPosition(ax.handle, ref position);
                 if (Result == (uint)ErrorCode.SUCCESS) ax.ActualPosition = position;
 
-                if (!SpindleWater) OnSpinWaterWanished(new DIEventArgs());
-                if (!CoolantWater) OnCoolWaterWanished(new DIEventArgs());
-                if (!ChuckVacuum) OnVacuumWanished(new DIEventArgs());
-                if (!Air) OnAirWanished?.Invoke(new DIEventArgs());
+                //if (!SpindleWater) OnSpinWaterWanished(/*new DIEventArgs()*/);
+                //if (!CoolantWater) OnCoolWaterWanished(/*new DIEventArgs()*/);
+                //if (!ChuckVacuum) OnVacuumWanished(/*new DIEventArgs()*/);
+                if (!Air) OnAirWanished?.Invoke(/*new DIEventArgs()*/);
+
+
                 //TrigVar trig = new TrigVar();
                 //DIEventArgs dI = new DIEventArgs();
                 ////trig.trigger(Air, (dI)=>OnAirWanished);
@@ -203,7 +205,7 @@ namespace DicingBlade.Classes
         public event DIEventHandler OnCoolWaterWanished;
         public event DIEventHandler OnSpinWaterWanished;
         public event DIEventHandler OnAirWanished;
-        private void EMGScenario(DIEventArgs eventArgs) { }
+        private void EMGScenario(/*DIEventArgs eventArgs*/) { }
         public bool SetOnChuck() 
         {
             if(!ChuckVacuum) SwitchOnChuckVacuum = true;
