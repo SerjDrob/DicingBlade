@@ -22,7 +22,7 @@ namespace DicingBlade.Classes
 {
     enum DO 
     {   
-        OUT4,
+        OUT4=4,
         OUT5,
         OUT6,
         OUT7    
@@ -59,7 +59,6 @@ namespace DicingBlade.Classes
                 SetVelocity(value);
             }
         }
-
         double position = new double();
         private IntPtr m_DeviceHandle = IntPtr.Zero;
         private IntPtr XYhandle = IntPtr.Zero;
@@ -69,19 +68,11 @@ namespace DicingBlade.Classes
         private FilterInfoCollection LocalWebCamsCollection;       
         public BitmapImage Bi { get; set; }
         public bool MachineInit { get; set; } = false;
-
         public Vector2 BladeChuckCenter { get; set; }
         public double CameraBladeOffset { get; set; }
         public Vector2 CameraChuckCenter { get; set; }
         public double CameraFocus { get; set; }
-        public bool PCI1240IsConnected;
-        //public double xLength;
-        //public double yLength;
-        //public double zLength;
-        //public double fAngle;
-        //public double gap; // зазор до концевика
-        //public bool Fast { get; set; }
-        
+        public bool PCI1240IsConnected;        
         public bool SpindleWater
         {
             get { return X.GetDI(DI.IN1); }
@@ -90,27 +81,30 @@ namespace DicingBlade.Classes
         {
             get { return X.GetDI(DI.IN2); }
         }
-        public bool SwitchOnCoolantWater { get; set; }
+        public bool SwitchOnCoolantWater
+        {
+            get { return U.GetDO(DO.OUT4); }
+            set { U.SetDo(DO.OUT4, (byte)(value ? 1 : 0)); }
+        }
         public bool ChuckVacuum
         {
             get { return X.GetDI(DI.IN3); }
         }
-        public bool SwitchOnChuckVacuum { get; set; }
+        public bool SwitchOnChuckVacuum
+        {
+            get { return Z.GetDO(DO.OUT5); }
+            set { Z.SetDo(DO.OUT5, (byte)(value ? 1 : 0)); }
+        }
         public bool Air
         {
             get { return Z.GetDI(DI.IN1); }
         }
-        public bool SwitchOnBlowing { get; set; }
+        public bool SwitchOnBlowing 
+        {
+            get { return Z.GetDO(DO.OUT6); }
+            set { Z.SetDo(DO.OUT6,(byte)(value?1:0)); }
+        }
         public bool BladeSensor { get; set; }
-
-        //public bool xDirP { get; set; } // Разрешение на положительное направление
-        //public bool xDirN { get; set; } // Разрешение на отрицательное направление
-        //public bool yDirP { get; set; }
-        //public bool yDirN { get; set; }
-        //public bool zDirP { get; set; }
-        //public bool zDirN { get; set; }
-        //public bool fDirP { get; set; }
-        //public bool fDirN { get; set; }
         public Axis X { get; set; }
         public Axis Y { get; set; }
         public Axis Z { get; set; }
@@ -192,10 +186,10 @@ namespace DicingBlade.Classes
                 Result = Motion.mAcm_AxGetActualPosition(ax.handle, ref position);
                 if (Result == (uint)ErrorCode.SUCCESS) ax.ActualPosition = position;
 
-                if (SpindleWater) OnSpinWaterWanished(new DIEventArgs());
-                if (CoolantWater) OnCoolWaterWanished(new DIEventArgs());
-                if (ChuckVacuum) OnVacuumWanished(new DIEventArgs());
-                if (Air) OnAirWanished?.Invoke(new DIEventArgs());
+                if (!SpindleWater) OnSpinWaterWanished(new DIEventArgs());
+                if (!CoolantWater) OnCoolWaterWanished(new DIEventArgs());
+                if (!ChuckVacuum) OnVacuumWanished(new DIEventArgs());
+                if (!Air) OnAirWanished?.Invoke(new DIEventArgs());
                 //TrigVar trig = new TrigVar();
                 //DIEventArgs dI = new DIEventArgs();
                 ////trig.trigger(Air, (dI)=>OnAirWanished);
@@ -339,10 +333,10 @@ namespace DicingBlade.Classes
             
             m_bInit = true;
 
-            X = new Axis(0) { handle = m_Axishand[0] };
-            Y = new Axis(6400) { handle = m_Axishand[1] };
-            Z = new Axis(0) { handle = m_Axishand[2] };
-            U = new Axis(0) { handle = m_Axishand[3] };
+            X = new Axis(0, m_Axishand[0]);
+            Y = new Axis(6400, m_Axishand[1]);
+            Z = new Axis(0, m_Axishand[2]);
+            U = new Axis(0, m_Axishand[3]);
             Result = Motion.mAcm_GpAddAxis(ref XYhandle, X.handle);
             if (Result != (uint)ErrorCode.SUCCESS)
             {
@@ -555,77 +549,7 @@ namespace DicingBlade.Classes
                 default:
                     break;
             }
-        }
-        public async Task MoveAxisInPosAsync(Ax axis, double position)
-        {           
-            double accuracy = 0.001;
-            double backlash = 0;
-            ushort state = new ushort();           
-            double vel = 0.1;
-            bool gotIt;           
-            int sign = 0;
-            Axis ax = new Axis(0);
-
-            switch (axis)
-            {
-                case Ax.X:
-                    ax = X;
-                    break;
-                case Ax.Y:
-                    ax = Y;
-                    break;
-                case Ax.Z:
-                    ax = Z;
-                    break;
-                case Ax.U:
-                    ax = U;
-                    break;
-                default:
-                    break;
-            }
-            if (ax.lineCoefficient != 0)
-            {
-                await Task.Run(() =>
-                {
-                    for (int recurcy = 0; recurcy < 20; recurcy++)
-                    {
-                        if (recurcy == 0)
-                        {
-                            position = Math.Round(position, 3);
-                            Motion.mAcm_AxMoveAbs(ax.handle, position);
-                            while ((state != (uint)AxisState.STA_AX_READY))
-                            {
-                                Motion.mAcm_AxGetState(ax.handle, ref state);
-                            }
-                            Motion.mAcm_SetProperty(ax.handle, (uint)PropertyID.PAR_AxVelLow, ref vel, 8);
-                            Motion.mAcm_SetProperty(ax.handle, (uint)PropertyID.PAR_AxVelHigh, ref vel, 8);
-                        }
-                        Thread.Sleep(300);
-
-                        if (Math.Abs(Math.Round(ax.ActualPosition, 3) - position) <= accuracy) gotIt = true;
-                        else gotIt = false;
-                        sign = Math.Sign(position - Math.Round(ax.ActualPosition, 3));
-                        if (!gotIt)
-                        {
-                            Motion.mAcm_AxMoveRel(ax.handle, sign * (Math.Abs(position - Math.Round(ax.ActualPosition, 3)) + sign * backlash));
-                            while (!gotIt)
-                            {
-                                if (Math.Abs(Math.Round(ax.ActualPosition, 3) - position) <= accuracy)
-                                {
-                                    Motion.mAcm_AxStopEmg(m_Axishand[0]);
-                                    gotIt = true;
-                                }
-                                Motion.mAcm_AxGetState(ax.handle, ref state);
-                                if (state == (uint)AxisState.STA_AX_READY) break;
-                            }
-                        }
-                        if (gotIt) break;
-                    }
-                }
-                );
-            }
-            else Motion.mAcm_AxMoveAbs(ax.handle, position);
-        }
+        }       
         public async Task MoveInPosXYAsync(Vector2 position)
         {
             uint ElCount = 2;           
@@ -964,6 +888,7 @@ namespace DicingBlade.Classes
     {
         Fast,
         Slow,
+        Step,
         Service,
         Stop,
         Work
@@ -978,11 +903,12 @@ namespace DicingBlade.Classes
 
     class Axis
     {
-        public Axis(int lineCoefficient) 
+        public Axis(int lineCoefficient, IntPtr handle)
         {
             this.lineCoefficient = lineCoefficient;
+            this.handle = handle;
         }
-        public IntPtr handle;
+        public IntPtr handle { get; }
         public int lineCoefficient { get; }
         private double actualPosition;
         public bool LmtP { get; set; }
@@ -1000,6 +926,16 @@ namespace DicingBlade.Classes
         {
             return (DIs & 1 << (int)din) != 0 ? true : false;
         }
+        public bool GetDO(DO dout)
+        {
+            byte bit = 0;
+            Motion.mAcm_AxDoGetBit(handle, (ushort)dout, ref bit);
+            return bit != 0 ? true : false;
+        }
+        public bool SetDo(DO dout, byte val) 
+        {
+            return (Motion.mAcm_AxDoSetBit(handle, (ushort)dout, val) == (uint)ErrorCode.SUCCESS) ? true : false; 
+        }
         /// <summary>
         /// Установка скорости по оси
         /// </summary>
@@ -1010,6 +946,58 @@ namespace DicingBlade.Classes
             Motion.mAcm_SetProperty(handle, (uint)PropertyID.PAR_AxVelHigh, ref Vel, 8);
             Vel /= 3;
             Motion.mAcm_SetProperty(handle, (uint)PropertyID.PAR_AxVelLow, ref Vel, 8);
+        }
+        public async Task MoveAxisInPosAsync(double position)
+        {
+            double accuracy = 0.001;
+            double backlash = 0;
+            ushort state = new ushort();
+            double vel = 0.1;
+            bool gotIt;
+            int sign = 0;
+           
+            if (lineCoefficient != 0)
+            {
+                await Task.Run(() =>
+                {
+                    for (int recurcy = 0; recurcy < 20; recurcy++)
+                    {
+                        if (recurcy == 0)
+                        {
+                            position = Math.Round(position, 3);
+                            Motion.mAcm_AxMoveAbs(handle, position);
+                            while ((state != (uint)AxisState.STA_AX_READY))
+                            {
+                                Motion.mAcm_AxGetState(handle, ref state);
+                            }
+                            Motion.mAcm_SetProperty(handle, (uint)PropertyID.PAR_AxVelLow, ref vel, 8);
+                            Motion.mAcm_SetProperty(handle, (uint)PropertyID.PAR_AxVelHigh, ref vel, 8);
+                        }
+                        Thread.Sleep(300);
+
+                        if (Math.Abs(Math.Round(ActualPosition, 3) - position) <= accuracy) gotIt = true;
+                        else gotIt = false;
+                        sign = Math.Sign(position - Math.Round(ActualPosition, 3));
+                        if (!gotIt)
+                        {
+                            Motion.mAcm_AxMoveRel(handle, sign * (Math.Abs(position - Math.Round(ActualPosition, 3)) + sign * backlash));
+                            while (!gotIt)
+                            {
+                                if (Math.Abs(Math.Round(ActualPosition, 3) - position) <= accuracy)
+                                {
+                                    Motion.mAcm_AxStopEmg(handle);
+                                    gotIt = true;
+                                }
+                                Motion.mAcm_AxGetState(handle, ref state);
+                                if (state == (uint)AxisState.STA_AX_READY) break;
+                            }
+                        }
+                        if (gotIt) break;
+                    }
+                }
+                );
+            }
+            else Motion.mAcm_AxMoveAbs(handle, position);
         }
     }
 }

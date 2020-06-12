@@ -498,11 +498,14 @@
                                 <Style.Triggers>
                                     <DataTrigger Value="True">
                                         <DataTrigger.Binding>
+                                            <Binding Path="Machine.SwitchOnChuckVacuum"/>
+                                        </DataTrigger.Binding>
+                                        <!--<DataTrigger.Binding>
                                             <MultiBinding Converter="{StaticResource ConditionConvert}">
                                                 <Binding Path="Condition.Mask"/>
                                                 <Binding Source="{x:Static model:Signals.vacuumValve}"/>
                                             </MultiBinding>
-                                        </DataTrigger.Binding>
+                                        </DataTrigger.Binding>-->
                                         <Setter Property="BorderBrush" Value="{StaticResource SignalGreen}"/>
                                     </DataTrigger>
                                 </Style.Triggers>

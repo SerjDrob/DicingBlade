@@ -109,17 +109,17 @@ namespace DicingBlade.ViewModels
             if (key.Key == Key.Q)
             {
                 Condition.Mask ^= (1 << (int)Signals.vacuumValve);
-                //machine.SwitchOnChuckVacuum ^=true;
+                Machine.SwitchOnChuckVacuum ^=true;
             }
             if (key.Key == Key.W)
             {
                 Condition.Mask ^= (1 << (int)Signals.waterValve);
-                //machine.SwitchOnCoolantWater ^= true;
+                Machine.SwitchOnCoolantWater ^= true;
             }
             if (key.Key == Key.R)
             {
                 Condition.Mask ^= (1 << (int)Signals.blowValve);
-                //machine.SwitchOnBlowing ^= true;
+                Machine.SwitchOnBlowing ^= true;
             }
             if (key.Key == Key.D) WaferView.Angle += 0.2;
             if (key.Key == Key.S) WaferView.Angle -= 0.2;
@@ -150,7 +150,7 @@ namespace DicingBlade.ViewModels
                             Wafer.SetCurrentDirectionAngle = Machine.U.ActualPosition;
                             if (Wafer.NextDir()) 
                             {
-                                await Machine.MoveAxisInPosAsync(Ax.U, Wafer.GetCurrentDiretionAngle);
+                                await Machine.U.MoveAxisInPosAsync(Wafer.GetCurrentDiretionAngle);
                                 await process.ProcElementDispatcherAsync(Diagram.goCameraPointLearningXYZ); 
                             }
                             else 
@@ -188,6 +188,22 @@ namespace DicingBlade.ViewModels
             {
                 Machine.GoWhile(AxisDirections.XP);
             }
+            if (key.Key == Key.S)
+            {
+                Machine.GoWhile(AxisDirections.UP);
+            }
+            if (key.Key == Key.D)
+            {
+                Machine.GoWhile(AxisDirections.UN);
+            }
+            if (key.Key == Key.V)
+            {
+                Machine.GoWhile(AxisDirections.ZP);
+            }
+            if (key.Key == Key.B)
+            {
+                Machine.GoWhile(AxisDirections.ZN);
+            }
             if (key.Key == Key.J) { }
             if (key.Key == Key.K) { }
             if (key.Key == Key.L) { }
@@ -203,12 +219,25 @@ namespace DicingBlade.ViewModels
                     else
                     {
                         tempWafer2.point2 = new Vector2(Machine.X.ActualPosition, Machine.Y.ActualPosition);
-                        await Machine.MoveAxisInPosAsync(Ax.U, Machine.U.ActualPosition - tempWafer2.GetAngle());
+                        await Machine.U.MoveAxisInPosAsync(Machine.U.ActualPosition - tempWafer2.GetAngle());
                     }
                 }
             }
-            if (key.Key == Key.Subtract) { }
-            if (key.Key == Key.Add) { }
+            if (key.Key == Key.Subtract) 
+            {
+                Machine.VelocityRegime = Velocity.Step;
+            }
+            if (key.Key == Key.Add) 
+            {
+                if(Machine.VelocityRegime== Velocity.Slow) 
+                {
+                    Machine.VelocityRegime = Velocity.Fast;
+                }
+                else 
+                {
+                    Machine.VelocityRegime = Velocity.Slow;
+                }
+            }
             if (Keyboard.IsKeyDown(Key.RightCtrl) && Keyboard.IsKeyDown(Key.Oem6))//}
             {
                 throw new NotImplementedException();
@@ -221,22 +250,21 @@ namespace DicingBlade.ViewModels
         private void KeyUp(object args) 
         {
             KeyEventArgs key = (KeyEventArgs)args;
-            if (key.Key == Key.A)
+            if (key.Key == Key.A | key.Key == Key.Z)
             {
                 Machine.Stop(Ax.Y);
-                int i;
-            }
-            if (key.Key == Key.Z)
-            {
-                Machine.Stop(Ax.Y);
-            }
-            if (key.Key == Key.X)
+            }           
+            if (key.Key == Key.X | key.Key == Key.C)
             {
                 Machine.Stop(Ax.X);
             }
-            if (key.Key == Key.C)
+            if (key.Key == Key.S | key.Key == Key.D)
             {
-                Machine.Stop(Ax.X);
+                Machine.Stop(Ax.U);
+            }
+            if (key.Key == Key.V | key.Key == Key.B)
+            {
+                Machine.Stop(Ax.Z);
             }
         }
         private void WaferSettings() 
