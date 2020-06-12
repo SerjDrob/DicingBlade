@@ -224,6 +224,7 @@ namespace DicingBlade.ViewModels
             if (key.Key == Key.A)
             {
                 Machine.Stop(Ax.Y);
+                int i;
             }
             if (key.Key == Key.Z)
             {
