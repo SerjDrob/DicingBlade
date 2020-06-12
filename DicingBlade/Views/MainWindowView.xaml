@@ -26,6 +26,9 @@
         <i:EventTrigger EventName="KeyDown">
             <cmd:EventToCommand Command="{Binding KeyDownCmd, Mode=OneWay}" PassEventArgsToCommand="True"/>
         </i:EventTrigger>
+        <i:EventTrigger EventName="KeyUp">
+            <cmd:EventToCommand Command="{Binding KeyUpCmd, Mode=OneWay}" PassEventArgsToCommand="True"/>
+        </i:EventTrigger>
     </i:Interaction.Triggers>
     
     <Grid>        
@@ -553,8 +556,9 @@
             </StackPanel>
 
         </GroupBox>
-        <Canvas Grid.Column="{Binding Cols[1]}" Grid.RowSpan="{Binding Rows[1]}" Background="Black" Margin="3">
-            <Image Source="{Binding Machine.Bi}"/>
+        <Image Source="{Binding Machine.Bi, Mode=OneWay}" Grid.Column="{Binding Cols[1]}" Grid.RowSpan="{Binding Rows[1]}"/>
+        <Canvas Grid.Column="{Binding Cols[1]}" Grid.RowSpan="{Binding Rows[1]}" Margin="3">
+            
             <Line  Stroke="Red" StrokeThickness="1">
                 <Line.X1>
                     <MultiBinding Converter="{StaticResource CrossConverter}" ConverterParameter="0,3">                        

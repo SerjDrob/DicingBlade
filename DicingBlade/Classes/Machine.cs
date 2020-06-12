@@ -49,7 +49,16 @@ namespace DicingBlade.Classes
         UInt32 IOStatus = new UInt32();
         UInt32 Result;
         byte BitData = new byte();
-
+        private Velocity velocityRegime;
+        public Velocity VelocityRegime 
+        {
+            get { return velocityRegime; }
+            set 
+            {
+                velocityRegime = value;
+                SetVelocity(value);
+            }
+        }
 
         double position = new double();
         private IntPtr m_DeviceHandle = IntPtr.Zero;
@@ -129,31 +138,32 @@ namespace DicingBlade.Classes
         {
             switch (direction)
             {
-                case AxisDirections.XP: return (m_Axishand[0], 1);
-                case AxisDirections.XN: return (m_Axishand[1], 0);
-                case AxisDirections.YP: return (m_Axishand[2], 1);
-                case AxisDirections.YN: return (m_Axishand[3], 0);
-                case AxisDirections.ZP: return (m_Axishand[0], 1);
-                case AxisDirections.ZN: return (m_Axishand[1], 0);
-                case AxisDirections.UP: return (m_Axishand[2], 1);
-                case AxisDirections.UN: return (m_Axishand[3], 0);
+                case AxisDirections.XP: return (X.handle, 1);
+                case AxisDirections.XN: return (X.handle, 0);
+                case AxisDirections.YP: return (Y.handle, 1);
+                case AxisDirections.YN: return (Y.handle, 0);
+                case AxisDirections.ZP: return (Z.handle, 1);
+                case AxisDirections.ZN: return (Z.handle, 0);
+                case AxisDirections.UP: return (U.handle, 1);
+                case AxisDirections.UN: return (U.handle, 0);
                 default: return (new IntPtr(), 1);
             }
         }
         public Machine(bool test) // В конструкторе происходит инициализация всех устройств, загрузка параметров.
         {
             testRegime = test;
+            
             if (!testRegime)
             {
                 StartCamera();
                 DevicesConnection();
-                SetConfigs();
-                SetVelocity(Velocity.Slow);
+                SetConfigs();                
             }
             axes = new Axis[] { X, Y, Z, U };
             OnAirWanished += EMGScenario;           
             Thread threadCurrentState = new Thread(new ThreadStart(MachineState));
             threadCurrentState.Start();
+            VelocityRegime = Velocity.Fast;
         }
         #region Методы
 
@@ -503,11 +513,33 @@ namespace DicingBlade.Classes
             //----------------------------------------------------------
         }
 
-        public void GoWhile(AxisDirections direction, Velocity velocity)
+        public void Stop(Ax axis)
         {
-            if (velocity!=Velocity.Stop) Motion.mAcm_AxMoveVel(MoveRelParam(direction).Item1, MoveRelParam(direction).Item2);           
+            IntPtr handle;
+            switch (axis)
+            {
+                case Ax.X:
+                    handle = X.handle;
+                    break;
+                case Ax.Y:
+                    handle = Y.handle;
+                    break;
+                case Ax.Z:
+                    handle = Z.handle;
+                    break;
+                case Ax.U:
+                    handle = U.handle;
+                    break;
+                default:
+                    handle = new IntPtr();
+                    break;
+            }
+            Motion.mAcm_AxStopEmg(handle);
         }
-
+        public void GoWhile(AxisDirections direction)
+        {
+            Motion.mAcm_AxMoveVel(MoveRelParam(direction).Item1, MoveRelParam(direction).Item2);     
+        }
         public async Task GoThereAsync(Place place)
         {
             switch (place)
@@ -942,7 +974,6 @@ namespace DicingBlade.Classes
         Y,
         Z,
         U
-
     }
 
     class Axis

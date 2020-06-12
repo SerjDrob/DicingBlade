@@ -64,6 +64,7 @@ namespace DicingBlade.ViewModels
         public ICommand RotateCmd { get; set; }
         public ICommand ChangeCmd { get; set; }
         public ICommand KeyDownCmd { get; set; }
+        public ICommand KeyUpCmd { get; set; }
         public ICommand WaferSettingsCmd { get; set; }
         public ICommand MachineSettingsCmd { get; set; }
         public ICommand TechnologySettingsCmd { get; set; }
@@ -77,6 +78,7 @@ namespace DicingBlade.ViewModels
             //RotateCmd = new Command(args => Rotate());
             ChangeCmd = new Command(args => Change());
             KeyDownCmd = new Command(args => KeyDownAsync(args));
+            KeyUpCmd = new Command(args => KeyUp(args));
             WaferSettingsCmd = new Command(args => WaferSettings());
             MachineSettingsCmd = new Command(args => MachineSettings());
             TechnologySettingsCmd = new Command(args => TechnologySettings());
@@ -170,6 +172,22 @@ namespace DicingBlade.ViewModels
                 }
                 //StartWorkAsync();
             }
+            if (key.Key == Key.A) 
+            {
+                Machine.GoWhile(AxisDirections.YP);
+            }
+            if (key.Key == Key.Z) 
+            {
+                Machine.GoWhile(AxisDirections.YN);
+            }
+            if (key.Key == Key.X)
+            {
+                Machine.GoWhile(AxisDirections.XN);
+            }
+            if (key.Key == Key.C)
+            {
+                Machine.GoWhile(AxisDirections.XP);
+            }
             if (key.Key == Key.J) { }
             if (key.Key == Key.K) { }
             if (key.Key == Key.L) { }
@@ -200,7 +218,26 @@ namespace DicingBlade.ViewModels
                 throw new NotImplementedException();
             }
         }
-        
+        private void KeyUp(object args) 
+        {
+            KeyEventArgs key = (KeyEventArgs)args;
+            if (key.Key == Key.A)
+            {
+                Machine.Stop(Ax.Y);
+            }
+            if (key.Key == Key.Z)
+            {
+                Machine.Stop(Ax.Y);
+            }
+            if (key.Key == Key.X)
+            {
+                Machine.Stop(Ax.X);
+            }
+            if (key.Key == Key.C)
+            {
+                Machine.Stop(Ax.X);
+            }
+        }
         private void WaferSettings() 
         {            
             new DicingBlade.Views.WaferSettingsView()
