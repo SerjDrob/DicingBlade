@@ -4,11 +4,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-        xmlns:local="clr-namespace:DicingBlade.Classes"        
+        xmlns:local="clr-namespace:DicingBlade.Classes"  
+        xmlns:model="clr-namespace:DicingBlade.ViewModels"
         xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Platform"
-        xmlns:System="clr-namespace:System;assembly=mscorlib"
-        xmlns:model ="clr-namespace:DicingBlade.ViewModels"
+        xmlns:System="clr-namespace:System;assembly=mscorlib"        
         mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance model:MainViewModel,IsDesignTimeCreatable=True}"
         Background="Beige"
         Title="MainWindowView" Height="1024" Width="1280" WindowStartupLocation="CenterScreen">
     <Window.Resources>
@@ -345,6 +346,15 @@
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
+            <Line x:Name="LineX" Stroke="Red"
+                  Y1="0"
+                  Y2="{Binding ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}"
+                  X1="{Binding Machine.X.ActualPosition}"
+                  X2="{Binding X1, RelativeSource={RelativeSource Mode=Self}}"
+                  >
+                
+            </Line>
+            <Line x:Name="LineY"></Line>
         </Canvas>
         <GroupBox Grid.Row="2" VerticalAlignment="Top">
             <Grid>
@@ -360,13 +370,12 @@
                     <RowDefinition/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
-                <Label Content="X:"/>
-                <Label Content="Y:" Grid.Row="1"/>
-                <Label Content="Z:" Grid.Row="2"/>
-                <Label Content="Ф:" Grid.Row="3"/>
-                <Label Content="Lx:" Grid.Column="2"/>
-                <Label Content="Lz:" Grid.Row="2" Grid.Column="2"/>
-                <Label Content="{Binding Wafer.CurrentAngle}" Grid.Row="3" Grid.Column="1"/>
+                <Label Content="{Binding Machine.X.ActualPosition, StringFormat=X:{0}}"/>
+                <Label Content="{Binding Machine.Y.ActualPosition, StringFormat=Y:{0}}" Grid.Row="1"/>
+                <Label Content="{Binding Machine.Z.ActualPosition, StringFormat=Z:{0}}" Grid.Row="2"/>
+                <Label Content="{Binding Machine.U.ActualPosition, StringFormat=U:{0}}" Grid.Row="3"/>
+                <!--<Label Content="Lx:" Grid.Column="2"/>
+                <Label Content="Lz:" Grid.Row="2" Grid.Column="2"/>-->                
             </Grid>
         </GroupBox>
         <GroupBox Grid.Row="2" HorizontalAlignment="Left" VerticalAlignment="Bottom">
