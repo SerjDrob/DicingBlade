@@ -443,13 +443,10 @@
                             <Style TargetType="Border">
                                 <Setter Property="BorderBrush" Value="Transparent"/>
                                 <Style.Triggers>
-                                    <DataTrigger Value="True">
-                                        <DataTrigger.Binding>
-                                            <MultiBinding Converter="{StaticResource ConditionConvert}">
-                                                <Binding Path="Condition.Mask"/>
-                                                <Binding Source="{x:Static model:Signals.waterValve}"/>
-                                            </MultiBinding>
-                                        </DataTrigger.Binding>
+                                    <DataTrigger Value="True">                                        
+                                            <DataTrigger.Binding>
+                                                <Binding Path="Machine.SwitchOnCoolantWater"/>
+                                            </DataTrigger.Binding>                                        
                                         <Setter Property="BorderBrush" Value="{StaticResource SignalGreen}"/>
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -508,13 +505,7 @@
                                     <DataTrigger Value="True">
                                         <DataTrigger.Binding>
                                             <Binding Path="Machine.SwitchOnChuckVacuum"/>
-                                        </DataTrigger.Binding>
-                                        <!--<DataTrigger.Binding>
-                                            <MultiBinding Converter="{StaticResource ConditionConvert}">
-                                                <Binding Path="Condition.Mask"/>
-                                                <Binding Source="{x:Static model:Signals.vacuumValve}"/>
-                                            </MultiBinding>
-                                        </DataTrigger.Binding>-->
+                                        </DataTrigger.Binding>                                        
                                         <Setter Property="BorderBrush" Value="{StaticResource SignalGreen}"/>
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -549,10 +540,7 @@
                                 <Style.Triggers>
                                     <DataTrigger Value="True">
                                         <DataTrigger.Binding>
-                                            <MultiBinding Converter="{StaticResource ConditionConvert}">
-                                                <Binding Path="Condition.Mask"/>
-                                                <Binding Source="{x:Static model:Signals.blowValve}"/>
-                                            </MultiBinding>
+                                            <Binding Path="Machine.SwitchOnBlowing"/>                                            
                                         </DataTrigger.Binding>
                                         <Setter Property="BorderBrush" Value="{StaticResource SignalGreen}"/>
                                     </DataTrigger>

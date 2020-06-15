@@ -108,17 +108,17 @@ namespace DicingBlade.ViewModels
             
             if (key.Key == Key.Q)
             {
-                Condition.Mask ^= (1 << (int)Signals.vacuumValve);
+                //Condition.Mask ^= (1 << (int)Signals.vacuumValve);
                 Machine.SwitchOnChuckVacuum ^=true;
             }
             if (key.Key == Key.W)
             {
-                Condition.Mask ^= (1 << (int)Signals.waterValve);
+                //Condition.Mask ^= (1 << (int)Signals.waterValve);
                 Machine.SwitchOnCoolantWater ^= true;
             }
             if (key.Key == Key.R)
             {
-                Condition.Mask ^= (1 << (int)Signals.blowValve);
+                //Condition.Mask ^= (1 << (int)Signals.blowValve);
                 Machine.SwitchOnBlowing ^= true;
             }
             if (key.Key == Key.D) WaferView.Angle += 0.2;
