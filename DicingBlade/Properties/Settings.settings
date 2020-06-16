@@ -3,73 +3,73 @@
   <Profiles />
   <Settings>
     <Setting Name="XVelLow" Type="System.UInt32" Scope="User">
-      <Value Profile="(Default)">20</Value>
+      <Value Profile="(Default)">10</Value>
     </Setting>
     <Setting Name="XVelHigh" Type="System.UInt32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">30</Value>
     </Setting>
     <Setting Name="XAcc" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">180</Value>
     </Setting>
     <Setting Name="XDec" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">180</Value>
     </Setting>
     <Setting Name="XPPU" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">6400</Value>
     </Setting>
     <Setting Name="XJerk" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="YVelHigh" Type="System.UInt32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">30</Value>
     </Setting>
     <Setting Name="YAcc" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">180</Value>
     </Setting>
     <Setting Name="YDec" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">180</Value>
     </Setting>
     <Setting Name="YPPU" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">6400</Value>
     </Setting>
     <Setting Name="YJerk" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="ZVelLow" Type="System.UInt32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="ZVelHigh" Type="System.UInt32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">3</Value>
     </Setting>
     <Setting Name="ZAcc" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">180</Value>
     </Setting>
     <Setting Name="ZDec" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">180</Value>
     </Setting>
     <Setting Name="ZPPU" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">4000</Value>
+      <Value Profile="(Default)">6400</Value>
     </Setting>
     <Setting Name="ZJerk" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="UVelLow" Type="System.UInt32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="UVelHigh" Type="System.UInt32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">3</Value>
     </Setting>
     <Setting Name="UAcc" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">180</Value>
     </Setting>
     <Setting Name="UDec" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">180</Value>
     </Setting>
     <Setting Name="UPPU" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">6400</Value>
     </Setting>
     <Setting Name="UJerk" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="XVelService" Type="System.UInt32" Scope="User">
       <Value Profile="(Default)">0</Value>
@@ -84,7 +84,7 @@
       <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="YVelLow" Type="System.UInt32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">10</Value>
     </Setting>
     <Setting Name="XObjective" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0</Value>

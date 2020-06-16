@@ -25,7 +25,7 @@ namespace DicingBlade.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("20")]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
         public uint XVelLow {
             get {
                 return ((uint)(this["XVelLow"]));
@@ -37,7 +37,7 @@ namespace DicingBlade.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("30")]
         public uint XVelHigh {
             get {
                 return ((uint)(this["XVelHigh"]));
@@ -49,7 +49,7 @@ namespace DicingBlade.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("180")]
         public double XAcc {
             get {
                 return ((double)(this["XAcc"]));
@@ -61,7 +61,7 @@ namespace DicingBlade.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("180")]
         public double XDec {
             get {
                 return ((double)(this["XDec"]));
@@ -73,7 +73,7 @@ namespace DicingBlade.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("6400")]
         public int XPPU {
             get {
                 return ((int)(this["XPPU"]));
@@ -85,7 +85,7 @@ namespace DicingBlade.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
         public int XJerk {
             get {
                 return ((int)(this["XJerk"]));
@@ -97,7 +97,7 @@ namespace DicingBlade.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("30")]
         public uint YVelHigh {
             get {
                 return ((uint)(this["YVelHigh"]));
@@ -109,7 +109,7 @@ namespace DicingBlade.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("180")]
         public double YAcc {
             get {
                 return ((double)(this["YAcc"]));
@@ -121,7 +121,7 @@ namespace DicingBlade.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("180")]
         public double YDec {
             get {
                 return ((double)(this["YDec"]));
@@ -133,7 +133,7 @@ namespace DicingBlade.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("6400")]
         public int YPPU {
             get {
                 return ((int)(this["YPPU"]));
@@ -145,7 +145,7 @@ namespace DicingBlade.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
         public int YJerk {
             get {
                 return ((int)(this["YJerk"]));
@@ -157,7 +157,7 @@ namespace DicingBlade.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
         public uint ZVelLow {
             get {
                 return ((uint)(this["ZVelLow"]));
@@ -169,7 +169,7 @@ namespace DicingBlade.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("3")]
         public uint ZVelHigh {
             get {
                 return ((uint)(this["ZVelHigh"]));
@@ -181,7 +181,7 @@ namespace DicingBlade.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("180")]
         public double ZAcc {
             get {
                 return ((double)(this["ZAcc"]));
@@ -193,7 +193,7 @@ namespace DicingBlade.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("180")]
         public double ZDec {
             get {
                 return ((double)(this["ZDec"]));
@@ -205,7 +205,7 @@ namespace DicingBlade.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("4000")]
+        [global::System.Configuration.DefaultSettingValueAttribute("6400")]
         public int ZPPU {
             get {
                 return ((int)(this["ZPPU"]));
@@ -217,7 +217,7 @@ namespace DicingBlade.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
         public int ZJerk {
             get {
                 return ((int)(this["ZJerk"]));
@@ -229,7 +229,7 @@ namespace DicingBlade.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
         public uint UVelLow {
             get {
                 return ((uint)(this["UVelLow"]));
@@ -241,7 +241,7 @@ namespace DicingBlade.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("3")]
         public uint UVelHigh {
             get {
                 return ((uint)(this["UVelHigh"]));
@@ -253,7 +253,7 @@ namespace DicingBlade.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("180")]
         public double UAcc {
             get {
                 return ((double)(this["UAcc"]));
@@ -265,7 +265,7 @@ namespace DicingBlade.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("180")]
         public double UDec {
             get {
                 return ((double)(this["UDec"]));
@@ -277,7 +277,7 @@ namespace DicingBlade.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("6400")]
         public int UPPU {
             get {
                 return ((int)(this["UPPU"]));
@@ -289,7 +289,7 @@ namespace DicingBlade.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
         public int UJerk {
             get {
                 return ((int)(this["UJerk"]));
@@ -349,7 +349,7 @@ namespace DicingBlade.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
         public uint YVelLow {
             get {
                 return ((uint)(this["YVelLow"]));

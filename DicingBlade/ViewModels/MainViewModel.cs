@@ -121,8 +121,8 @@ namespace DicingBlade.ViewModels
                 //Condition.Mask ^= (1 << (int)Signals.blowValve);
                 Machine.SwitchOnBlowing ^= true;
             }
-            if (key.Key == Key.D) WaferView.Angle += 0.2;
-            if (key.Key == Key.S) WaferView.Angle -= 0.2;
+            //if (key.Key == Key.D) WaferView.Angle += 0.2;
+            //if (key.Key == Key.S) WaferView.Angle -= 0.2;
             if (key.Key == Key.F2) OpenFile();
             if (key.Key == Key.T) Change();
             if (key.Key == Key.Divide)
