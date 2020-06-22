@@ -338,8 +338,8 @@ namespace DicingBlade.Classes
             
             m_bInit = true;
                         
-            X = new Axis(6400, m_Axishand[0]);
-            Y = new Axis(6400, m_Axishand[1]);
+            X = new Axis(6.4, m_Axishand[0]);
+            Y = new Axis(6.4, m_Axishand[1]);
             Z = new Axis(0, m_Axishand[2]);
             U = new Axis(0, m_Axishand[3]);
             Result = Motion.mAcm_GpAddAxis(ref XYhandle, X.Handle);
@@ -942,13 +942,13 @@ namespace DicingBlade.Classes
     [AddINotifyPropertyChangedInterface]
     class Axis
     {
-        public Axis(int lineCoefficient, IntPtr handle)
+        public Axis(double lineCoefficient, IntPtr handle)
         {
             this.LineCoefficient = lineCoefficient;
             this.Handle = handle;
         }
         public IntPtr Handle { get; }
-        public int LineCoefficient { get; }
+        public double LineCoefficient { get; }
         private double actualPosition;
         public bool LmtP { get; set; }
         public bool LmtN { get; set; }

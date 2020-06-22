@@ -83,6 +83,7 @@ namespace DicingBlade.ViewModels
             MachineSettingsCmd = new Command(args => MachineSettings());
             TechnologySettingsCmd = new Command(args => TechnologySettings());
             Machine = new Machine(false);
+            Machine.BladeChuckCenter = new Vector2(10, 10);
             BaseProcess = new Diagram[] {
                 Diagram.goNextCutXY,
                 Diagram.goWaferStartX,
