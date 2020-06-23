@@ -20,6 +20,7 @@
         <local:ConditionConverter x:Key="ConditionConvert"/>
         <local:VisibilityConverter x:Key="VisConvert"/>
         <local:CrossPositionConverter x:Key="CrossConverter"/>
+        <local:ToPointConverter x:Key="ToPointConvert"/>
         <SolidColorBrush Color="MediumSpringGreen" x:Key="SignalGreen"/>
         <SolidColorBrush Color="IndianRed" x:Key="SignalRed"/>
     </Window.Resources>    
@@ -346,6 +347,62 @@
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
+            <Path StrokeThickness="1" Stroke="Green">
+                <Path.Data>
+                    <GeometryGroup>
+                        <LineGeometry>
+                            <LineGeometry.StartPoint>
+                                <MultiBinding Converter="{StaticResource ToPointConvert}">
+                                    <Binding Path="Machine.X.ActualPosition" FallbackValue="0"/>
+                                    <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Canvas}"/>
+                                </MultiBinding>
+                            </LineGeometry.StartPoint>
+                            <LineGeometry.EndPoint>
+                                <MultiBinding Converter="{StaticResource ToPointConvert}">
+                                    <Binding Path="Machine.X.ActualPosition" FallbackValue="0"/>
+                                    <Binding Path="" FallbackValue="0"/>
+                                </MultiBinding>
+                            </LineGeometry.EndPoint>
+                        </LineGeometry>
+                        <LineGeometry>
+                            <LineGeometry.StartPoint>
+                                <MultiBinding Converter="{StaticResource ToPointConvert}">
+                                    <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Canvas}"/>
+                                    <Binding Path="Machine.Y.ActualPosition" FallbackValue="0"/>                                    
+                                </MultiBinding>
+                            </LineGeometry.StartPoint>
+                            <LineGeometry.EndPoint>
+                                <MultiBinding Converter="{StaticResource ToPointConvert}">
+                                    <Binding Path="" FallbackValue="0"/>
+                                    <Binding Path="Machine.Y.ActualPosition" FallbackValue="0"/>                                    
+                                </MultiBinding>
+                            </LineGeometry.EndPoint>
+                        </LineGeometry>
+                    </GeometryGroup>
+                </Path.Data>
+                <Path.RenderTransform>
+                    <TransformGroup>
+                        <TranslateTransform X="{Binding Machine.BladeChuckCenter.X}"/>
+                        <ScaleTransform>
+                            <ScaleTransform.ScaleX>
+                                <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
+                                    <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType=Canvas}"/>
+                                    <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType=Canvas}"/>
+                                    <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                    <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                </MultiBinding>
+                            </ScaleTransform.ScaleX>
+                        </ScaleTransform>
+                        <TranslateTransform>
+                            <TranslateTransform.X>
+                                <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
+                                    <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}"/>
+                                </MultiBinding>
+                            </TranslateTransform.X>
+                        </TranslateTransform>
+                    </TransformGroup>
+                </Path.RenderTransform>
+            </Path>
             <Line x:Name="LineX" Stroke="Red" Panel.ZIndex="3"
                   Y1="0"
                   Y2="{Binding ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}"
