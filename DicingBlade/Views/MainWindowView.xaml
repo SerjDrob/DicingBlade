@@ -23,6 +23,7 @@
         <local:ToPointConverter x:Key="ToPointConvert"/>
         <SolidColorBrush Color="MediumSpringGreen" x:Key="SignalGreen"/>
         <SolidColorBrush Color="IndianRed" x:Key="SignalRed"/>
+        <System:Double x:Key="Zero">0</System:Double>
     </Window.Resources>    
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="KeyDown">
@@ -347,34 +348,29 @@
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-            <Path StrokeThickness="1" Stroke="Green">
+            <Path Stroke="Green" StrokeThickness="10">
                 <Path.Data>
                     <GeometryGroup>
+                        <!--<EllipseGeometry x:Name="CameraCenter" RadiusX="10" RadiusY="10">
+                            <EllipseGeometry.Center>
+                                <MultiBinding Converter="{StaticResource ToPointConvert}">
+                                    <Binding Path="Machine.X.ActualPosition"/>
+                                    <Binding Path="Machine.Y.ActualPosition"/>
+                                </MultiBinding>
+                            </EllipseGeometry.Center>                            
+                        </EllipseGeometry>-->
                         <LineGeometry>
                             <LineGeometry.StartPoint>
                                 <MultiBinding Converter="{StaticResource ToPointConvert}">
-                                    <Binding Path="Machine.X.ActualPosition" FallbackValue="0"/>
-                                    <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Canvas}"/>
+                                    <Binding Source="{StaticResource Zero}"/>
+                                    <Binding Path="Machine.Y.ActualPosition"/>
                                 </MultiBinding>
                             </LineGeometry.StartPoint>
                             <LineGeometry.EndPoint>
-                                <MultiBinding Converter="{StaticResource ToPointConvert}">
-                                    <Binding Path="Machine.X.ActualPosition" FallbackValue="0"/>
-                                    <Binding Path="" FallbackValue="0"/>
-                                </MultiBinding>
-                            </LineGeometry.EndPoint>
-                        </LineGeometry>
-                        <LineGeometry>
-                            <LineGeometry.StartPoint>
+
                                 <MultiBinding Converter="{StaticResource ToPointConvert}">
                                     <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Canvas}"/>
-                                    <Binding Path="Machine.Y.ActualPosition" FallbackValue="0"/>                                    
-                                </MultiBinding>
-                            </LineGeometry.StartPoint>
-                            <LineGeometry.EndPoint>
-                                <MultiBinding Converter="{StaticResource ToPointConvert}">
-                                    <Binding Path="" FallbackValue="0"/>
-                                    <Binding Path="Machine.Y.ActualPosition" FallbackValue="0"/>                                    
+                                    <Binding Path="Machine.Y.ActualPosition"/>
                                 </MultiBinding>
                             </LineGeometry.EndPoint>
                         </LineGeometry>
@@ -399,11 +395,49 @@
                                     <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}"/>
                                 </MultiBinding>
                             </TranslateTransform.X>
+                            <TranslateTransform.Y>
+                                <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
+                                    <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}"/>
+                                </MultiBinding>
+                            </TranslateTransform.Y>
                         </TranslateTransform>
                     </TransformGroup>
                 </Path.RenderTransform>
             </Path>
-            <Line x:Name="LineX" Stroke="Red" Panel.ZIndex="3"
+            <!--<Path Stroke="Green" StrokeThickness="0.5">
+                <Path.Data>
+                    <LineGeometry>
+                        <LineGeometry.StartPoint>                            
+                            <MultiBinding Converter="{StaticResource ToPointConvert}">
+                                <Binding Source="{StaticResource Zero}"/>
+                                <Binding ElementName="CameraCenter" Path="Center.Y"/>
+                            </MultiBinding>
+                        </LineGeometry.StartPoint>
+                        <LineGeometry.EndPoint>
+                            
+                            <MultiBinding Converter="{StaticResource ToPointConvert}">
+                                <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Canvas}"/>
+                                <Binding ElementName=" "/>
+                            </MultiBinding>
+                        </LineGeometry.EndPoint>
+                    </LineGeometry>
+                </Path.Data>
+            </Path>-->
+            <!--<Line Stroke="Green" StrokeThickness="0.5"
+                Y1="{Binding ElementName=CameraCenter, Path=Center.Y}"
+                Y2="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Y1}"
+                X1="{StaticResource Zero}"
+                X2="{Binding RelativeSource={RelativeSource AncestorLevel=1,AncestorType=Canvas, Mode=FindAncestor}, Path=ActualWidth}"
+                />
+            <Line Stroke="Green" StrokeThickness="0.5"
+                X1="{Binding ElementName=CameraCenter, Path=Center.X}"
+                X2="{Binding RelativeSource={RelativeSource Mode=Self}, Path=X1}"
+                Y1="{StaticResource Zero}"
+                Y2="{Binding RelativeSource={RelativeSource AncestorLevel=1,AncestorType=Canvas, Mode=FindAncestor}, Path=ActualHeight}"
+                />-->
+
+
+            <!--<Line x:Name="LineX" Stroke="Red" Panel.ZIndex="3"
                   Y1="0"
                   Y2="{Binding ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}"
                   X1="{Binding Machine.X.ActualPosition}"
@@ -441,8 +475,8 @@
                     </TransformGroup>
                 </Line.RenderTransform>
 
-            </Line>
-            <Line x:Name="LineY" Stroke="Red" Panel.ZIndex="3"
+            </Line>-->
+            <!--<Line x:Name="LineY" Stroke="Red" Panel.ZIndex="3"
                   X1="0"
                   X2="{Binding ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}"
                   Y1="{Binding Machine.Y.ActualPosition}"
@@ -480,7 +514,7 @@
                     </TransformGroup>
                 </Line.RenderTransform>
 
-            </Line>
+            </Line>-->
         </Canvas>
         <GroupBox Grid.Row="2" VerticalAlignment="Top">
             <Grid>
