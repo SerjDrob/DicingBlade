@@ -156,6 +156,7 @@
     <Compile Include="Classes\Blade.cs" />
     <Compile Include="Classes\Command.cs" />
     <Compile Include="Classes\CrossPositionConverter.cs" />
+    <Compile Include="Classes\CursorToPathConverter.cs" />
     <Compile Include="Classes\PropContainer.cs" />
     <Compile Include="Classes\ConditionConverter.cs" />
     <Compile Include="Classes\Grid.cs" />

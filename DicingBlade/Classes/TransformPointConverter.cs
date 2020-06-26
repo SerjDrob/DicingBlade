@@ -26,7 +26,7 @@ namespace DicingBlade.Classes
             TranslateTransform translateTransform1;
             TranslateTransform translateTransform2;
             ScaleTransform scaleTransform;
-           
+            LineGeometry lineGeometry = new LineGeometry();
 
             double wh = 0;
             double res = 1;
@@ -53,7 +53,7 @@ namespace DicingBlade.Classes
             }
             catch { }
 
-            Point point = new Point(x, y);
+            //Point point = new Point(x, y);
             switch (selector)
             {
                 case 1:
@@ -72,7 +72,7 @@ namespace DicingBlade.Classes
                     scaleTransform = new ScaleTransform(1, 1);
                     break;
             }
-            return translateTransform2.Transform(scaleTransform.Transform(translateTransform1.Transform(point)));
+            return translateTransform2.Transform(scaleTransform.Transform(translateTransform1.Transform(new Point(x, y))));
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

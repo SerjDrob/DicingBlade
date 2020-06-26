@@ -22,6 +22,7 @@
         <local:CrossPositionConverter x:Key="CrossConverter"/>
         <local:ToPointConverter x:Key="ToPointConvert"/>
         <local:TransformPointConverter x:Key="TransformPoint"/>
+        <local:CursorToPathConverter x:Key="GetCursor"/>
         <SolidColorBrush Color="MediumSpringGreen" x:Key="SignalGreen"/>
         <SolidColorBrush Color="IndianRed" x:Key="SignalRed"/>
         <System:Double x:Key="Zero">0</System:Double>
@@ -78,279 +79,298 @@
         </GroupBox>
         <Border Grid.RowSpan="2" BorderBrush="LightGray" BorderThickness="3"/>
         <Border Grid.Column="1" BorderBrush="LightGray" BorderThickness="3"/>
-        <Canvas Grid.Column="{Binding Cols[0]}" Grid.RowSpan="{Binding Rows[0]}" Background="White" Margin="3">
-            <Ellipse Fill="AliceBlue" Panel.ZIndex="1">
-                <Ellipse.Visibility>
-                    <Binding Path="WaferView.IsRound" Converter="{StaticResource VisConvert}" ConverterParameter="round"/>
-                </Ellipse.Visibility>
-                <Ellipse.Width>
-                    <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType={x:Type Window}}" FallbackValue="0"/>
-                </Ellipse.Width>
-                <Ellipse.Height>
-                    <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" FallbackValue="0"/>
-                </Ellipse.Height>
-                <Ellipse.RenderTransform>
-                    <TransformGroup>
-                        <TranslateTransform>
-                            <TranslateTransform.X>
-                                <MultiBinding Converter="{StaticResource TranslateConverterSchemeInverse}">
-                                    <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType={x:Type Window}}" FallbackValue="0"/>
-                                </MultiBinding>
-                            </TranslateTransform.X>
-                            <TranslateTransform.Y>
-                                <MultiBinding Converter="{StaticResource TranslateConverterSchemeInverse}">
-                                    <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType={x:Type Window}}" FallbackValue="0"/>
-                                </MultiBinding>
-                            </TranslateTransform.Y>
-                        </TranslateTransform>
-                        <RotateTransform>
-                            <RotateTransform.Angle>
-                                <Binding Path="DataContext.WaferView.Angle" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
-                            </RotateTransform.Angle>
-                        </RotateTransform>
-                        <ScaleTransform>
-                            <ScaleTransform.ScaleX>
-                                <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
-                                    <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType=Canvas}"/>
-                                    <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType=Canvas}"/>
-                                    <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
-                                    <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
-                                </MultiBinding>
-                            </ScaleTransform.ScaleX>
-                            <ScaleTransform.ScaleY>
-                                <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
-                                    <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}"/>
-                                    <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}"/>
-                                    <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
-                                    <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
-                                </MultiBinding>
-                            </ScaleTransform.ScaleY>
-                        </ScaleTransform>
-                        <TranslateTransform>
-                            <TranslateTransform.X>
-                                <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
-                                    <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}"/>
-                                </MultiBinding>
-                            </TranslateTransform.X>
-                            <TranslateTransform.Y>
-                                <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
-                                    <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}"/>
-                                </MultiBinding>
-                            </TranslateTransform.Y>
-                        </TranslateTransform>
-                    </TransformGroup>
-                </Ellipse.RenderTransform>
-            </Ellipse>
-            <Rectangle Fill="AliceBlue" Panel.ZIndex="1">
-                <Rectangle.Visibility>
-                    <Binding Path="WaferView.IsRound" Converter="{StaticResource VisConvert}" ConverterParameter="square"/>
-                </Rectangle.Visibility>
-                <Rectangle.Width>
-                    <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType={x:Type Window}}" FallbackValue="0"/>
-                </Rectangle.Width>
-                <Rectangle.Height>
-                    <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" FallbackValue="0"/>
-                </Rectangle.Height>               
-                <Rectangle.RenderTransform>
-                    <TransformGroup>
-                        <TranslateTransform>
-                            <TranslateTransform.X>
-                                <MultiBinding Converter="{StaticResource TranslateConverterSchemeInverse}">
-                                    <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType={x:Type Window}}" FallbackValue="0"/>
-                                </MultiBinding>
-                            </TranslateTransform.X>
-                            <TranslateTransform.Y>
-                                <MultiBinding Converter="{StaticResource TranslateConverterSchemeInverse}">
-                                    <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType={x:Type Window}}" FallbackValue="0"/>
-                                </MultiBinding>
-                            </TranslateTransform.Y>
-                        </TranslateTransform>
-                        <RotateTransform>
-                            <RotateTransform.Angle>
-                                <Binding Path="DataContext.WaferView.Angle" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
-                            </RotateTransform.Angle>
-                        </RotateTransform>
-                        <ScaleTransform>
-                            <ScaleTransform.ScaleX>
-                                <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
-                                    <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType=Canvas}"/>
-                                    <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType=Canvas}"/>
-                                    <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
-                                    <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
-                                </MultiBinding>
-                            </ScaleTransform.ScaleX>
-                            <ScaleTransform.ScaleY>
-                                <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
-                                    <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}"/>
-                                    <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}"/>
-                                    <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
-                                    <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
-                                </MultiBinding>
-                            </ScaleTransform.ScaleY>
-                        </ScaleTransform>
-                        <TranslateTransform>
-                            <TranslateTransform.X>
-                                <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
-                                    <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}"/>
-                                </MultiBinding>
-                            </TranslateTransform.X>
-                            <TranslateTransform.Y>
-                                <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
-                                    <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}"/>
-                                </MultiBinding>
-                            </TranslateTransform.Y>
-                        </TranslateTransform>                        
-                    </TransformGroup>                
-                </Rectangle.RenderTransform>                       
-            </Rectangle>
-            <ItemsControl ItemsSource="{Binding WaferView.RawLines}" Panel.ZIndex="2">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Canvas>
-                            <Line X1="{Binding StartPoint.X}"
+        <DockPanel Grid.Column="{Binding Cols[0]}" Grid.RowSpan="{Binding Rows[0]}">
+            <WrapPanel DockPanel.Dock="Top">
+                <CheckBox x:Name="ChuckCursor"/>
+                <CheckBox>
+                    <CheckBox.Triggers>
+                        <!--<DataTrigger Property="IsChecked" Value="True">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility">
+                                            <DiscreteObjectKeyFrame Value="{x:Static Visibility.Collapsed}"/>
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                        </DataTrigger>-->
+                    </CheckBox.Triggers>
+                </CheckBox>
+            </WrapPanel>
+            <Canvas ClipToBounds="True"  Background="White" Margin="3" VerticalAlignment="Stretch">
+                <Ellipse Fill="AliceBlue" Panel.ZIndex="1">
+                    <Ellipse.Visibility>
+                        <Binding Path="WaferView.IsRound" Converter="{StaticResource VisConvert}" ConverterParameter="round"/>
+                    </Ellipse.Visibility>
+                    <Ellipse.Width>
+                        <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType={x:Type Window}}" FallbackValue="0"/>
+                    </Ellipse.Width>
+                    <Ellipse.Height>
+                        <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" FallbackValue="0"/>
+                    </Ellipse.Height>
+                    <Ellipse.RenderTransform>
+                        <TransformGroup>
+                            <TranslateTransform>
+                                <TranslateTransform.X>
+                                    <MultiBinding Converter="{StaticResource TranslateConverterSchemeInverse}">
+                                        <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType={x:Type Window}}" FallbackValue="0"/>
+                                    </MultiBinding>
+                                </TranslateTransform.X>
+                                <TranslateTransform.Y>
+                                    <MultiBinding Converter="{StaticResource TranslateConverterSchemeInverse}">
+                                        <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType={x:Type Window}}" FallbackValue="0"/>
+                                    </MultiBinding>
+                                </TranslateTransform.Y>
+                            </TranslateTransform>
+                            <RotateTransform>
+                                <RotateTransform.Angle>
+                                    <Binding Path="DataContext.WaferView.Angle" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                </RotateTransform.Angle>
+                            </RotateTransform>
+                            <ScaleTransform>
+                                <ScaleTransform.ScaleX>
+                                    <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
+                                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType=Canvas}"/>
+                                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType=Canvas}"/>
+                                        <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                        <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                    </MultiBinding>
+                                </ScaleTransform.ScaleX>
+                                <ScaleTransform.ScaleY>
+                                    <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
+                                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}"/>
+                                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}"/>
+                                        <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                        <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                    </MultiBinding>
+                                </ScaleTransform.ScaleY>
+                            </ScaleTransform>
+                            <TranslateTransform>
+                                <TranslateTransform.X>
+                                    <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
+                                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}"/>
+                                    </MultiBinding>
+                                </TranslateTransform.X>
+                                <TranslateTransform.Y>
+                                    <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
+                                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}"/>
+                                    </MultiBinding>
+                                </TranslateTransform.Y>
+                            </TranslateTransform>
+                        </TransformGroup>
+                    </Ellipse.RenderTransform>
+                </Ellipse>
+                <Rectangle Fill="AliceBlue" Panel.ZIndex="1">
+                    <Rectangle.Visibility>
+                        <Binding Path="WaferView.IsRound" Converter="{StaticResource VisConvert}" ConverterParameter="square"/>
+                    </Rectangle.Visibility>
+                    <Rectangle.Width>
+                        <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType={x:Type Window}}" FallbackValue="0"/>
+                    </Rectangle.Width>
+                    <Rectangle.Height>
+                        <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" FallbackValue="0"/>
+                    </Rectangle.Height>
+                    <Rectangle.RenderTransform>
+                        <TransformGroup>
+                            <TranslateTransform>
+                                <TranslateTransform.X>
+                                    <MultiBinding Converter="{StaticResource TranslateConverterSchemeInverse}">
+                                        <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType={x:Type Window}}" FallbackValue="0"/>
+                                    </MultiBinding>
+                                </TranslateTransform.X>
+                                <TranslateTransform.Y>
+                                    <MultiBinding Converter="{StaticResource TranslateConverterSchemeInverse}">
+                                        <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType={x:Type Window}}" FallbackValue="0"/>
+                                    </MultiBinding>
+                                </TranslateTransform.Y>
+                            </TranslateTransform>
+                            <RotateTransform>
+                                <RotateTransform.Angle>
+                                    <Binding Path="DataContext.WaferView.Angle" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                </RotateTransform.Angle>
+                            </RotateTransform>
+                            <ScaleTransform>
+                                <ScaleTransform.ScaleX>
+                                    <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
+                                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType=Canvas}"/>
+                                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType=Canvas}"/>
+                                        <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                        <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                    </MultiBinding>
+                                </ScaleTransform.ScaleX>
+                                <ScaleTransform.ScaleY>
+                                    <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
+                                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}"/>
+                                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}"/>
+                                        <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                        <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                    </MultiBinding>
+                                </ScaleTransform.ScaleY>
+                            </ScaleTransform>
+                            <TranslateTransform>
+                                <TranslateTransform.X>
+                                    <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
+                                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}"/>
+                                    </MultiBinding>
+                                </TranslateTransform.X>
+                                <TranslateTransform.Y>
+                                    <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
+                                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}"/>
+                                    </MultiBinding>
+                                </TranslateTransform.Y>
+                            </TranslateTransform>
+                        </TransformGroup>
+                    </Rectangle.RenderTransform>
+                </Rectangle>
+                <ItemsControl ItemsSource="{Binding WaferView.RawLines}" Panel.ZIndex="2">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Canvas>
+                                <Line X1="{Binding StartPoint.X}"
                                               X2="{Binding EndPoint.X}"
                                               Y1="{Binding StartPoint.Y}"
                                               Y2="{Binding EndPoint.Y}"
                                               Stroke="Black"                                                                                            
                                               UseLayoutRounding="True"                                                
-                                              >                                
-                                <Line.StrokeThickness>
-                                    <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
-                                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=2,AncestorType=Canvas}"/>
-                                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=2,AncestorType=Canvas}"/>
-                                        <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
-                                        <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
-                                        <Binding Path="DataContext.Thickness" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
-                                    </MultiBinding>
-                                </Line.StrokeThickness>
-                                <Line.RenderTransform>
-                                    <TransformGroup>
-                                        <RotateTransform>
-                                            <RotateTransform.Angle>
-                                                <Binding Path="DataContext.WaferView.Angle" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType={x:Type Window}}"/>
-                                            </RotateTransform.Angle>
-                                        </RotateTransform>
-                                        <ScaleTransform>
-                                            <ScaleTransform.ScaleX>
-                                                <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
-                                                    <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=2,AncestorType=Canvas}"/>
-                                                    <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=2,AncestorType=Canvas}"/>
-                                                    <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
-                                                    <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
-                                                </MultiBinding>
-                                            </ScaleTransform.ScaleX>
-                                            <ScaleTransform.ScaleY>
-                                                <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
-                                                    <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=2, AncestorType=Canvas}"/>
-                                                    <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=2, AncestorType=Canvas}"/>
-                                                    <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
-                                                    <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
-                                                </MultiBinding>
-                                            </ScaleTransform.ScaleY>
-                                        </ScaleTransform>
+                                              >
+                                    <Line.StrokeThickness>
+                                        <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
+                                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=2,AncestorType=Canvas}"/>
+                                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=2,AncestorType=Canvas}"/>
+                                            <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                            <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                            <Binding Path="DataContext.Thickness" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                        </MultiBinding>
+                                    </Line.StrokeThickness>
+                                    <Line.RenderTransform>
+                                        <TransformGroup>
+                                            <RotateTransform>
+                                                <RotateTransform.Angle>
+                                                    <Binding Path="DataContext.WaferView.Angle" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType={x:Type Window}}"/>
+                                                </RotateTransform.Angle>
+                                            </RotateTransform>
+                                            <ScaleTransform>
+                                                <ScaleTransform.ScaleX>
+                                                    <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
+                                                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=2,AncestorType=Canvas}"/>
+                                                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=2,AncestorType=Canvas}"/>
+                                                        <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                                        <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                                    </MultiBinding>
+                                                </ScaleTransform.ScaleX>
+                                                <ScaleTransform.ScaleY>
+                                                    <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
+                                                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=2, AncestorType=Canvas}"/>
+                                                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=2, AncestorType=Canvas}"/>
+                                                        <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                                        <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                                    </MultiBinding>
+                                                </ScaleTransform.ScaleY>
+                                            </ScaleTransform>
 
-                                        <TranslateTransform>
-                                            <TranslateTransform.X>
-                                                <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
-                                                    <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=2, AncestorType=Canvas}"/>                                                    
-                                                </MultiBinding>
-                                            </TranslateTransform.X>
-                                            <TranslateTransform.Y>
-                                                <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
-                                                    <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=2, AncestorType=Canvas}"/>                                                    
-                                                </MultiBinding>
-                                            </TranslateTransform.Y>
-                                        </TranslateTransform>
-                                    </TransformGroup>
-                                </Line.RenderTransform>
-                            </Line>
-                            <Line Name="mask" X1="{Binding StartPoint.X}"
+                                            <TranslateTransform>
+                                                <TranslateTransform.X>
+                                                    <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
+                                                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=2, AncestorType=Canvas}"/>
+                                                    </MultiBinding>
+                                                </TranslateTransform.X>
+                                                <TranslateTransform.Y>
+                                                    <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
+                                                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=2, AncestorType=Canvas}"/>
+                                                    </MultiBinding>
+                                                </TranslateTransform.Y>
+                                            </TranslateTransform>
+                                        </TransformGroup>
+                                    </Line.RenderTransform>
+                                </Line>
+                                <Line Name="mask" X1="{Binding StartPoint.X}"
                                               X2="{Binding EndPoint.X}"
                                               Y1="{Binding StartPoint.Y}"
                                               Y2="{Binding EndPoint.Y}"
                                               Stroke="Transparent"                                                                                            
                                               UseLayoutRounding="True"                                  
                                               >
-                                <Line.Triggers>
-                                    <EventTrigger RoutedEvent="Line.MouseEnter" >
-                                        <EventTrigger.Actions>
-                                            <BeginStoryboard>
-                                                <Storyboard>
-                                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Stroke" Duration="0">
-                                                        <DiscreteObjectKeyFrame Value="{x:Static Brushes.Red}"/>
-                                                    </ObjectAnimationUsingKeyFrames>
-                                                </Storyboard>
-                                            </BeginStoryboard>
-                                        </EventTrigger.Actions>
-                                    </EventTrigger>
-                                    <EventTrigger RoutedEvent="Line.MouseLeave" >
-                                        <EventTrigger.Actions>
-                                            <BeginStoryboard>
-                                                <Storyboard>
-                                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Stroke" Duration="0">
-                                                        <DiscreteObjectKeyFrame Value="{x:Static Brushes.Transparent}"/>
-                                                    </ObjectAnimationUsingKeyFrames>
-                                                </Storyboard>
-                                            </BeginStoryboard>
-                                        </EventTrigger.Actions>
-                                    </EventTrigger>
-                                </Line.Triggers>
-                                <Line.StrokeThickness>
-                                    <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
-                                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=2,AncestorType=Canvas}"/>
-                                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=2,AncestorType=Canvas}"/>
-                                        <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
-                                        <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
-                                        <Binding Path="grg"  FallbackValue="3"/>
-                                    </MultiBinding>
-                                </Line.StrokeThickness>
-                                <Line.RenderTransform>
-                                    <TransformGroup>
-                                        <RotateTransform>
-                                            <RotateTransform.Angle>
-                                                <Binding Path="DataContext.WaferView.Angle" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType={x:Type Window}}"/>
-                                            </RotateTransform.Angle>
-                                        </RotateTransform>
-                                        <ScaleTransform>
-                                            <ScaleTransform.ScaleX>
-                                                <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
-                                                    <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=2,AncestorType=Canvas}"/>
-                                                    <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=2,AncestorType=Canvas}"/>
-                                                    <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
-                                                    <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
-                                                </MultiBinding>
-                                            </ScaleTransform.ScaleX>
-                                            <ScaleTransform.ScaleY>
-                                                <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
-                                                    <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=2, AncestorType=Canvas}"/>
-                                                    <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=2, AncestorType=Canvas}"/>
-                                                    <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
-                                                    <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
-                                                </MultiBinding>
-                                            </ScaleTransform.ScaleY>
-                                        </ScaleTransform>
+                                    <Line.Triggers>
+                                        <EventTrigger RoutedEvent="Line.MouseEnter" >
+                                            <EventTrigger.Actions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Stroke" Duration="0">
+                                                            <DiscreteObjectKeyFrame Value="{x:Static Brushes.Red}"/>
+                                                        </ObjectAnimationUsingKeyFrames>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </EventTrigger.Actions>
+                                        </EventTrigger>
+                                        <EventTrigger RoutedEvent="Line.MouseLeave" >
+                                            <EventTrigger.Actions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Stroke" Duration="0">
+                                                            <DiscreteObjectKeyFrame Value="{x:Static Brushes.Transparent}"/>
+                                                        </ObjectAnimationUsingKeyFrames>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </EventTrigger.Actions>
+                                        </EventTrigger>
+                                    </Line.Triggers>
+                                    <Line.StrokeThickness>
+                                        <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
+                                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=2,AncestorType=Canvas}"/>
+                                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=2,AncestorType=Canvas}"/>
+                                            <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                            <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                            <Binding Path="grg"  FallbackValue="3"/>
+                                        </MultiBinding>
+                                    </Line.StrokeThickness>
+                                    <Line.RenderTransform>
+                                        <TransformGroup>
+                                            <RotateTransform>
+                                                <RotateTransform.Angle>
+                                                    <Binding Path="DataContext.WaferView.Angle" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType={x:Type Window}}"/>
+                                                </RotateTransform.Angle>
+                                            </RotateTransform>
+                                            <ScaleTransform>
+                                                <ScaleTransform.ScaleX>
+                                                    <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
+                                                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=2,AncestorType=Canvas}"/>
+                                                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=2,AncestorType=Canvas}"/>
+                                                        <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                                        <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                                    </MultiBinding>
+                                                </ScaleTransform.ScaleX>
+                                                <ScaleTransform.ScaleY>
+                                                    <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
+                                                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=2, AncestorType=Canvas}"/>
+                                                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=2, AncestorType=Canvas}"/>
+                                                        <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                                        <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                                    </MultiBinding>
+                                                </ScaleTransform.ScaleY>
+                                            </ScaleTransform>
 
-                                        <TranslateTransform>
-                                            <TranslateTransform.X>
-                                                <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
-                                                    <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=2, AncestorType=Canvas}"/>                                                    
-                                                </MultiBinding>
-                                            </TranslateTransform.X>
-                                            <TranslateTransform.Y>
-                                                <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
-                                                    <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=2, AncestorType=Canvas}"/>                                                   
-                                                </MultiBinding>
-                                            </TranslateTransform.Y>
-                                        </TranslateTransform>
-                                    </TransformGroup>
-                                </Line.RenderTransform>
-                            </Line>                            
-                        </Canvas>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-            <Path Stroke="Green" StrokeThickness="1">
-                <Path.Data>
+                                            <TranslateTransform>
+                                                <TranslateTransform.X>
+                                                    <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
+                                                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=2, AncestorType=Canvas}"/>
+                                                    </MultiBinding>
+                                                </TranslateTransform.X>
+                                                <TranslateTransform.Y>
+                                                    <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
+                                                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=2, AncestorType=Canvas}"/>
+                                                    </MultiBinding>
+                                                </TranslateTransform.Y>
+                                            </TranslateTransform>
+                                        </TransformGroup>
+                                    </Line.RenderTransform>
+                                </Line>
+                            </Canvas>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <!--<Path x:Name="BladeCursor" Stroke="Green" StrokeThickness="1">
+                <Path.Data>                    
                     <GeometryGroup>                        
                         <LineGeometry>
                             <LineGeometry.StartPoint>
@@ -366,7 +386,7 @@
                                 </MultiBinding>
                             </LineGeometry.StartPoint>
                             <LineGeometry.EndPoint>
-                                <MultiBinding Converter="{StaticResource TransformPoint}" ConverterParameter="2">
+                                <MultiBinding Converter="{StaticResource TransformPoint}" ConverterParameter="2" Delay="100">
                                     <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Canvas}"/>
                                     <Binding Path="Machine.Y.ActualPosition"/>
                                     <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Canvas}"/>
@@ -378,10 +398,123 @@
                                 </MultiBinding>
                             </LineGeometry.EndPoint>
                         </LineGeometry>
+                        <LineGeometry>
+                            <LineGeometry.StartPoint>
+                                <MultiBinding Converter="{StaticResource TransformPoint}" ConverterParameter="1">                                    
+                                    <Binding Path="Machine.X.ActualPosition"/>                                    
+                                    <Binding Source="{StaticResource Zero}"/>
+                                    <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Canvas}"/>
+                                    <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Canvas}"/>
+                                    <Binding Path="Machine.BladeChuckCenter.X"/>
+                                    <Binding Path="Machine.BladeChuckCenter.Y"/>
+                                    <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                    <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                </MultiBinding>
+                            </LineGeometry.StartPoint>
+                            <LineGeometry.EndPoint>
+                                <MultiBinding Converter="{StaticResource TransformPoint}" ConverterParameter="1">                                    
+                                    <Binding Path="Machine.X.ActualPosition"/>
+                                    <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Canvas}"/>
+                                    <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Canvas}"/>
+                                    <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Canvas}"/>
+                                    <Binding Path="Machine.BladeChuckCenter.X"/>
+                                    <Binding Path="Machine.BladeChuckCenter.Y"/>
+                                    <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                    <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                </MultiBinding>
+                            </LineGeometry.EndPoint>
+                        </LineGeometry>
                     </GeometryGroup>
                 </Path.Data>                
-            </Path>           
-        </Canvas>
+            </Path>-->
+                <!--<Path x:Name="CameraCursor" Stroke="Orange" StrokeThickness="1">
+                <Path.Data>
+                    <GeometryGroup>
+                        <LineGeometry>
+                            <LineGeometry.StartPoint>
+                                <MultiBinding Converter="{StaticResource TransformPoint}" ConverterParameter="2">
+                                    <Binding Source="{StaticResource Zero}"/>
+                                    <Binding Path="Machine.Y.ActualPosition"/>
+                                    <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Canvas}"/>
+                                    <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Canvas}"/>
+                                    <Binding Path="Machine.CameraChuckCenter.X"/>
+                                    <Binding Path="Machine.CameraChuckCenter.Y"/>
+                                    <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                    <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                </MultiBinding>
+                            </LineGeometry.StartPoint>
+                            <LineGeometry.EndPoint>
+                                <MultiBinding Converter="{StaticResource TransformPoint}" ConverterParameter="2">
+                                    <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Canvas}"/>
+                                    <Binding Path="Machine.Y.ActualPosition"/>
+                                    <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Canvas}"/>
+                                    <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Canvas}"/>
+                                    <Binding Path="Machine.CameraChuckCenter.X"/>
+                                    <Binding Path="Machine.CameraChuckCenter.Y"/>
+                                    <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                    <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                </MultiBinding>
+                            </LineGeometry.EndPoint>
+                        </LineGeometry>
+                        <LineGeometry>
+                            <LineGeometry.StartPoint>
+                                <MultiBinding Converter="{StaticResource TransformPoint}" ConverterParameter="1">
+                                    <Binding Path="Machine.X.ActualPosition"/>
+                                    <Binding Source="{StaticResource Zero}"/>
+                                    <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Canvas}"/>
+                                    <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Canvas}"/>
+                                    <Binding Path="Machine.CameraChuckCenter.X"/>
+                                    <Binding Path="Machine.CameraChuckCenter.Y"/>
+                                    <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                    <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                </MultiBinding>
+                            </LineGeometry.StartPoint>
+                            <LineGeometry.EndPoint>
+                                <MultiBinding Converter="{StaticResource TransformPoint}" ConverterParameter="1">
+                                    <Binding Path="Machine.X.ActualPosition"/>
+                                    <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Canvas}"/>
+                                    <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Canvas}"/>
+                                    <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Canvas}"/>
+                                    <Binding Path="Machine.CameraChuckCenter.X"/>
+                                    <Binding Path="Machine.CameraChuckCenter.Y"/>
+                                    <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                    <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                </MultiBinding>
+                            </LineGeometry.EndPoint>
+                        </LineGeometry>
+                    </GeometryGroup>
+                </Path.Data>
+            </Path>-->
+                <Path Stroke="Green" StrokeThickness="1" Panel.ZIndex="3">
+                    <Path.Data>
+                        <MultiBinding Converter="{StaticResource GetCursor}">
+                            <Binding Path="Machine.X.ActualPosition"/>
+                            <Binding Path="Machine.Y.ActualPosition"/>
+                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Canvas}"/>
+                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Canvas}"/>
+                            <Binding Path="Machine.BladeChuckCenter.X"/>
+                            <Binding Path="Machine.BladeChuckCenter.Y"/>
+                            <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                            <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                        </MultiBinding>
+                    </Path.Data>
+                </Path>
+                <Path x:Name="CameraCursor" StrokeThickness="1" Panel.ZIndex="3">
+                    <Path.Data>
+                        <MultiBinding Converter="{StaticResource GetCursor}">
+                            <Binding Path="Machine.X.ActualPosition"/>
+                            <Binding Path="Machine.Y.ActualPosition"/>
+                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Canvas}"/>
+                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Canvas}"/>
+                            <Binding Path="Machine.CameraChuckCenter.X"/>
+                            <Binding Path="Machine.CameraChuckCenter.Y"/>
+                            <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                            <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                        </MultiBinding>
+                    </Path.Data>
+                </Path>
+            </Canvas>
+        </DockPanel>
         <GroupBox Grid.Row="2" VerticalAlignment="Top">
             <Grid>
                 <Grid.ColumnDefinitions>
