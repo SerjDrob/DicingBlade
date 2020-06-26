@@ -165,6 +165,7 @@
     <Compile Include="Classes\StatMethods.cs" />
     <Compile Include="Classes\ITechnology.cs" />
     <Compile Include="Classes\ToPointConverter.cs" />
+    <Compile Include="Classes\TransformPointConverter.cs" />
     <Compile Include="Classes\TranslateConverter.cs" />
     <Compile Include="Classes\TrigVar.cs" />
     <Compile Include="Classes\VisibilityConverter.cs" />

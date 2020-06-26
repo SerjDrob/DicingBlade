@@ -13,7 +13,7 @@ namespace DicingBlade.Classes
     class ToPointConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
-        {
+        {            
             double x = 0;
             double y = 0;
             try

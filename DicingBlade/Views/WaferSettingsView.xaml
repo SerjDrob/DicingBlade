@@ -15,7 +15,7 @@
 
     </Window.Resources>
     <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Closing">
+        <i:EventTrigger EventName="Closed">
             <cmd:EventToCommand Command="{Binding CloseCmd, Mode=OneWay}" PassEventArgsToCommand="True"/>
         </i:EventTrigger>
     </i:Interaction.Triggers>
