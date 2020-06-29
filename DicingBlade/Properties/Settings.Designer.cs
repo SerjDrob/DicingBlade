@@ -430,5 +430,65 @@ namespace DicingBlade.Properties {
                 this["ZObjective"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool CoolantSensorDsbl {
+            get {
+                return ((bool)(this["CoolantSensorDsbl"]));
+            }
+            set {
+                this["CoolantSensorDsbl"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool SpindleCoolantSensorDsbl {
+            get {
+                return ((bool)(this["SpindleCoolantSensorDsbl"]));
+            }
+            set {
+                this["SpindleCoolantSensorDsbl"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AirSensorDsbl {
+            get {
+                return ((bool)(this["AirSensorDsbl"]));
+            }
+            set {
+                this["AirSensorDsbl"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool VacuumSensorDsbl {
+            get {
+                return ((bool)(this["VacuumSensorDsbl"]));
+            }
+            set {
+                this["VacuumSensorDsbl"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool SpindleCntrlDsbl {
+            get {
+                return ((bool)(this["SpindleCntrlDsbl"]));
+            }
+            set {
+                this["SpindleCntrlDsbl"] = value;
+            }
+        }
     }
 }

@@ -537,15 +537,13 @@ namespace DicingBlade.Classes
             Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.PAR_AxVelLow, ref YVel, 8);
             Motion.mAcm_SetProperty(Z.Handle, (uint)PropertyID.PAR_AxVelLow, ref ZVel, 8);
             Motion.mAcm_SetProperty(U.Handle, (uint)PropertyID.PAR_AxVelLow, ref UVel, 8);
-        }
-       
+        }       
         private void SaveParams()
         {
             //-------------Сохранение параметров в файле онфигурации----
             Settings.Default.Save();
             //----------------------------------------------------------
         }
-
         public void Stop(Ax axis)
         {
             IntPtr handle;

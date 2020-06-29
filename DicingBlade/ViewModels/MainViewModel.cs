@@ -57,8 +57,7 @@ namespace DicingBlade.ViewModels
             {
                 cols = value;               
             }
-        }
-       
+        }       
         private Diagram[] BaseProcess { get; set; }
         public ICommand OpenFileCmd { get; set; }
         public ICommand RotateCmd { get; set; }
@@ -98,12 +97,10 @@ namespace DicingBlade.ViewModels
             // machine = new Machine();
             //  machine.OnAirWanished += Machine_OnAirWanished;
         }
-
         private void Machine_OnAirWanished(DIEventArgs eventArgs)
         {
             throw new NotImplementedException();
         }
-
         private async Task KeyDownAsync(object args) 
         {
             KeyEventArgs key = (KeyEventArgs)args;
@@ -123,8 +120,8 @@ namespace DicingBlade.ViewModels
                 //Condition.Mask ^= (1 << (int)Signals.blowValve);
                 Machine.SwitchOnBlowing ^= true;
             }
-            //if (key.Key == Key.D) WaferView.Angle += 0.2;
-            //if (key.Key == Key.S) WaferView.Angle -= 0.2;
+            if (key.Key == Key.D) WaferView.Angle += 0.2;
+            if (key.Key == Key.S) WaferView.Angle -= 0.2;
             if (key.Key == Key.F2) OpenFile();
             if (key.Key == Key.T) Change();
             if (key.Key == Key.Divide)
