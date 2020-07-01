@@ -37,8 +37,7 @@ namespace DicingBlade.ViewModels
         private TempWafer2D tempWafer2;
         private int[] cols;
         private int[] rows;
-        private bool test;
-        public Signals MyProperty { get; set; }
+        private bool test;        
         public Map Condition { get; set; }        
         public double Thickness { get; set; }        
         public bool Test { get; set; }      
@@ -283,6 +282,7 @@ namespace DicingBlade.ViewModels
                 DataContext = Settings.Default
             }.ShowDialog();
             Settings.Default.Save();
+            Machine.RefreshSettings(PrepareSettings());
         }
         private void TechnologySettings() 
         {
@@ -312,6 +312,17 @@ namespace DicingBlade.ViewModels
             
             Thickness = 1;
         }
-        //private void Rotate() => Wafer.CurrentAngle += 5;
+        
+
+        private Bridge PrepareSettings() 
+        {
+            return new Bridge()
+            {
+                Air = Settings.Default.AirSensorDsbl,
+                CoolantWater = Settings.Default.CoolantSensorDsbl,
+                SpindleWater = Settings.Default.SpindleCntrlDsbl,
+                ChuckVacuum = Settings.Default.VacuumSensorDsbl
+            };
+        }
     }
 }

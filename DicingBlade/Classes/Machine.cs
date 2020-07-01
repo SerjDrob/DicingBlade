@@ -37,14 +37,20 @@ namespace DicingBlade.Classes
     public struct DIEventArgs { }
     public delegate void DIEventHandler(/*DIEventArgs eventArgs*/);
 
-
+    struct Bridge 
+    {
+        public bool SpindleWater;
+        public bool CoolantWater;
+        public bool ChuckVacuum;
+        public bool Air;
+    }
 
 
     [AddINotifyPropertyChangedInterface]
     class Machine
     {
+        private Bridge Bridge;
         private bool testRegime;
-
         public IntPtr[] m_Axishand = new IntPtr[32];
         UInt32 IOStatus = new UInt32();
         UInt32 Result;
@@ -73,32 +79,20 @@ namespace DicingBlade.Classes
         public Vector2 CameraChuckCenter { get; set; }
         public double CameraFocus { get; set; }
         public bool PCI1240IsConnected;        
-        public bool SpindleWater
-        {
-            get { return X.GetDI(DI.IN1); }
-        }
-        public bool CoolantWater
-        {
-            get { return X.GetDI(DI.IN2); }
-        }
+        public bool SpindleWater { get; set; }       
+        public bool CoolantWater { get; set; }        
         public bool SwitchOnCoolantWater
         {
             get { return U.GetDO(DO.OUT4); }
             set { U.SetDo(DO.OUT4, (byte)(value ? 1 : 0)); }
-        }
-        public bool ChuckVacuum
-        {
-            get { return X.GetDI(DI.IN3); }
-        }
+        }        
+        public bool ChuckVacuum { get; set; }        
         public bool SwitchOnChuckVacuum
         {
             get { return Z.GetDO(DO.OUT5); }
             set { Z.SetDo(DO.OUT5, (byte)(value ? 1 : 0)); }
         }
-        public bool Air
-        {
-            get { return Z.GetDI(DI.IN1); }
-        }
+        public bool Air { get; set; }        
         public bool SwitchOnBlowing 
         {
             get { return Z.GetDO(DO.OUT6); }
@@ -182,6 +176,8 @@ namespace DicingBlade.Classes
                         {
                             ax.DIs &= ~BitData << channel;
                         }
+                        CheckSensors();
+
                     }
                     Result = Motion.mAcm_AxGetCmdPosition(ax.Handle, ref position);
                     if (Result == (uint)ErrorCode.SUCCESS) ax.CmdPosition = position;
@@ -202,8 +198,16 @@ namespace DicingBlade.Classes
                 Thread.Sleep(100);
             }
         }
+
+        private void CheckSensors()
+        {
+            ChuckVacuum = Bridge.ChuckVacuum ? true : X.GetDI(DI.IN3);
+            SpindleWater = Bridge.SpindleWater ? true : X.GetDI(DI.IN1);
+            CoolantWater = Bridge.CoolantWater ? true : X.GetDI(DI.IN2);
+            Air = Bridge.Air ? true : Z.GetDI(DI.IN1);
+        }
         #endregion
-       
+
         public event DIEventHandler OnVacuumWanished;
         public event DIEventHandler OnCoolWaterWanished;
         public event DIEventHandler OnSpinWaterWanished;
@@ -667,6 +671,10 @@ namespace DicingBlade.Classes
                 }
             }
             );
+        }
+        public void RefreshSettings(Bridge settings)
+        {
+            Bridge = settings;            
         }
         //private IntPtr m_GpHand = new IntPtr();
         //private IntPtr m_GpXYHand = new IntPtr();

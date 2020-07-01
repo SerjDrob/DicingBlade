@@ -270,25 +270,25 @@ namespace DicingBlade.Classes
         private void Machine_OnVacuumWanished(/*DIEventArgs eventArgs*/)
         {
             if (IsCutting) { }
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         private void Machine_OnSpinWaterWanished(/*DIEventArgs eventArgs*/)
         {
             if (IsCutting) { }
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         private void Machine_OnCoolWaterWanished(/*DIEventArgs eventArgs*/)
         {
             if (IsCutting) { }
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         private void Machine_OnAirWanished(/*DIEventArgs eventArgs*/)
         {
             if (IsCutting) { }
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
     }
 }

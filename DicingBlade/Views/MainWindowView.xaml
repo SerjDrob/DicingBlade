@@ -472,10 +472,7 @@
                                         <Style.Triggers>
                                             <DataTrigger Value="True">
                                                 <DataTrigger.Binding>
-                                                    <MultiBinding Converter="{StaticResource ConditionConvert}">
-                                                        <Binding Path="Condition.Mask"/>
-                                                        <Binding Source="{x:Static model:Signals.coolingSensor}"/>
-                                                    </MultiBinding>
+                                                    <Binding Path="Machine.SpindleWater"/>
                                                 </DataTrigger.Binding>
                                                 <Setter Property="Fill" Value="{StaticResource SignalGreen}"/>
                                             </DataTrigger>
@@ -508,10 +505,7 @@
                                         <Style.Triggers>
                                             <DataTrigger Value="True">
                                                 <DataTrigger.Binding>
-                                                    <MultiBinding Converter="{StaticResource ConditionConvert}">
-                                                        <Binding Path="Condition.Mask"/>
-                                                        <Binding Source="{x:Static model:Signals.waterSensor}"/>
-                                                    </MultiBinding>
+                                                    <Binding Path="Machine.CoolantWater"/>
                                                 </DataTrigger.Binding>
                                                 <Setter Property="Fill" Value="{StaticResource SignalGreen}"/>
                                             </DataTrigger>
@@ -531,10 +525,7 @@
                                         <Style.Triggers>
                                             <DataTrigger Value="True">
                                                 <DataTrigger.Binding>
-                                                    <MultiBinding Converter="{StaticResource ConditionConvert}">
-                                                        <Binding Path="Condition.Mask"/>
-                                                        <Binding Source="{x:Static model:Signals.airSensor}"/>
-                                                    </MultiBinding>
+                                                    <Binding Path="Machine.Air"/>
                                                 </DataTrigger.Binding>
                                                 <Setter Property="Fill" Value="{StaticResource SignalGreen}"/>
                                             </DataTrigger>
@@ -567,10 +558,7 @@
                                         <Style.Triggers>
                                             <DataTrigger Value="True">
                                                 <DataTrigger.Binding>
-                                                    <MultiBinding Converter="{StaticResource ConditionConvert}">
-                                                        <Binding Path="Condition.Mask"/>
-                                                        <Binding Source="{x:Static model:Signals.vacuumSensor}"/>
-                                                    </MultiBinding>
+                                                    <Binding Path="Machine.ChuckVacuum"/>                                                    
                                                 </DataTrigger.Binding>
                                                 <Setter Property="Fill" Value="{StaticResource SignalGreen}"/>
                                             </DataTrigger>

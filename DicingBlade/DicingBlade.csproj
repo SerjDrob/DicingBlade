@@ -155,21 +155,20 @@
     </ApplicationDefinition>
     <Compile Include="Classes\Blade.cs" />
     <Compile Include="Classes\Command.cs" />
-    <Compile Include="Classes\CrossPositionConverter.cs" />
-    <Compile Include="Classes\CursorToPathConverter.cs" />
+    <Compile Include="Converters\CrossPositionConverter.cs" />
+    <Compile Include="Converters\CursorToPathConverter.cs" />
     <Compile Include="Classes\PropContainer.cs" />
-    <Compile Include="Classes\ConditionConverter.cs" />
+    <Compile Include="Converters\ConditionConverter.cs" />
     <Compile Include="Classes\Grid.cs" />
     <Compile Include="Classes\Map.cs" />
-    <Compile Include="Classes\RadioEnumConverter.cs" />
-    <Compile Include="Classes\ScaleConverter.cs" />
+    <Compile Include="Converters\RadioEnumConverter.cs" />
+    <Compile Include="Converters\ScaleConverter.cs" />
     <Compile Include="Classes\StatMethods.cs" />
     <Compile Include="Classes\ITechnology.cs" />
-    <Compile Include="Classes\ToPointConverter.cs" />
-    <Compile Include="Classes\TransformPointConverter.cs" />
-    <Compile Include="Classes\TranslateConverter.cs" />
-    <Compile Include="Classes\TrigVar.cs" />
-    <Compile Include="Classes\VisibilityConverter.cs" />
+    <Compile Include="Converters\ToPointConverter.cs" />
+    <Compile Include="Converters\TransformPointConverter.cs" />
+    <Compile Include="Converters\TranslateConverter.cs" />
+    <Compile Include="Converters\VisibilityConverter.cs" />
     <Compile Include="Classes\WaferView.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="Classes\TechnologySettingsValidator.cs" />
@@ -185,9 +184,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Classes\Constants.cs" />
     <Compile Include="Classes\Cut.cs" />
-    <Compile Include="Classes\LineCnv.cs" />
     <Compile Include="Classes\Machine.cs" />
     <Compile Include="Classes\Process.cs" />
     <Compile Include="Classes\Wafer.cs" />
