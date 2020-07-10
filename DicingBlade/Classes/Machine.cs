@@ -580,6 +580,9 @@ namespace DicingBlade.Classes
             switch (place)
             {
                 case Place.Home:
+                    //Motion.mAcm_AxMoveHome(Y.Handle, (uint)HomeMode.MODE2_Lmt, (uint)HomeDir.NegDir);
+                    Motion.mAcm_AxHome(X.Handle, (uint)HomeMode.MODE6_Lmt_Ref, (uint)HomeDir.NegDir);
+                    Motion.mAcm_AxHome(Y.Handle, (uint)HomeMode.MODE6_Lmt_Ref, (uint)HomeDir.NegDir);
                     break;
                 case Place.Loading:
                     break;

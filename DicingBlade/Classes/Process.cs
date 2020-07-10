@@ -130,6 +130,7 @@ namespace DicingBlade.Classes
                 {
                     foreach (var item in diagrams)
                     {
+                        if (pauseToken.Equals(default)) await pauseToken.Token.WaitWhilePausedAsync();
                         await ProcElementDispatcherAsync(item);
                     }
                 }
@@ -166,7 +167,7 @@ namespace DicingBlade.Classes
             #region MyRegion            
             // проверка перед каждым действием. асинхронные действия await()!!!
             // паузы, корректировки.
-            if(pauseToken.Equals(default)) await pauseToken.Token.WaitWhilePausedAsync();
+            //if(pauseToken.Equals(default)) await pauseToken.Token.WaitWhilePausedAsync();
 
             #endregion
 

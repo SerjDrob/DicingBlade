@@ -206,6 +206,10 @@ namespace DicingBlade.ViewModels
             if (key.Key == Key.K) { }
             if (key.Key == Key.L) { }
             if (key.Key == Key.I) { }
+            if (key.Key == Key.Home) 
+            {
+                await Machine.GoThereAsync(Place.Home);
+            }
             if (key.Key == Key.OemMinus) 
             {
                 if (process.ProcessStatus == Status.Learning)
