@@ -47,7 +47,7 @@ namespace DicingBlade.Classes
 
 
     [AddINotifyPropertyChangedInterface]
-    class Machine
+    internal class Machine
     {
         private Bridge Bridge;
         private bool testRegime;
@@ -146,16 +146,25 @@ namespace DicingBlade.Classes
                 StartCamera();
                 DevicesConnection();
                 SetConfigs();
+                
                 VelocityRegime = Velocity.Slow;               
             }
             axes = new Axis[] { X, Y, Z, U };
             OnAirWanished += EMGScenario;           
             Thread threadCurrentState = new Thread(new ThreadStart(MachineState));
             threadCurrentState.Start();
-            VelocityRegime = Velocity.Fast;
+            VelocityRegime = Velocity.Fast;            
+            RefreshSettings();
         }
         #region Методы
 
+        public void ResetErrors()
+        {
+            foreach (var ax in axes)
+            {
+                Motion.mAcm_AxResetError(ax.Handle);
+            }
+        }
 
         public void MachineState() // Производит опрос всех датчиков, линеек, координат
         {
@@ -183,7 +192,7 @@ namespace DicingBlade.Classes
                     if (Result == (uint)ErrorCode.SUCCESS) ax.CmdPosition = position;
 
                     Result = Motion.mAcm_AxGetActualPosition(ax.Handle, ref position);
-                    if (Result == (uint)ErrorCode.SUCCESS) ax.ActualPosition = position;
+                    if (Result == (uint)ErrorCode.SUCCESS) ax.ActualPosition = -  position;
 
                     //if (!SpindleWater) OnSpinWaterWanished(/*new DIEventArgs()*/);
                     //if (!CoolantWater) OnCoolWaterWanished(/*new DIEventArgs()*/);
@@ -433,6 +442,14 @@ namespace DicingBlade.Classes
             Motion.mAcm_SetProperty(U.Handle, (uint)PropertyID.PAR_AxAcc, ref UAcc, 8);
             Motion.mAcm_SetProperty(U.Handle, (uint)PropertyID.PAR_AxDec, ref UDec, 8);
 
+            Motion.mAcm_SetProperty(XYhandle, (uint)PropertyID.CFG_GpPPU, ref YPPU, 8);
+            Motion.mAcm_SetProperty(XYhandle, (uint)PropertyID.PAR_GpJerk, ref YJerk, 8);
+            Motion.mAcm_SetProperty(XYhandle, (uint)PropertyID.CFG_GpMaxAcc, ref AxMaxAcc, 8);
+            Motion.mAcm_SetProperty(XYhandle, (uint)PropertyID.CFG_GpMaxDec, ref AxMaxDec, 8);
+            Motion.mAcm_SetProperty(XYhandle, (uint)PropertyID.CFG_GpMaxVel, ref AxMaxVel, 8);
+            Motion.mAcm_SetProperty(XYhandle, (uint)PropertyID.PAR_GpAcc, ref YAcc, 8);
+            Motion.mAcm_SetProperty(XYhandle, (uint)PropertyID.PAR_GpDec, ref YDec, 8);
+
             int PlsInMde = 2;
             int PlsInLogic = 2;
             int PlsInSrc = 2;
@@ -458,12 +475,6 @@ namespace DicingBlade.Classes
             Motion.mAcm_SetProperty(U.Handle, (uint)PropertyID.CFG_AxPulseInLogic, ref PlsInLogic, 8);
             Motion.mAcm_SetProperty(U.Handle, (uint)PropertyID.CFG_AxPulseInSource, ref PlsInSrc, 8);
             Motion.mAcm_SetProperty(U.Handle, (uint)PropertyID.CFG_AxPulseOutMode, ref PlsOutMde, 8);
-
-            //int EZ = 0;
-
-            //Motion.mAcm_SetProperty(m_Axishand[0], (uint)PropertyID.CFG_AxEzLogic, ref EZ, 8);
-            //Motion.mAcm_SetProperty(m_Axishand[1], (uint)PropertyID.CFG_AxEzLogic, ref EZ, 8);
-
 
             int Reset = 1;
             Motion.mAcm_SetProperty(X.Handle, (uint)PropertyID.CFG_AxHomeResetEnable, ref Reset, 8);
@@ -513,7 +524,7 @@ namespace DicingBlade.Classes
             double AxMaxAcc = 180;            
             Motion.mAcm_SetProperty(X.Handle, (uint)PropertyID.CFG_AxMaxAcc, ref AxMaxAcc, 8);
             Motion.mAcm_SetProperty(X.Handle, (uint)PropertyID.CFG_AxMaxDec, ref AxMaxDec, 8);
-            Motion.mAcm_SetProperty(X.Handle, (uint)PropertyID.CFG_AxMaxVel, ref AxMaxVel, 8);
+            Motion.mAcm_SetProperty(X.Handle, (uint)PropertyID.CFG_AxMaxVel, ref AxMaxVel, 8);            
 
             Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxMaxAcc, ref AxMaxAcc, 8);
             Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxMaxDec, ref AxMaxDec, 8);
@@ -527,10 +538,15 @@ namespace DicingBlade.Classes
             Motion.mAcm_SetProperty(U.Handle, (uint)PropertyID.CFG_AxMaxDec, ref AxMaxDec, 8);
             Motion.mAcm_SetProperty(U.Handle, (uint)PropertyID.CFG_AxMaxVel, ref AxMaxVel, 8);
 
+            Motion.mAcm_SetProperty(XYhandle, (uint)PropertyID.CFG_GpMaxAcc, ref AxMaxAcc, 8);
+            Motion.mAcm_SetProperty(XYhandle, (uint)PropertyID.CFG_GpMaxDec, ref AxMaxDec, 8);
+            Motion.mAcm_SetProperty(XYhandle, (uint)PropertyID.CFG_GpMaxVel, ref AxMaxVel, 8);
+
             Motion.mAcm_SetProperty(X.Handle, (uint)PropertyID.PAR_AxVelHigh, ref XVel, 8);            
             Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.PAR_AxVelHigh, ref YVel, 8);            
             Motion.mAcm_SetProperty(Z.Handle, (uint)PropertyID.PAR_AxVelHigh, ref ZVel, 8);
             Motion.mAcm_SetProperty(U.Handle, (uint)PropertyID.PAR_AxVelHigh, ref UVel, 8);
+            Motion.mAcm_SetProperty(XYhandle, (uint)PropertyID.PAR_GpVelHigh, ref YVel, 8);
 
             XVel /= 3;
             YVel /= 3;
@@ -541,6 +557,7 @@ namespace DicingBlade.Classes
             Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.PAR_AxVelLow, ref YVel, 8);
             Motion.mAcm_SetProperty(Z.Handle, (uint)PropertyID.PAR_AxVelLow, ref ZVel, 8);
             Motion.mAcm_SetProperty(U.Handle, (uint)PropertyID.PAR_AxVelLow, ref UVel, 8);
+            Motion.mAcm_SetProperty(XYhandle, (uint)PropertyID.PAR_GpVelLow, ref YVel, 8);
         }       
         private void SaveParams()
         {
@@ -675,9 +692,18 @@ namespace DicingBlade.Classes
             }
             );
         }
-        public void RefreshSettings(Bridge settings)
+        public void RefreshSettings()
         {
-            Bridge = settings;            
+            Bridge = new Bridge()
+            {
+                Air = Settings.Default.AirSensorDsbl,
+                CoolantWater = Settings.Default.CoolantSensorDsbl,
+                SpindleWater = Settings.Default.SpindleCntrlDsbl,
+                ChuckVacuum = Settings.Default.VacuumSensorDsbl
+            };
+            CameraChuckCenter = new Vector2(Settings.Default.XObjective, Settings.Default.YObjective);
+            CameraBladeOffset = Settings.Default.DiskShift;
+            BladeChuckCenter = new Vector2(Settings.Default.XDisk, CameraChuckCenter.Y + CameraBladeOffset);
         }
         //private IntPtr m_GpHand = new IntPtr();
         //private IntPtr m_GpXYHand = new IntPtr();

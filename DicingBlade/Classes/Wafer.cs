@@ -70,22 +70,22 @@ namespace DicingBlade.Classes
         {
             this.thickness = thickness;
             Grid = new Grid(dxf.Lines.Where(l => l.Layer.Name == layer));
-            MakeDirections(Directions, new List<double>(Grid.Lines.Keys));
+            MakeDirections(new List<double>(Grid.Lines.Keys));
             CurrentAngleNum = 0;
         }
-        private void MakeDirections(List<(double,double)> directions, List<double> list) 
+        private void MakeDirections(List<double> list) 
         {
-            directions = new List<(double, double)>();
+            Directions = new List<(double, double)>();
             foreach (var item in list)
             {
-                directions.Add((item, 0));
+                Directions.Add((item, 0));
             }
         }
         public Wafer(Vector2 origin, double thickness, params (double degree, double length, double side, double index)[] directions)
         {
             this.thickness = thickness;
             Grid = new Grid(origin, directions);
-            MakeDirections(Directions, new List<double>(Grid.Lines.Keys));
+            MakeDirections(new List<double>(Grid.Lines.Keys));
             CurrentAngleNum = 0;
             IsRound = false;
         }
@@ -93,7 +93,7 @@ namespace DicingBlade.Classes
         {
             this.thickness = thickness;
             Grid = new Grid(origin, diameter, directions);
-            MakeDirections(Directions, new List<double>(Grid.Lines.Keys));
+            MakeDirections(new List<double>(Grid.Lines.Keys));
             CurrentAngleNum = 0;
             IsRound = true;
         }

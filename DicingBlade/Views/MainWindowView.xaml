@@ -421,6 +421,11 @@
                 <Label Content="{Binding Machine.Y.ActualPosition, StringFormat=Y:{0}}" Grid.Row="1"/>
                 <Label Content="{Binding Machine.Z.ActualPosition, StringFormat=Z:{0}}" Grid.Row="2"/>
                 <Label Content="{Binding Machine.U.ActualPosition, StringFormat=U:{0}}" Grid.Row="3"/>
+
+                <Label Content="{Binding Machine.X.CmdPosition, StringFormat=Xcmd:{0}}" Grid.Column="1"/>
+                <Label Content="{Binding Machine.Y.CmdPosition, StringFormat=Ycmd:{0}}" Grid.Column="1" Grid.Row="1"/>
+                <Label Content="{Binding Machine.Z.CmdPosition, StringFormat=Zcmd:{0}}" Grid.Column="1" Grid.Row="2"/>
+                <Label Content="{Binding Machine.U.CmdPosition, StringFormat=Ucmd:{0}}" Grid.Column="1" Grid.Row="3"/>
                 <!--<Label Content="Lx:" Grid.Column="2"/>
                 <Label Content="Lz:" Grid.Row="2" Grid.Column="2"/>-->                
             </Grid>

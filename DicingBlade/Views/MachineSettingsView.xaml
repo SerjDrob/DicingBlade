@@ -1,15 +1,16 @@
 ﻿<Window x:Class="DicingBlade.Views.MachineSettingsView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:local="clr-namespace:DicingBlade.Classes"  
-        xmlns:model="clr-namespace:DicingBlade.Properties"
+        xmlns:model="clr-namespace:DicingBlade.ViewModels"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"        
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:st="clr-namespace:DicingBlade.Properties"
         mc:Ignorable ="d"
-        d:DataContext="{d:DesignInstance model:Settings, IsDesignTimeCreatable=False}"        
+        d:DataContext="{d:DesignInstance model:MachineSettingsViewModel, IsDesignTimeCreatable=False}"        
         Title="Настройки" Height="auto" Width="auto" SizeToContent="WidthAndHeight" ResizeMode="NoResize">
-    
-    <Grid>
+
+    <Grid >
         <Grid.Resources>
             <Style TargetType="CheckBox">
                 <Setter Property="Margin" Value="3"/>
@@ -80,22 +81,22 @@
                             <Label Content="V серв." Grid.Column="2"/>
                             <Label Content="V медл." Grid.Column="3"/>
                             <Label Content="V быстр." Grid.Column="4"/>
-                            <TextBox Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" Text="{Binding XAcc}"/>
-                            <TextBox Grid.Column="2" Grid.Row="1" TextWrapping="Wrap" Text="{Binding XVelService}"/>
-                            <TextBox Grid.Column="3" Grid.Row="1" TextWrapping="Wrap" Text="{Binding XVelLow}"/>
-                            <TextBox Grid.Column="4" Grid.Row="1" TextWrapping="Wrap" Text="{Binding XVelHigh}"/>
-                            <TextBox Grid.Column="1" Grid.Row="2" TextWrapping="Wrap" Text="{Binding YAcc}" />
-                            <TextBox Grid.Column="2" Grid.Row="2" TextWrapping="Wrap" Text="{Binding YVelService}"/>
-                            <TextBox Grid.Column="3" Grid.Row="2" TextWrapping="Wrap" Text="{Binding YVelLow}"/>
-                            <TextBox Grid.Column="4" Grid.Row="2" TextWrapping="Wrap" Text="{Binding YVelHigh}"/>
-                            <TextBox Grid.Column="1" Grid.Row="3" TextWrapping="Wrap" Text="{Binding ZAcc}"/>
-                            <TextBox Grid.Column="2" Grid.Row="3" TextWrapping="Wrap" Text="{Binding ZVelService}"/>
-                            <TextBox Grid.Column="3" Grid.Row="3" TextWrapping="Wrap" Text="{Binding ZVelLow}"/>
-                            <TextBox Grid.Column="4" Grid.Row="3" TextWrapping="Wrap" Text="{Binding ZVelHigh}"/>
-                            <TextBox Grid.Column="1" Grid.Row="4" TextWrapping="Wrap" Text="{Binding UAcc}"/>
-                            <TextBox Grid.Column="2" Grid.Row="4" TextWrapping="Wrap" Text="{Binding UVelService}"/>
-                            <TextBox Grid.Column="3" Grid.Row="4" TextWrapping="Wrap" Text="{Binding UVelLow}"/>
-                            <TextBox Grid.Column="4" Grid.Row="4" TextWrapping="Wrap" Text="{Binding UVelHigh}"/>
+                            <TextBox Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" Text="{Binding Source={x:Static st:Settings.Default}, Path=XAcc}"/>
+                            <TextBox Grid.Column="2" Grid.Row="1" TextWrapping="Wrap" Text="{Binding Source={x:Static st:Settings.Default}, Path=XVelService}"/>
+                            <TextBox Grid.Column="3" Grid.Row="1" TextWrapping="Wrap" Text="{Binding Source={x:Static st:Settings.Default}, Path=XVelLow}"/>
+                            <TextBox Grid.Column="4" Grid.Row="1" TextWrapping="Wrap" Text="{Binding Source={x:Static st:Settings.Default}, Path=XVelHigh}"/>
+                            <TextBox Grid.Column="1" Grid.Row="2" TextWrapping="Wrap" Text="{Binding Source={x:Static st:Settings.Default}, Path=YAcc}" />
+                            <TextBox Grid.Column="2" Grid.Row="2" TextWrapping="Wrap" Text="{Binding Source={x:Static st:Settings.Default}, Path=YVelService}"/>
+                            <TextBox Grid.Column="3" Grid.Row="2" TextWrapping="Wrap" Text="{Binding Source={x:Static st:Settings.Default}, Path=YVelLow}"/>
+                            <TextBox Grid.Column="4" Grid.Row="2" TextWrapping="Wrap" Text="{Binding Source={x:Static st:Settings.Default}, Path=YVelHigh}"/>
+                            <TextBox Grid.Column="1" Grid.Row="3" TextWrapping="Wrap" Text="{Binding Source={x:Static st:Settings.Default}, Path=ZAcc}"/>
+                            <TextBox Grid.Column="2" Grid.Row="3" TextWrapping="Wrap" Text="{Binding Source={x:Static st:Settings.Default}, Path=ZVelService}"/>
+                            <TextBox Grid.Column="3" Grid.Row="3" TextWrapping="Wrap" Text="{Binding Source={x:Static st:Settings.Default}, Path=ZVelLow}"/>
+                            <TextBox Grid.Column="4" Grid.Row="3" TextWrapping="Wrap" Text="{Binding Source={x:Static st:Settings.Default}, Path=ZVelHigh}"/>
+                            <TextBox Grid.Column="1" Grid.Row="4" TextWrapping="Wrap" Text="{Binding Source={x:Static st:Settings.Default}, Path=UAcc}"/>
+                            <TextBox Grid.Column="2" Grid.Row="4" TextWrapping="Wrap" Text="{Binding Source={x:Static st:Settings.Default}, Path=UVelService}"/>
+                            <TextBox Grid.Column="3" Grid.Row="4" TextWrapping="Wrap" Text="{Binding Source={x:Static st:Settings.Default}, Path=UVelLow}"/>
+                            <TextBox Grid.Column="4" Grid.Row="4" TextWrapping="Wrap" Text="{Binding Source={x:Static st:Settings.Default}, Path=UVelHigh}"/>
                         </Grid>
                     </GroupBox>
                     <GroupBox Header="Центр столика в микроскопе" Grid.Row="1" HorizontalAlignment="Left">
@@ -111,9 +112,9 @@
                             </Grid.RowDefinitions>
                             <Label Content="X"/>
                             <Label Content="Y" Grid.Row="1"/>
-                            <TextBox Text="{Binding XObjective}" Grid.Column="1"/>
-                            <TextBox Text="{Binding YObjective}" Grid.Column="1" Grid.Row="1"/>
-                            <Button Content="Обучить" Grid.Column="2" Grid.RowSpan="2" />
+                            <TextBox Text="{Binding Source={x:Static st:Settings.Default}, Path=XObjective}" Grid.Column="1"/>
+                            <TextBox Text="{Binding Source={x:Static st:Settings.Default}, Path=YObjective}" Grid.Column="1" Grid.Row="1"/>
+                            <Button Command="{Binding XYObjectiveTeachCmd}" Content="Обучить" Grid.Column="2" Grid.RowSpan="2" />
                         </Grid>
                     </GroupBox>
                     <GroupBox Header="Ось диска над центром СП" Grid.Row="2" HorizontalAlignment="Left">
@@ -125,11 +126,10 @@
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="auto"/>
-
                             </Grid.RowDefinitions>
                             <Label Content="X"/>
-                            <TextBox Text="{Binding XDisk}" Grid.Column="1"/>
-                            <Button Content="Обучить" Grid.Column="2" Margin="3"/>
+                            <TextBox Text="{Binding Source={x:Static st:Settings.Default}, Path=XDisk}" Grid.Column="1"/>
+                            <Button Command="{Binding XDiskTeachCmd}" Content="Обучить" Grid.Column="2" Margin="3"/>
                         </Grid>
                     </GroupBox>
                     <GroupBox Header="Смещение ОЦ от кромки диска" Grid.Row="3" HorizontalAlignment="Left">
@@ -142,7 +142,7 @@
                                 <RowDefinition Height="auto"/>
                             </Grid.RowDefinitions>
                             <Label Content="H"/>
-                            <TextBox Text="{Binding DiskShift}" Grid.Column="1"/>
+                            <TextBox Text="{Binding Source={x:Static st:Settings.Default}, Path=DiskShift}" Grid.Column="1"/>
                         </Grid>
                     </GroupBox>
                     <GroupBox Header="Z диска" Grid.Row="4" HorizontalAlignment="Left">
@@ -155,7 +155,7 @@
                                 <RowDefinition Height="auto"/>
                             </Grid.RowDefinitions>
                             <Label Content="Z"/>
-                            <TextBox Text="{Binding ZTouch}" Grid.Column="1"/>
+                            <TextBox Text="{Binding Source={x:Static st:Settings.Default}, Path=ZTouch}" Grid.Column="1"/>
                         </Grid>
                     </GroupBox>
                 </Grid>
@@ -163,11 +163,11 @@
             <TabItem Header="Наладка">
                 <Grid>
                     <StackPanel>
-                        <CheckBox Content="Всегда включен датчик подачи СОЖ" IsChecked="{Binding CoolantSensorDsbl}"/>
-                        <CheckBox Content="Всегда включен датчик воздуха" IsChecked="{Binding AirSensorDsbl}"/>
-                        <CheckBox Content="Всегда включен датчик вакуума" IsChecked="{Binding VacuumSensorDsbl}"/>
-                        <CheckBox Content="Всегда включен датчик охлаждения шпинделя" IsChecked="{Binding SpindleCoolantSensorDsbl}"/>
-                        <CheckBox Content="Отключен контроль работы шпинделя" IsChecked="{Binding SpindleCntrlDsbl}"/>
+                        <CheckBox Content="Всегда включен датчик подачи СОЖ" IsChecked="{Binding Source={x:Static st:Settings.Default}, Path=CoolantSensorDsbl}"/>
+                        <CheckBox Content="Всегда включен датчик воздуха" IsChecked="{Binding Source={x:Static st:Settings.Default}, Path=AirSensorDsbl}"/>
+                        <CheckBox Content="Всегда включен датчик вакуума" IsChecked="{Binding Source={x:Static st:Settings.Default}, Path=VacuumSensorDsbl}"/>
+                        <CheckBox Content="Всегда включен датчик охлаждения шпинделя" IsChecked="{Binding Source={x:Static st:Settings.Default}, Path=SpindleCoolantSensorDsbl}"/>
+                        <CheckBox Content="Отключен контроль работы шпинделя" IsChecked="{Binding Source={x:Static st:Settings.Default}, Path=SpindleCntrlDsbl}"/>
                     </StackPanel>
                 </Grid>
             </TabItem>

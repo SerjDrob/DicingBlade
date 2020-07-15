@@ -170,6 +170,8 @@
     <Compile Include="Converters\TranslateConverter.cs" />
     <Compile Include="Converters\VisibilityConverter.cs" />
     <Compile Include="Classes\WaferView.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="ViewModels\MachineSettingsViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="Classes\TechnologySettingsValidator.cs" />
     <Compile Include="ViewModels\TechnologySettingsViewModel.cs" />

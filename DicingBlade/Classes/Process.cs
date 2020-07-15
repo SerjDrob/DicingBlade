@@ -257,9 +257,11 @@ namespace DicingBlade.Classes
                 case Diagram.goCameraPointLearningXYZ:
                     Machine.SetVelocity(Velocity.Service);
                     await Machine.Z.MoveAxisInPosAsync(Machine.ZBladeTouch - Wafer.Thickness - BladeTransferGapZ);
+                    double y = Wafer.GetNearestCut(/*Machine.CameraChuckCenter.Y*/0).StartPoint.Y
+                        + Machine.CameraChuckCenter.Y;
                     await Machine.MoveInPosXYAsync(new netDxf.Vector2(
                         Machine.CameraChuckCenter.X,
-                        Wafer.GetNearestCut(Machine.CameraChuckCenter.Y).StartPoint.Y
+                        y
                         ));
                     await Machine.Z.MoveAxisInPosAsync(Machine.CameraFocus);
                     break;

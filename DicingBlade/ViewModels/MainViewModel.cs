@@ -81,8 +81,7 @@ namespace DicingBlade.ViewModels
             MachineSettingsCmd = new Command(args => MachineSettings());
             TechnologySettingsCmd = new Command(args => TechnologySettings());
             Machine = new Machine(false);
-            Machine.BladeChuckCenter = new Vector2(10, 10);
-            Machine.CameraChuckCenter = new Vector2(15, 20);
+            
             BaseProcess = new Diagram[] {
                 Diagram.goNextCutXY,
                 Diagram.goWaferStartX,
@@ -104,6 +103,13 @@ namespace DicingBlade.ViewModels
         {
             KeyEventArgs key = (KeyEventArgs)args;
             
+            //test key
+            if(key.Key==Key.Tab)
+            {
+                if(process==null) process = new Process(Machine, Wafer, new Blade());
+                await process.ProcElementDispatcherAsync(Diagram.goCameraPointLearningXYZ);
+            }
+
             if (key.Key == Key.Q)
             {
                 //Condition.Mask ^= (1 << (int)Signals.vacuumValve);
@@ -208,6 +214,7 @@ namespace DicingBlade.ViewModels
             if (key.Key == Key.I) { }
             if (key.Key == Key.Home) 
             {
+                Machine.ResetErrors();
                 await Machine.GoThereAsync(Place.Home);
             }
             if (key.Key == Key.OemMinus) 
@@ -282,11 +289,11 @@ namespace DicingBlade.ViewModels
         private void MachineSettings() 
         {
             new DicingBlade.Views.MachineSettingsView()
-            {
-                DataContext = Settings.Default
+            {                             
+                DataContext = new MachineSettingsViewModel(Machine)
             }.ShowDialog();
             Settings.Default.Save();
-            Machine.RefreshSettings(PrepareSettings());
+            Machine.RefreshSettings();
         }
         private void TechnologySettings() 
         {
@@ -316,17 +323,6 @@ namespace DicingBlade.ViewModels
             
             Thickness = 1;
         }
-        
-
-        private Bridge PrepareSettings() 
-        {
-            return new Bridge()
-            {
-                Air = Settings.Default.AirSensorDsbl,
-                CoolantWater = Settings.Default.CoolantSensorDsbl,
-                SpindleWater = Settings.Default.SpindleCntrlDsbl,
-                ChuckVacuum = Settings.Default.VacuumSensorDsbl
-            };
-        }
+                
     }
 }
