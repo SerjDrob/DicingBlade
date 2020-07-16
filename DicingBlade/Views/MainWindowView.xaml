@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:local="clr-namespace:DicingBlade.Classes"  
+        xmlns:converters="clr-namespace:DicingBlade.Converters"
         xmlns:model="clr-namespace:DicingBlade.ViewModels"
         xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Platform"
         xmlns:System="clr-namespace:System;assembly=mscorlib"        
@@ -23,9 +24,11 @@
         <local:ToPointConverter x:Key="ToPointConvert"/>
         <local:TransformPointConverter x:Key="TransformPoint"/>
         <local:CursorToPathConverter x:Key="GetCursor"/>
+        <converters:MatchEnumVisibilityConverter x:Key="MatchEnumConverter"/>
         <SolidColorBrush Color="MediumSpringGreen" x:Key="SignalGreen"/>
         <SolidColorBrush Color="IndianRed" x:Key="SignalRed"/>
         <System:Double x:Key="Zero">0</System:Double>
+        
     </Window.Resources>    
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="KeyDown">
@@ -36,7 +39,19 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
     
-    <Grid>        
+    <Grid>
+        <Grid.Resources>            
+                <Style x:Key="Rec1" TargetType="Rectangle">
+                    <Setter Property="Width" Value="10"/>
+                    <Setter Property="Height" Value="10"/>                 
+                    <!--<Setter Property="Fill"  Value="{StaticResource SignalRed}"/>
+                <Style.Triggers>
+                    <DataTrigger Value="True">
+                        <Setter Property="Fill" Value="{StaticResource SignalGreen}"/>
+                    </DataTrigger>
+                </Style.Triggers>-->
+            </Style>            
+        </Grid.Resources>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2*"/>
             <ColumnDefinition Width="*"/>
@@ -426,8 +441,138 @@
                 <Label Content="{Binding Machine.Y.CmdPosition, StringFormat=Ycmd:{0}}" Grid.Column="1" Grid.Row="1"/>
                 <Label Content="{Binding Machine.Z.CmdPosition, StringFormat=Zcmd:{0}}" Grid.Column="1" Grid.Row="2"/>
                 <Label Content="{Binding Machine.U.CmdPosition, StringFormat=Ucmd:{0}}" Grid.Column="1" Grid.Row="3"/>
-                <!--<Label Content="Lx:" Grid.Column="2"/>
-                <Label Content="Lz:" Grid.Row="2" Grid.Column="2"/>-->                
+                
+                <StackPanel Orientation="Horizontal" Grid.Column="2">
+                    <Rectangle Margin="3">
+                        <Rectangle.Style>
+                            <Style TargetType="Rectangle">
+                                <Setter Property="Fill"  Value="{StaticResource SignalRed}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Value="True">
+                                        <DataTrigger.Binding>
+                                            <Binding Path="Machine.X.LmtN"/>
+                                        </DataTrigger.Binding>
+                                        <Setter Property="Fill" Value="{StaticResource SignalGreen}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Rectangle.Style>
+                    </Rectangle>
+                    <Rectangle Margin="3" Width="20" Height="20">
+                        <Rectangle.Style>
+                            <Style TargetType="Rectangle">
+                                <Setter Property="Fill"  Value="{StaticResource SignalRed}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Value="True">
+                                        <DataTrigger.Binding>
+                                            <Binding Path="Machine.X.LmtP"/>
+                                        </DataTrigger.Binding>
+                                        <Setter Property="Fill" Value="{StaticResource SignalGreen}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Rectangle.Style>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Grid.Column="2" Grid.Row="1">
+                    <Rectangle Margin="3" Width="20" Height="20">
+                        <Rectangle.Style>
+                            <Style TargetType="Rectangle">
+                                <Setter Property="Fill"  Value="{StaticResource SignalRed}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Value="True">
+                                        <DataTrigger.Binding>
+                                            <Binding Path="Machine.Y.LmtN"/>
+                                        </DataTrigger.Binding>
+                                        <Setter Property="Fill" Value="{StaticResource SignalGreen}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Rectangle.Style>
+                    </Rectangle>
+                    <Rectangle Margin="3" Width="20" Height="20">
+                        <Rectangle.Style>
+                            <Style TargetType="Rectangle">
+                                <Setter Property="Fill"  Value="{StaticResource SignalRed}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Value="True">
+                                        <DataTrigger.Binding>
+                                            <Binding Path="Machine.Y.LmtP"/>
+                                        </DataTrigger.Binding>
+                                        <Setter Property="Fill" Value="{StaticResource SignalGreen}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Rectangle.Style>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Grid.Column="2" Grid.Row="2">
+                    <Rectangle Margin="3" Width="20" Height="20">
+                        <Rectangle.Style>
+                            <Style TargetType="Rectangle">
+                                <Setter Property="Fill"  Value="{StaticResource SignalRed}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Value="True">
+                                        <DataTrigger.Binding>
+                                            <Binding Path="Machine.Z.LmtN"/>
+                                        </DataTrigger.Binding>
+                                        <Setter Property="Fill" Value="{StaticResource SignalGreen}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Rectangle.Style>
+                    </Rectangle>
+                    <Rectangle Margin="3" Width="20" Height="20">
+                        <Rectangle.Style>
+                            <Style TargetType="Rectangle">
+                                <Setter Property="Fill"  Value="{StaticResource SignalRed}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Value="True">
+                                        <DataTrigger.Binding>
+                                            <Binding Path="Machine.Z.LmtP"/>
+                                        </DataTrigger.Binding>
+                                        <Setter Property="Fill" Value="{StaticResource SignalGreen}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Rectangle.Style>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Grid.Column="2" Grid.Row="3">
+                    <Rectangle Margin="3" Width="20" Height="20">
+                        <Rectangle.Style>
+                            <Style TargetType="Rectangle">
+                                <Setter Property="Fill"  Value="{StaticResource SignalRed}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Value="True">
+                                        <DataTrigger.Binding>
+                                            <Binding Path="Machine.U.LmtN"/>
+                                        </DataTrigger.Binding>
+                                        <Setter Property="Fill" Value="{StaticResource SignalGreen}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Rectangle.Style>
+                    </Rectangle>
+                    <Rectangle Margin="3" Width="20" Height="20">
+                        <Rectangle.Style>
+                            <Style TargetType="Rectangle">
+                                <Setter Property="Fill"  Value="{StaticResource SignalRed}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Value="True">
+                                        <DataTrigger.Binding>
+                                            <Binding Path="Machine.U.LmtP"/>
+                                        </DataTrigger.Binding>
+                                        <Setter Property="Fill" Value="{StaticResource SignalGreen}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Rectangle.Style>
+                    </Rectangle>
+                </StackPanel>
+                <Label Content="Быстро" Grid.Column="3" Visibility="{Binding Machine.VelocityRegime, Converter={StaticResource MatchEnumConverter}, ConverterParameter={x:Static local:Velocity.Fast}}"/>
+                <Label Content="Медленно" Grid.Column="3" Visibility="{Binding Machine.VelocityRegime, Converter={StaticResource MatchEnumConverter}, ConverterParameter={x:Static local:Velocity.Slow}}"/>
+                <Label Content="Шаг" Grid.Column="3" Visibility="{Binding Machine.VelocityRegime, Converter={StaticResource MatchEnumConverter}, ConverterParameter={x:Static local:Velocity.Step}}"/>
             </Grid>
         </GroupBox>
         <GroupBox Grid.Row="2" HorizontalAlignment="Left" VerticalAlignment="Bottom">
@@ -588,7 +733,7 @@
                             </Style>
                         </Border.Style>
                         <DockPanel LastChildFill="False">
-                            <Label Content="Обдув" DockPanel.Dock="Left"/>
+                            <Label Content="Обдув" DockPanel.Dock="Left"/>                            
                         </DockPanel>
                     </Border>
                 </StackPanel>

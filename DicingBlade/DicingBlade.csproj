@@ -161,6 +161,7 @@
     <Compile Include="Converters\ConditionConverter.cs" />
     <Compile Include="Classes\Grid.cs" />
     <Compile Include="Classes\Map.cs" />
+    <Compile Include="Converters\MatchEnumVisibilityConverter.cs" />
     <Compile Include="Converters\RadioEnumConverter.cs" />
     <Compile Include="Converters\ScaleConverter.cs" />
     <Compile Include="Classes\StatMethods.cs" />

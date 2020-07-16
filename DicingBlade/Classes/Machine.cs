@@ -604,8 +604,10 @@ namespace DicingBlade.Classes
                 case Place.Loading:
                     break;
                 case Place.CameraChuckCenter:
+                    await MoveInPosXYAsync(CameraChuckCenter);
                     break;
                 case Place.BladeChuckCenter:
+                    await MoveInPosXYAsync(BladeChuckCenter);
                     break;
                 default:
                     break;

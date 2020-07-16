@@ -60,11 +60,11 @@ namespace DicingBlade.Classes
             }
             catch { }
 
-            translateTransform1x = new TranslateTransform(xOffset, 0);
+            translateTransform1x = new TranslateTransform(-xOffset, 0);
             translateTransform2x = new TranslateTransform(ActualWidth / 2, 0);
             scaleTransformX = new ScaleTransform(wh / (1.4 * res), 1);
 
-            translateTransform1y = new TranslateTransform(0, yOffset);
+            translateTransform1y = new TranslateTransform(0, -yOffset);
             translateTransform2y = new TranslateTransform(0, ActualHeight / 2);
             scaleTransformY = new ScaleTransform(1, wh / (1.4 * res));
 
