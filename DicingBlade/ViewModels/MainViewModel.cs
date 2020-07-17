@@ -106,23 +106,20 @@ namespace DicingBlade.ViewModels
             //test key
             if(key.Key==Key.Tab)
             {
-                if(process==null) process = new Process(Machine, Wafer, new Blade());
-                await process.ProcElementDispatcherAsync(Diagram.goCameraPointLearningXYZ);
+                //if(process==null) process = new Process(Machine, Wafer, new Blade());
+                //await process.ProcElementDispatcherAsync(Diagram.goCameraPointLearningXYZ);
             }
 
             if (key.Key == Key.Q)
-            {
-                //Condition.Mask ^= (1 << (int)Signals.vacuumValve);
+            {                
                 Machine.SwitchOnChuckVacuum ^=true;
             }
             if (key.Key == Key.W)
             {
-                //Condition.Mask ^= (1 << (int)Signals.waterValve);
                 Machine.SwitchOnCoolantWater ^= true;
             }
             if (key.Key == Key.R)
             {
-                //Condition.Mask ^= (1 << (int)Signals.blowValve);
                 Machine.SwitchOnBlowing ^= true;
             }
             if (key.Key == Key.D) WaferView.Angle += 0.2;
@@ -136,43 +133,14 @@ namespace DicingBlade.ViewModels
                     if (Machine.SetOnChuck())
                     {
                         await Machine.GoThereAsync(Place.CameraChuckCenter);
-                        process = new Process(Machine, Wafer, new Blade());
+                        process = new Process(Machine, Wafer, new Blade(), BaseProcess);
                         process.ProcessStatus = Status.StartLearning;                        
                     }
                     
                 }
                 else 
                 {
-                    switch (process.ProcessStatus)
-                    {
-                        case Status.StartLearning:
-                            await process.ProcElementDispatcherAsync(Diagram.goCameraPointLearningXYZ);
-                            process.ProcessStatus = Status.Learning;
-                            break;
-                        case Status.Learning:                            
-                            Wafer.SetCurrentDirectionIndexShift = Machine.Y.ActualPosition - Wafer.GetNearestCut(Machine.Y.ActualPosition).StartPoint.Y;
-                            Wafer.SetCurrentDirectionAngle = Machine.U.ActualPosition;
-                            if (Wafer.NextDir()) 
-                            {
-                                await Machine.U.MoveAxisInPosAsync(Wafer.GetCurrentDiretionAngle);
-                                await process.ProcElementDispatcherAsync(Diagram.goCameraPointLearningXYZ); 
-                            }
-                            else 
-                            {
-                                process.ProcessStatus = Status.Working;
-                                process.DoProcessAsync(BaseProcess);
-                            }                         
-                            
-                            break;
-                        case Status.Working:
-                            process.PauseProcess = !process.PauseProcess;
-                            if (process.PauseProcess) process.PauseScenarioAsync();
-                            break;
-                        case Status.Correcting:
-                            break;
-                        default:
-                            break;
-                    }
+                    await process.StartPauseProc();
                 }
                 //StartWorkAsync();
             }
@@ -282,7 +250,7 @@ namespace DicingBlade.ViewModels
             {
                 DataContext = new WaferSettingsViewModel()
             }.ShowDialog();
-            Wafer = PropContainer.Wafer;
+            Wafer = PropContainer.Wafer;           
             WaferView = Wafer.MakeWaferView();
             Thickness = 1;
         }

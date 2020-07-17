@@ -52,14 +52,14 @@ namespace DicingBlade.ViewModels
             if (IsRound) 
             {
                 PropContainer.IsRound = true;
-                PropContainer.Wafer=new Wafer(new Vector2(0, 0), Thickness, Diameter, (0, IndexW), (90, IndexH));
+                PropContainer.Wafer=new Wafer(new Vector2(Diameter/2, Diameter/2), Thickness, Diameter, (0, IndexW), (90, IndexH));
                 //wafer = new Wafer(new Vector2(0, 0), Thickness, Diameter, (0, IndexW), (90, IndexH));
                 //wafer.WriteObject<Wafer>("/Wafer.xml");
             }
             else 
             {
                 PropContainer.IsRound = false;
-                PropContainer.Wafer= new Wafer(new Vector2(0, 0), Thickness, (0, Height, Width, IndexW), (90, Width, Height, IndexH));
+                PropContainer.Wafer= new Wafer(new Vector2(Width/2, Height/2), Thickness, (0, Height, Width, IndexW), (90, Width, Height, IndexH));
                 //wafer = new Wafer(new Vector2(0, 0), Thickness, (0, Height, Width, IndexW), (90, Width, Height, IndexH));
                 //wafer.WriteObject<Wafer>("/Wafer.xml");
             }

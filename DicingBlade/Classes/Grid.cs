@@ -154,7 +154,9 @@ namespace DicingBlade.Classes
                 foreach (var cut in Lines[degree])
                 {
                     var tempLine = RotateLine(degree * PI / 180, new Line(cut.StartPoint, cut.EndPoint), GridCenter);
-                    tempRaws.Add(new Line(tempLine.StartPoint, tempLine.EndPoint));
+                    Vector2 startPoint = new Vector2(tempLine.StartPoint.X - GridCenter.X, tempLine.StartPoint.Y - GridCenter.Y);
+                    Vector2 endPoint = new Vector2(tempLine.EndPoint.X - GridCenter.X, tempLine.EndPoint.Y - GridCenter.Y);
+                    tempRaws.Add(new Line(startPoint,endPoint));
                 }
             }
             return new WaferView(tempRaws, GridCenter);  

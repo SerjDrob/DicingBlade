@@ -77,6 +77,33 @@ namespace DicingBlade.Classes
         public Vector2 BladeChuckCenter { get; set; }
         public double CameraBladeOffset { get; set; }
         public Vector2 CameraChuckCenter { get; set; }
+        /// <summary>
+        /// Возвращает текущие координаты в системе центр столика - ось объектива камеры.
+        /// </summary>
+        public Vector2 COSystemCurrentCoors 
+        {
+            get 
+            {
+                return new Vector2(X.ActualPosition - CameraChuckCenter.X, Y.ActualPosition - CameraChuckCenter.Y);
+            }
+        }
+        /// <summary>
+        /// Возвращает текущие координаты в системе центр столика - центр кромки диска.
+        /// </summary>
+        public Vector2 CBSystemCurrentCoors
+        {
+            get
+            {
+                return new Vector2(X.ActualPosition - BladeChuckCenter.X, Y.ActualPosition - BladeChuckCenter.Y);
+            }
+        }
+        /// <summary>
+        /// Перевод системы центр столика в систему центр кромки диска
+        /// </summary>
+        public Vector2 CtoBSystemCoors(Vector2 coordinates)
+        {
+            return new Vector2(coordinates.X + BladeChuckCenter.X, coordinates.Y + BladeChuckCenter.Y);
+        }
         public double CameraFocus { get; set; }
         public bool PCI1240IsConnected;        
         public bool SpindleWater { get; set; }       

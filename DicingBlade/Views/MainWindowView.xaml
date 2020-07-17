@@ -40,17 +40,15 @@
     </i:Interaction.Triggers>
     
     <Grid>
-        <Grid.Resources>            
-                <Style x:Key="Rec1" TargetType="Rectangle">
-                    <Setter Property="Width" Value="10"/>
-                    <Setter Property="Height" Value="10"/>                 
-                    <!--<Setter Property="Fill"  Value="{StaticResource SignalRed}"/>
-                <Style.Triggers>
-                    <DataTrigger Value="True">
-                        <Setter Property="Fill" Value="{StaticResource SignalGreen}"/>
-                    </DataTrigger>
-                </Style.Triggers>-->
-            </Style>            
+        <Grid.Resources>
+            <Style x:Key="Rec1" TargetType="Rectangle">
+                <Setter Property="Margin" Value="3"/>                
+                <Setter Property="Width" Value="10"/>
+                <Setter Property="Height" Value="10"/>
+                <Setter Property="Fill"  Value="{StaticResource SignalRed}"/>
+                <Setter Property="RadiusX" Value="5"/>
+                <Setter Property="RadiusY" Value="5"/>
+            </Style>
         </Grid.Resources>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2*"/>
@@ -370,7 +368,7 @@
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>               
-                <Path Stroke="Green" StrokeThickness="1" Panel.ZIndex="3">
+                <Path x:Name="BladeCursor" Stroke="Green" StrokeThickness="1" Panel.ZIndex="3">
                     <Path.Data>
                         <MultiBinding Converter="{StaticResource GetCursor}">
                             <Binding Path="Machine.X.ActualPosition"/>
@@ -443,10 +441,9 @@
                 <Label Content="{Binding Machine.U.CmdPosition, StringFormat=Ucmd:{0}}" Grid.Column="1" Grid.Row="3"/>
                 
                 <StackPanel Orientation="Horizontal" Grid.Column="2">
-                    <Rectangle Margin="3">
+                    <Rectangle>
                         <Rectangle.Style>
-                            <Style TargetType="Rectangle">
-                                <Setter Property="Fill"  Value="{StaticResource SignalRed}"/>
+                            <Style TargetType="Rectangle" BasedOn="{StaticResource Rec1}">                               
                                 <Style.Triggers>
                                     <DataTrigger Value="True">
                                         <DataTrigger.Binding>
@@ -457,11 +454,10 @@
                                 </Style.Triggers>
                             </Style>
                         </Rectangle.Style>
-                    </Rectangle>
-                    <Rectangle Margin="3" Width="20" Height="20">
+                    </Rectangle>                    
+                    <Rectangle>
                         <Rectangle.Style>
-                            <Style TargetType="Rectangle">
-                                <Setter Property="Fill"  Value="{StaticResource SignalRed}"/>
+                            <Style TargetType="Rectangle" BasedOn="{StaticResource Rec1}">                                
                                 <Style.Triggers>
                                     <DataTrigger Value="True">
                                         <DataTrigger.Binding>
@@ -475,10 +471,9 @@
                     </Rectangle>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Grid.Column="2" Grid.Row="1">
-                    <Rectangle Margin="3" Width="20" Height="20">
+                    <Rectangle>
                         <Rectangle.Style>
-                            <Style TargetType="Rectangle">
-                                <Setter Property="Fill"  Value="{StaticResource SignalRed}"/>
+                            <Style TargetType="Rectangle" BasedOn="{StaticResource Rec1}">
                                 <Style.Triggers>
                                     <DataTrigger Value="True">
                                         <DataTrigger.Binding>
@@ -490,10 +485,9 @@
                             </Style>
                         </Rectangle.Style>
                     </Rectangle>
-                    <Rectangle Margin="3" Width="20" Height="20">
+                    <Rectangle>
                         <Rectangle.Style>
-                            <Style TargetType="Rectangle">
-                                <Setter Property="Fill"  Value="{StaticResource SignalRed}"/>
+                            <Style TargetType="Rectangle" BasedOn="{StaticResource Rec1}">
                                 <Style.Triggers>
                                     <DataTrigger Value="True">
                                         <DataTrigger.Binding>
@@ -507,10 +501,9 @@
                     </Rectangle>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Grid.Column="2" Grid.Row="2">
-                    <Rectangle Margin="3" Width="20" Height="20">
+                    <Rectangle>
                         <Rectangle.Style>
-                            <Style TargetType="Rectangle">
-                                <Setter Property="Fill"  Value="{StaticResource SignalRed}"/>
+                            <Style TargetType="Rectangle" BasedOn="{StaticResource Rec1}">
                                 <Style.Triggers>
                                     <DataTrigger Value="True">
                                         <DataTrigger.Binding>
@@ -522,10 +515,9 @@
                             </Style>
                         </Rectangle.Style>
                     </Rectangle>
-                    <Rectangle Margin="3" Width="20" Height="20">
+                    <Rectangle>
                         <Rectangle.Style>
-                            <Style TargetType="Rectangle">
-                                <Setter Property="Fill"  Value="{StaticResource SignalRed}"/>
+                            <Style TargetType="Rectangle" BasedOn="{StaticResource Rec1}">
                                 <Style.Triggers>
                                     <DataTrigger Value="True">
                                         <DataTrigger.Binding>
@@ -539,10 +531,9 @@
                     </Rectangle>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Grid.Column="2" Grid.Row="3">
-                    <Rectangle Margin="3" Width="20" Height="20">
+                    <Rectangle>
                         <Rectangle.Style>
-                            <Style TargetType="Rectangle">
-                                <Setter Property="Fill"  Value="{StaticResource SignalRed}"/>
+                            <Style TargetType="Rectangle" BasedOn="{StaticResource Rec1}">
                                 <Style.Triggers>
                                     <DataTrigger Value="True">
                                         <DataTrigger.Binding>
@@ -554,10 +545,9 @@
                             </Style>
                         </Rectangle.Style>
                     </Rectangle>
-                    <Rectangle Margin="3" Width="20" Height="20">
+                    <Rectangle>
                         <Rectangle.Style>
-                            <Style TargetType="Rectangle">
-                                <Setter Property="Fill"  Value="{StaticResource SignalRed}"/>
+                            <Style TargetType="Rectangle" BasedOn="{StaticResource Rec1}">
                                 <Style.Triggers>
                                     <DataTrigger Value="True">
                                         <DataTrigger.Binding>

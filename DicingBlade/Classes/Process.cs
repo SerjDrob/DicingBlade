@@ -84,6 +84,8 @@ namespace DicingBlade.Classes
         }
         
         private PauseTokenSource pauseToken;
+
+        private Diagram[] BaseProcess;
         
         private CancellationTokenSource cancellationToken;
         //private bool WaferInProcessed { }
@@ -104,11 +106,13 @@ namespace DicingBlade.Classes
 
         //private Dictionary<int, double> AlignedAngles;
         private double OffsetAngle { get; set; }
-        public Process(Machine machine, Wafer wafer, Blade blade) // В конструкторе происходит загрузка технологических параметров
+        
+        public Process(Machine machine, Wafer wafer, Blade blade, Diagram[] proc) // В конструкторе происходит загрузка технологических параметров
         {
             Machine = machine;
             Wafer = wafer;
-            Blade = blade;            
+            Blade = blade;
+            BaseProcess = proc;
             Machine.OnAirWanished += Machine_OnAirWanished;
             Machine.OnCoolWaterWanished += Machine_OnCoolWaterWanished;
             Machine.OnSpinWaterWanished += Machine_OnSpinWaterWanished;
@@ -162,7 +166,7 @@ namespace DicingBlade.Classes
         {
             if (CurrentLine > 0) CurrentLine--;
         }
-        public async Task ProcElementDispatcherAsync(Diagram element) 
+        private async Task ProcElementDispatcherAsync(Diagram element) 
         {
             #region MyRegion            
             // проверка перед каждым действием. асинхронные действия await()!!!
@@ -226,12 +230,13 @@ namespace DicingBlade.Classes
                 case Diagram.goNextCutY:
                     if (BladeInWafer) break;
                     Machine.SetVelocity(Velocity.Service);
-                    await Machine.Y.MoveAxisInPosAsync(Wafer.GetCurrentLine(CurrentLine).start.Y);
+                    await Machine.Y.MoveAxisInPosAsync(Machine.CtoBSystemCoors(Wafer.GetCurrentLine(CurrentLine).start).Y);
                     break;
                 case Diagram.goNextCutXY:
                     if (BladeInWafer) break;
                     Machine.SetVelocity(Velocity.Service);
-                    await Machine.MoveInPosXYAsync(new Vector2(Wafer.GetCurrentLine(CurrentLine).start.X, Wafer.GetCurrentLine(CurrentLine).start.Y));
+                    Vector2 vector = Machine.CtoBSystemCoors(Wafer.GetCurrentLine(CurrentLine).start);
+                    await Machine.MoveInPosXYAsync(vector);
                     break;
                 case Diagram.goTransferingHeightZ:
                     Machine.SetVelocity(Velocity.Service);
@@ -270,6 +275,39 @@ namespace DicingBlade.Classes
             }
         }
 
+        public async Task StartPauseProc()
+        {
+            switch (ProcessStatus)
+            {
+                case Status.StartLearning:
+                    await ProcElementDispatcherAsync(Diagram.goCameraPointLearningXYZ);
+                    ProcessStatus = Status.Learning;
+                    break;
+                case Status.Learning:
+                    Wafer.SetCurrentDirectionIndexShift = Machine.COSystemCurrentCoors.Y - Wafer.GetNearestCut(Machine.COSystemCurrentCoors.Y).StartPoint.Y;
+                    Wafer.SetCurrentDirectionAngle = Machine.U.ActualPosition;
+                    if (Wafer.NextDir())
+                    {
+                        await Machine.U.MoveAxisInPosAsync(Wafer.GetCurrentDiretionAngle);
+                        await ProcElementDispatcherAsync(Diagram.goCameraPointLearningXYZ);
+                    }
+                    else
+                    {
+                        ProcessStatus = Status.Working;
+                        await DoProcessAsync(BaseProcess);
+                    }
+
+                    break;
+                case Status.Working:
+                    PauseProcess = !PauseProcess;
+                    if (PauseProcess) await PauseScenarioAsync();
+                    break;
+                case Status.Correcting:
+                    break;
+                default:
+                    break;
+            }
+        }
         private void Machine_OnVacuumWanished(/*DIEventArgs eventArgs*/)
         {
             if (IsCutting) { }
