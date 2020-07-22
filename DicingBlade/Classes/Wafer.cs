@@ -66,6 +66,27 @@ namespace DicingBlade.Classes
             }
         }
         public Wafer() { }
+        public void ResetWafer() 
+        {
+            foreach (var key in Grid.Lines.Keys)
+            {
+                foreach (var cut in Grid.Lines[key])
+                {
+                    cut.ResetCut();
+                }
+            }
+            CurrentAngleNum = 0;
+        }
+        public void SetPassCount(int passes) 
+        {
+            foreach (var key in Grid.Lines.Keys)
+            {
+                foreach (var cut in Grid.Lines[key])
+                {
+                    cut.CutCount=passes;
+                }
+            }
+        }
         public Wafer(double thickness, DxfDocument dxf, string layer)
         {
             Thickness = thickness;

@@ -29,9 +29,10 @@ namespace DicingBlade.ViewModels
     }
     [AddINotifyPropertyChangedInterface]
     class MainViewModel
-    {       
+    {
+        
         public Machine Machine { get; set; }
-        private Process process;
+        public Process process { get; set; }
         public Wafer Wafer { get; set; }
         public WaferView WaferView { get; set; }
         private TempWafer2D tempWafer2;
@@ -80,8 +81,7 @@ namespace DicingBlade.ViewModels
             WaferSettingsCmd = new Command(args => WaferSettings());
             MachineSettingsCmd = new Command(args => MachineSettings());
             TechnologySettingsCmd = new Command(args => TechnologySettings());
-            Machine = new Machine(false);
-            
+            Machine = new Machine(false);           
             BaseProcess = new Diagram[] {
                 Diagram.goNextCutXY,               
                 Diagram.goNextDepthZ,
@@ -139,7 +139,11 @@ namespace DicingBlade.ViewModels
                 }
                 else 
                 {
-                    await process.StartPauseProc();
+                    if(process.ProcessStatus == Status.Done) 
+                    {
+                        process = null;                        
+                    }
+                    else await process.StartPauseProc();
                 }
                 //StartWorkAsync();
             }
@@ -268,6 +272,10 @@ namespace DicingBlade.ViewModels
             {
                 DataContext = new TechnologySettingsViewModel()
             }.ShowDialog();
+            if (Wafer != null) 
+            {
+                Wafer.SetPassCount(PropContainer.Technology.PassCount);
+            }
         }
         private void Change() 
         {

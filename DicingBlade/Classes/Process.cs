@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Advantech.Motion;
 using netDxf;
 using Microsoft.VisualStudio.Workspace;
+using PropertyChanged;
 
 namespace DicingBlade.Classes
 {   
@@ -33,7 +34,8 @@ namespace DicingBlade.Classes
         StartLearning,
         Learning,
         Working,
-        Correcting
+        Correcting,
+        Done
     }
     /// <summary>
     /// Структура параметров процесса
@@ -54,6 +56,7 @@ namespace DicingBlade.Classes
             return Math.Atan2(point2.Y-point1.Y, point2.X - point1.X);
         }
     }
+    [AddINotifyPropertyChangedInterface]
     class Process
     {
 
@@ -89,8 +92,8 @@ namespace DicingBlade.Classes
         
         private CancellationTokenSource cancellationToken;
         //private bool WaferInProcessed { }
-        private bool SideDone { get; set; } = false;
-        private int SideCounter { get; set; } = 0;
+        public bool SideDone { get; private set; } = false;
+        public int SideCounter { get; private set; } = 0;
         private bool BladeInWafer 
         {
             get 
@@ -99,7 +102,7 @@ namespace DicingBlade.Classes
                 else return false;
             }
         }
-        private int CurrentLine { get; set; }
+        public int CurrentLine { get; private set; }
         private double RotationSpeed { get; set; } 
         private uint FeedSpeed { get; set; }        
         private bool Aligned { get; set; }
@@ -138,6 +141,8 @@ namespace DicingBlade.Classes
                         await ProcElementDispatcherAsync(item);
                     }
                 }
+                ProcessStatus = Status.Done;
+                Wafer.ResetWafer();
             }
         }
         private void NextLine() 
@@ -200,7 +205,8 @@ namespace DicingBlade.Classes
                     IsCutting = true;
                     target = Machine.CtoBSystemCoors(Wafer.GetCurrentLine(CurrentLine).end);
                     await Machine.X.MoveAxisInPosAsync(target.X);
-                    IsCutting = false;                
+                    IsCutting = false;
+                    Machine.SwitchOnCoolantWater = false;
                     if (!Wafer.CurrentCutIncrement(CurrentLine))
                     {
                         NextLine();
@@ -260,7 +266,7 @@ namespace DicingBlade.Classes
                         SideCounter++;
                         if (SideCounter == Wafer.DirectionsCount)
                         {
-                            InProcess = false;
+                            InProcess = false;                            
                         }
                     }
                     break;

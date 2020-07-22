@@ -88,6 +88,28 @@
                         <Button Grid.Column="2" Grid.Row="2" Margin="3"/>
                     </Grid>
                 </GroupBox>
+                <GroupBox Header="Наладка">
+                    <Grid>
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="ProcessStatus"/>
+                                <Label Content="{Binding process.ProcessStatus}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="SideDone"/>
+                                <Label Content="{Binding process.SideDone}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="SideCounter"/>
+                                <Label Content="{Binding process.SideCounter}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="CurrentLine"/>
+                                <Label Content="{Binding process.CurrentLine}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                </GroupBox>
             </Grid>
         </GroupBox>
         <Border Grid.RowSpan="2" BorderBrush="LightGray" BorderThickness="3"/>

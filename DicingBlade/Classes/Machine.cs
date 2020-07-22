@@ -18,6 +18,8 @@ using System.IO;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using DicingBlade.Properties;
+using System.Windows.Data;
+
 namespace DicingBlade.Classes
 {
     enum DO 
@@ -378,7 +380,7 @@ namespace DicingBlade.Classes
             
             m_bInit = true;
                         
-            X = new Axis(6.4, m_Axishand[0]);
+            X = new Axis(0, m_Axishand[0]);
             Y = new Axis(6.4, m_Axishand[1]);
             Z = new Axis(0, m_Axishand[2]);
             U = new Axis(0, m_Axishand[3]);
@@ -645,8 +647,7 @@ namespace DicingBlade.Classes
             uint ElCount = 2;           
             double accuracy = 0.001;
             double backlash = 0;
-            ushort state = new ushort();
-            ushort stateZ = new ushort();
+            ushort state = new ushort();            
             double vel = 0.1;
             bool gotItX;
             bool gotItY;
@@ -731,14 +732,14 @@ namespace DicingBlade.Classes
                 position.X = Math.Round(position.X, 3);
                 position.Y = Math.Round(position.Y, 3);
                 Motion.mAcm_GpMoveLinearAbs(XYhandle, new double[2] { position.X, position.Y }, ref ElCount);
-                while ((state != (uint)GroupState.STA_Gp_Ready))
+                do
                 {
                     Motion.mAcm_GpGetState(XYhandle, ref state);
-                }                
+                } while (state == (uint)GroupState.STA_GP_BUSY);
             }
             );
-            X.MoveAxisInPosAsync(position.X);
-            Y.MoveAxisInPosAsync(position.Y);
+            await X.MoveAxisInPosAsync(position.X);
+            await Y.MoveAxisInPosAsync(position.Y);
         }
         public void RefreshSettings()
         {
@@ -1074,9 +1075,10 @@ namespace DicingBlade.Classes
         }
         public async Task MoveAxisInPosAsync(double position)
         {
-            double accuracy = 0.001;
+            double accuracy = 0.003;
             double backlash = 0;
             ushort state = new ushort();
+            uint motionStatus = new uint();
             double vel = 0.1;
             bool gotIt;
             int sign = 0;
@@ -1091,14 +1093,14 @@ namespace DicingBlade.Classes
                         {
                             position = Math.Round(position, 3);
                             Motion.mAcm_AxMoveAbs(Handle, position);
-                            while ((state != (uint)AxisState.STA_AX_READY))
+                            do
                             {
-                                Motion.mAcm_AxGetState(Handle, ref state);
-                            }
+                                Motion.mAcm_AxGetMotionStatus(Handle, ref motionStatus);
+                            } while ((motionStatus & 0b_1) != 1);
                             Motion.mAcm_SetProperty(Handle, (uint)PropertyID.PAR_AxVelLow, ref vel, 8);
                             Motion.mAcm_SetProperty(Handle, (uint)PropertyID.PAR_AxVelHigh, ref vel, 8);
                         }
-                        Thread.Sleep(300);
+                        //Thread.Sleep(300);
 
                         if (Math.Abs(Math.Round(ActualPosition, 3) - position) <= accuracy) gotIt = true;
                         else gotIt = false;
@@ -1113,8 +1115,8 @@ namespace DicingBlade.Classes
                                     Motion.mAcm_AxStopEmg(Handle);
                                     gotIt = true;
                                 }
-                                Motion.mAcm_AxGetState(Handle, ref state);
-                                if (state == (uint)AxisState.STA_AX_READY) break;
+                                Motion.mAcm_AxGetMotionStatus(Handle, ref motionStatus);
+                                if ((motionStatus&0b_1) == 1) break;
                             }
                         }
                         if (gotIt) break;
@@ -1124,11 +1126,16 @@ namespace DicingBlade.Classes
             }
             else
             {
-                Motion.mAcm_AxMoveAbs(Handle, position);
-                while ((state != (uint)AxisState.STA_AX_READY))
+                await Task.Run(() =>
                 {
-                    Motion.mAcm_AxGetState(Handle, ref state);
+                    Motion.mAcm_AxMoveAbs(Handle, position);
+                    do
+                    {
+                        Motion.mAcm_AxGetMotionStatus(Handle, ref motionStatus);
+                        //Motion.mAcm_AxGetState(Handle, ref state);
+                    } while (/*state == (uint)AxisState.STA_AX_BUSY*/(motionStatus&0b_1)!=1);
                 }
+                );
             }
         }
     }
