@@ -39,11 +39,11 @@ namespace DicingBlade.ViewModels
         {
             CloseCmd = new Command(args => ClosingWnd());
             SquareVisibility = Visibility.Visible;
-            Width = 60;
-            Height = 48;
+            Width = 30;
+            Height = 10;
             Thickness = 1;
-            IndexH = 1.1;
-            IndexW = 2.4;
+            IndexH = 1;
+            IndexW = 2;
             Diameter = 40;
         }
         public ICommand CloseCmd { get; set; }

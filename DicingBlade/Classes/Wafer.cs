@@ -16,7 +16,7 @@ namespace DicingBlade.Classes
     [AddINotifyPropertyChangedInterface]
     public class Wafer
     {
-        private double thickness;       
+        //private double thickness;       
         /// <summary>
         /// Признак выравненности по определённому углу
         /// </summary>
@@ -68,7 +68,7 @@ namespace DicingBlade.Classes
         public Wafer() { }
         public Wafer(double thickness, DxfDocument dxf, string layer)
         {
-            this.thickness = thickness;
+            Thickness = thickness;
             Grid = new Grid(dxf.Lines.Where(l => l.Layer.Name == layer));
             MakeDirections(new List<double>(Grid.Lines.Keys));
             CurrentAngleNum = 0;
@@ -83,7 +83,7 @@ namespace DicingBlade.Classes
         }
         public Wafer(Vector2 origin, double thickness, params (double degree, double length, double side, double index)[] directions)
         {
-            this.thickness = thickness;
+            Thickness = thickness;
             Grid = new Grid(origin, directions);
             MakeDirections(new List<double>(Grid.Lines.Keys));
             CurrentAngleNum = 0;
@@ -91,7 +91,7 @@ namespace DicingBlade.Classes
         }
         public Wafer(Vector2 origin, double thickness, double diameter, params (double degree, double index)[] directions)
         {
-            this.thickness = thickness;
+            Thickness = thickness;
             Grid = new Grid(origin, diameter, directions);
             MakeDirections(new List<double>(Grid.Lines.Keys));
             CurrentAngleNum = 0;
@@ -103,11 +103,11 @@ namespace DicingBlade.Classes
             tempView.IsRound = IsRound;
             return tempView;
         }
-        public bool NextDir()
+        public bool NextDir(bool reset = false)
         {
             if (Directions.Count - 1 == CurrentAngleNum)
             {
-                CurrentAngleNum = 0;
+                if(reset) CurrentAngleNum = 0;
                 return false;
             }
             else
@@ -157,9 +157,13 @@ namespace DicingBlade.Classes
         {
             return (1 - GetCurrentCut(currentLine).CutRatio) * Thickness;
         }
-        public bool CurrentCutIncrement(int currentLine) 
+        public void test() 
         {
-            return Grid.Lines[CurrentAngleNum][currentLine].NextCut();
+          //  List<Cut> cuts = Grid.Lines[CurrentAngleNum];
+        }
+        public bool CurrentCutIncrement(int currentLine) 
+        {            
+            return Grid.Lines.GetItemByIndex(CurrentAngleNum)[currentLine].NextCut();
         }
     }
 

@@ -72,8 +72,10 @@ namespace DicingBlade.Classes
         
         public (Vector2 start, Vector2 end) GetCenteredLine(double angle, int line)
         {
-          //  if (!Lines.Keys.Contains(angle)) throw;
-            return (new Vector2(Lines[angle][line].StartPoint.X - GridCenter.X, Lines[angle][line].StartPoint.Y - GridCenter.Y), new Vector2(Lines[angle][line].EndPoint.X - GridCenter.X, Lines[angle][line].EndPoint.Y - GridCenter.Y));
+            //  if (!Lines.Keys.Contains(angle)) throw;
+            Vector2 start = Lines[angle][line].StartPoint.SplitZ() - GridCenter;
+            Vector2 end = Lines[angle][line].EndPoint.SplitZ() - GridCenter;
+            return (start,end);
         }
         #endregion
         #region Functions
@@ -134,17 +136,7 @@ namespace DicingBlade.Classes
                 }
                 Lines.Add(direction.degree, tempLines);
 
-            }
-            //var tempRaws = new List<Line>();
-            //foreach (var degree in Lines.Keys)
-            //{
-            //    foreach (var cut in Lines[degree])
-            //    {
-            //        var tempLine = RotateLine(degree*PI/180, new Line(cut.StartPoint, cut.EndPoint), GridCenter);
-            //        tempRaws.Add(new Line(tempLine.StartPoint, tempLine.EndPoint));
-            //    }
-            //}
-            //RawLines = new ObservableCollection<Line>(tempRaws);
+            }            
         }
         public WaferView MakeGridView() 
         {

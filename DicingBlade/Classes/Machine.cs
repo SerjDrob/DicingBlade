@@ -640,7 +640,7 @@ namespace DicingBlade.Classes
                     break;
             }
         }       
-        public async Task MoveInPosXYAsync(Vector2 position)
+        public async Task MoveInPosXY1Async(Vector2 position)
         {
             uint ElCount = 2;           
             double accuracy = 0.001;
@@ -652,6 +652,7 @@ namespace DicingBlade.Classes
             bool gotItY;
             int signx = 0;
             int signy = 0;
+
             await Task.Run(() =>
             {
                 for (int recurcy = 0; recurcy < 20; recurcy++)
@@ -662,14 +663,13 @@ namespace DicingBlade.Classes
                         position.Y = Math.Round(position.Y, 3);                        
                         Motion.mAcm_GpMoveLinearAbs(XYhandle, new double[2] { position.X, position.Y }, ref ElCount);
                         while ((state != (uint)GroupState.STA_Gp_Ready))
-                        {
-                            Motion.mAcm_AxGetState(m_Axishand[2], ref stateZ);
+                        {                           
                             Motion.mAcm_GpGetState(XYhandle, ref state);
                         }
-                        Motion.mAcm_SetProperty(m_Axishand[0], (uint)PropertyID.PAR_AxVelLow, ref vel, 8);
-                        Motion.mAcm_SetProperty(m_Axishand[1], (uint)PropertyID.PAR_AxVelLow, ref vel, 8);
-                        Motion.mAcm_SetProperty(m_Axishand[0], (uint)PropertyID.PAR_AxVelHigh, ref vel, 8);
-                        Motion.mAcm_SetProperty(m_Axishand[1], (uint)PropertyID.PAR_AxVelHigh, ref vel, 8);
+                        Motion.mAcm_SetProperty(X.Handle, (uint)PropertyID.PAR_AxVelLow, ref vel, 8);
+                        Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.PAR_AxVelLow, ref vel, 8);
+                        Motion.mAcm_SetProperty(X.Handle, (uint)PropertyID.PAR_AxVelHigh, ref vel, 8);
+                        Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.PAR_AxVelHigh, ref vel, 8);
                     }
                     Thread.Sleep(300);
                     
@@ -685,32 +685,32 @@ namespace DicingBlade.Classes
                     //Motion.mAcm_CheckMotionEvent(m_DeviceHandle, null, null, 2, 0, 10);
                     if (!gotItX)
                     {
-                        Motion.mAcm_AxMoveRel(m_Axishand[0], signx * (Math.Abs(position.X - Math.Round(X.ActualPosition, 3)) + signx * backlash));
+                        Motion.mAcm_AxMoveRel(X.Handle, signx * (Math.Abs(position.X - Math.Round(X.ActualPosition, 3)) + signx * backlash));
 
                         while (!gotItX)
                         {
                             if (Math.Abs(Math.Round(X.ActualPosition, 3) - position.X) <= accuracy)
                             {
-                                Motion.mAcm_AxStopEmg(m_Axishand[0]);
+                                Motion.mAcm_AxStopEmg(X.Handle);
                                 gotItX = true;
                             }
-                            Motion.mAcm_AxGetState(m_Axishand[0], ref state);
+                            Motion.mAcm_AxGetState(X.Handle, ref state);
                             if (state == (uint)AxisState.STA_AX_READY) break;
                         }
 
                     }
                     if (!gotItY)
                     {
-                        Motion.mAcm_AxMoveRel(m_Axishand[1], signy * (Math.Abs(position.Y - Math.Round(Y.ActualPosition, 3)) + signy * backlash));
+                        Motion.mAcm_AxMoveRel(Y.Handle, signy * (Math.Abs(position.Y - Math.Round(Y.ActualPosition, 3)) + signy * backlash));
 
                         while (!gotItY)
                         {
                             if (Math.Abs(Math.Round(Y.ActualPosition, 3) - position.Y) <= accuracy)
                             {
-                                Motion.mAcm_AxStopEmg(m_Axishand[1]);
+                                Motion.mAcm_AxStopEmg(Y.Handle);
                                 gotItY = true;
                             }
-                            Motion.mAcm_AxGetState(m_Axishand[1], ref state);
+                            Motion.mAcm_AxGetState(Y.Handle, ref state);
                             if (state == (uint)AxisState.STA_AX_READY) break;
                         }
 
@@ -720,6 +720,25 @@ namespace DicingBlade.Classes
                 }
             }
             );
+        }
+
+        public async Task MoveInPosXYAsync(Vector2 position)
+        {
+            uint ElCount = 2;
+            ushort state = new ushort();            
+            await Task.Run(() =>
+            {
+                position.X = Math.Round(position.X, 3);
+                position.Y = Math.Round(position.Y, 3);
+                Motion.mAcm_GpMoveLinearAbs(XYhandle, new double[2] { position.X, position.Y }, ref ElCount);
+                while ((state != (uint)GroupState.STA_Gp_Ready))
+                {
+                    Motion.mAcm_GpGetState(XYhandle, ref state);
+                }                
+            }
+            );
+            X.MoveAxisInPosAsync(position.X);
+            Y.MoveAxisInPosAsync(position.Y);
         }
         public void RefreshSettings()
         {
@@ -1061,7 +1080,7 @@ namespace DicingBlade.Classes
             double vel = 0.1;
             bool gotIt;
             int sign = 0;
-           
+
             if (LineCoefficient != 0)
             {
                 await Task.Run(() =>
@@ -1103,7 +1122,14 @@ namespace DicingBlade.Classes
                 }
                 );
             }
-            else Motion.mAcm_AxMoveAbs(Handle, position);
+            else
+            {
+                Motion.mAcm_AxMoveAbs(Handle, position);
+                while ((state != (uint)AxisState.STA_AX_READY))
+                {
+                    Motion.mAcm_AxGetState(Handle, ref state);
+                }
+            }
         }
     }
 }

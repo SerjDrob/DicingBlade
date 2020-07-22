@@ -8,7 +8,7 @@ namespace DicingBlade.Classes
 {
     class Blade
     {
-        public double Diameter { get; set; }
+        public double Diameter { get; set; } = 1;
         public double Thickness { get; set; }
         public string Type { get; set; }
         /// <summary>

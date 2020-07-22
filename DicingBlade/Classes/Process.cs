@@ -142,15 +142,15 @@ namespace DicingBlade.Classes
         }
         private void NextLine() 
         {
-            if (CurrentLine < Wafer.DirectionLinesCount) CurrentLine++;
-            else if(CurrentLine == Wafer.DirectionLinesCount) 
+            if (CurrentLine < Wafer.DirectionLinesCount - 1) CurrentLine++;
+            else if(CurrentLine == Wafer.DirectionLinesCount - 1) 
             {
                 SideDone = true;
             }
         }     
         private async Task MoveNextDirAsync() 
         {
-            if (Wafer.NextDir())
+            if (!Wafer.NextDir(true))
             {
                 await Machine.U.MoveAxisInPosAsync(Wafer.GetCurrentDiretionAngle);
             }
@@ -174,13 +174,15 @@ namespace DicingBlade.Classes
             //if(pauseToken.Equals(default)) await pauseToken.Token.WaitWhilePausedAsync();
 
             #endregion
-
+            Vector2 target;
             switch (element)
             {
                 case Diagram.goWaferStartX:
                     if (BladeInWafer) break;
                     Machine.SetVelocity(Velocity.Service);
-                    await Machine.X.MoveAxisInPosAsync(Wafer.GetCurrentLine(CurrentLine).start.X + Machine.BladeChuckCenter.X + Blade.XGap(Wafer.Thickness));
+                    target = Machine.CtoBSystemCoors(Wafer.GetCurrentLine(CurrentLine).start);
+                    double xGap = Blade.XGap(Wafer.Thickness);
+                    await Machine.X.MoveAxisInPosAsync(target.X + xGap);
                     break;
                 case Diagram.goWaferEndX:
                     if (BladeInWafer) break;
@@ -196,10 +198,11 @@ namespace DicingBlade.Classes
                     Machine.SwitchOnCoolantWater = true;
                     Machine.X.SetVelocity(FeedSpeed);
                     IsCutting = true;
-                    await Machine.X.MoveAxisInPosAsync(Wafer.GetCurrentLine(CurrentLine).end.X);
-                    IsCutting = false;                   
+                    target = Machine.CtoBSystemCoors(Wafer.GetCurrentLine(CurrentLine).end);
+                    await Machine.X.MoveAxisInPosAsync(target.X);
+                    IsCutting = false;                
                     if (!Wafer.CurrentCutIncrement(CurrentLine))
-                    {                       
+                    {
                         NextLine();
                     }
                     break;
@@ -233,10 +236,11 @@ namespace DicingBlade.Classes
                     await Machine.Y.MoveAxisInPosAsync(Machine.CtoBSystemCoors(Wafer.GetCurrentLine(CurrentLine).start).Y);
                     break;
                 case Diagram.goNextCutXY:
-                    if (BladeInWafer) break;
+                   // if (BladeInWafer) break;
                     Machine.SetVelocity(Velocity.Service);
-                    Vector2 vector = Machine.CtoBSystemCoors(Wafer.GetCurrentLine(CurrentLine).start);
-                    await Machine.MoveInPosXYAsync(vector);
+                    target = Machine.CtoBSystemCoors(Wafer.GetCurrentLine(CurrentLine).start);
+                    target.X -= Blade.XGap(Wafer.Thickness);
+                    await Machine.MoveInPosXYAsync(target);
                     break;
                 case Diagram.goTransferingHeightZ:
                     Machine.SetVelocity(Velocity.Service);
@@ -247,11 +251,12 @@ namespace DicingBlade.Classes
                     await Machine.Z.MoveAxisInPosAsync(0);
                     break;
                 case Diagram.goNextDirection:
-                    if (InProcess & SideDone/* | ProcessStatus == Status.Learning*/)
+                    if (InProcess & SideDone /*| ProcessStatus == Status.Learning*/)
                     {
                         Machine.SetVelocity(Velocity.Service);
                         await MoveNextDirAsync();
                         SideDone = false;
+                        CurrentLine = 0;
                         SideCounter++;
                         if (SideCounter == Wafer.DirectionsCount)
                         {

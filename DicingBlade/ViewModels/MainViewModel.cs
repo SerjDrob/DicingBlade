@@ -83,8 +83,7 @@ namespace DicingBlade.ViewModels
             Machine = new Machine(false);
             
             BaseProcess = new Diagram[] {
-                Diagram.goNextCutXY,
-                Diagram.goWaferStartX,
+                Diagram.goNextCutXY,               
                 Diagram.goNextDepthZ,
                 Diagram.cuttingX,
                 Diagram.goNextDirection
