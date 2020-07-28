@@ -104,7 +104,7 @@ namespace DicingBlade.Classes
         }
         public int CurrentLine { get; private set; }
         private double RotationSpeed { get; set; } 
-        private uint FeedSpeed { get; set; }        
+        private double FeedSpeed { get; set; }        
         private bool Aligned { get; set; }
 
         //private Dictionary<int, double> AlignedAngles;
@@ -116,6 +116,9 @@ namespace DicingBlade.Classes
             Wafer = wafer;
             Blade = blade;
             BaseProcess = proc;
+
+            FeedSpeed = PropContainer.Technology.FeedSpeed;
+
             Machine.OnAirWanished += Machine_OnAirWanished;
             Machine.OnCoolWaterWanished += Machine_OnCoolWaterWanished;
             Machine.OnSpinWaterWanished += Machine_OnSpinWaterWanished;

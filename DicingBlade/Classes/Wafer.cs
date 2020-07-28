@@ -176,7 +176,8 @@ namespace DicingBlade.Classes
         }
         public double GetCurrentCutZ(int currentLine)
         {
-            return (1 - GetCurrentCut(currentLine).CutRatio) * Thickness;
+            double res = GetCurrentCut(currentLine).CutRatio;
+            return (1 - res) * Thickness;
         }
         public void test() 
         {

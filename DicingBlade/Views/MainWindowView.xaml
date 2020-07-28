@@ -24,6 +24,7 @@
         <local:ToPointConverter x:Key="ToPointConvert"/>
         <local:TransformPointConverter x:Key="TransformPoint"/>
         <local:CursorToPathConverter x:Key="GetCursor"/>
+        <converters:ZIndicatorConverter x:Key="ZIndConverter"/>
         <converters:MatchEnumVisibilityConverter x:Key="MatchEnumConverter"/>
         <SolidColorBrush Color="MediumSpringGreen" x:Key="SignalGreen"/>
         <SolidColorBrush Color="IndianRed" x:Key="SignalRed"/>
@@ -90,24 +91,48 @@
                 </GroupBox>
                 <GroupBox Header="Наладка">
                     <Grid>
-                        <StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <Label Content="ProcessStatus"/>
-                                <Label Content="{Binding process.ProcessStatus}"/>
+                        <DockPanel>
+                            <StackPanel DockPanel.Dock="Top">
+                                <StackPanel Orientation="Horizontal">
+                                    <Label Content="ProcessStatus"/>
+                                    <Label Content="{Binding process.ProcessStatus}"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <Label Content="SideDone"/>
+                                    <Label Content="{Binding process.SideDone}"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <Label Content="SideCounter"/>
+                                    <Label Content="{Binding process.SideCounter}"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <Label Content="CurrentLine"/>
+                                    <Label Content="{Binding process.CurrentLine}"/>
+                                </StackPanel>
                             </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <Label Content="SideDone"/>
-                                <Label Content="{Binding process.SideDone}"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <Label Content="SideCounter"/>
-                                <Label Content="{Binding process.SideCounter}"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <Label Content="CurrentLine"/>
-                                <Label Content="{Binding process.CurrentLine}"/>
-                            </StackPanel>
-                        </StackPanel>
+                            
+                            <Border BorderBrush="Red" BorderThickness="1" DockPanel.Dock="Bottom">
+                                <Canvas Background="White" Width="30" Height="150">
+                                    <Rectangle Fill="Blue" Width="{Binding RelativeSource={RelativeSource AncestorType=Canvas}, Path=ActualWidth}"
+                                               Height="50"/>
+                                    <Line Stroke="Red" StrokeThickness="1" 
+                                          X1="0" X2="{Binding RelativeSource={RelativeSource AncestorType=Canvas}, Path=ActualWidth}"                                          
+                                          Y2="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Y1}"
+                                          >
+                                        <Line.Y1>
+                                            <MultiBinding Converter="{StaticResource ZIndConverter}">
+                                                <Binding Path="ActualHeight" RelativeSource="{RelativeSource AncestorType=Canvas, Mode=FindAncestor}"/>
+                                                <Binding Path="Wafer.Thickness" FallbackValue="1"/>
+                                                <Binding Path="Machine.Z.ActualPosition"/>
+                                            </MultiBinding>
+                                        </Line.Y1>
+                                    </Line>
+                                    <Canvas.RenderTransform>
+                                        <ScaleTransform ScaleY="-1"/>
+                                    </Canvas.RenderTransform>
+                                </Canvas>
+                            </Border>
+                        </DockPanel>
                     </Grid>
                 </GroupBox>
             </Grid>
@@ -491,6 +516,20 @@
                             </Style>
                         </Rectangle.Style>
                     </Rectangle>
+                    <Rectangle>
+                        <Rectangle.Style>
+                            <Style TargetType="Rectangle" BasedOn="{StaticResource Rec1}">
+                                <Style.Triggers>
+                                    <DataTrigger Value="True">
+                                        <DataTrigger.Binding>
+                                            <Binding Path="Machine.X.MotionDone"/>
+                                        </DataTrigger.Binding>
+                                        <Setter Property="Fill" Value="{StaticResource SignalGreen}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Rectangle.Style>
+                    </Rectangle>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Grid.Column="2" Grid.Row="1">
                     <Rectangle>
@@ -514,6 +553,20 @@
                                     <DataTrigger Value="True">
                                         <DataTrigger.Binding>
                                             <Binding Path="Machine.Y.LmtP"/>
+                                        </DataTrigger.Binding>
+                                        <Setter Property="Fill" Value="{StaticResource SignalGreen}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Rectangle.Style>
+                    </Rectangle>
+                    <Rectangle>
+                        <Rectangle.Style>
+                            <Style TargetType="Rectangle" BasedOn="{StaticResource Rec1}">
+                                <Style.Triggers>
+                                    <DataTrigger Value="True">
+                                        <DataTrigger.Binding>
+                                            <Binding Path="Machine.Y.MotionDone"/>
                                         </DataTrigger.Binding>
                                         <Setter Property="Fill" Value="{StaticResource SignalGreen}"/>
                                     </DataTrigger>

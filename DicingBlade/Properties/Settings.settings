@@ -83,7 +83,7 @@
     <Setting Name="UVelService" Type="System.UInt32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="YVelLow" Type="System.UInt32" Scope="User">
+    <Setting Name="YVelLow" Type="System.Double" Scope="User">
       <Value Profile="(Default)">10</Value>
     </Setting>
     <Setting Name="XObjective" Type="System.Double" Scope="User">

@@ -86,6 +86,7 @@ namespace DicingBlade.ViewModels
                 Diagram.goNextCutXY,               
                 Diagram.goNextDepthZ,
                 Diagram.cuttingX,
+                Diagram.goTransferingHeightZ,
                 Diagram.goNextDirection
             };
 

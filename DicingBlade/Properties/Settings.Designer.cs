@@ -350,9 +350,9 @@ namespace DicingBlade.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("10")]
-        public uint YVelLow {
+        public double YVelLow {
             get {
-                return ((uint)(this["YVelLow"]));
+                return ((double)(this["YVelLow"]));
             }
             set {
                 this["YVelLow"] = value;
