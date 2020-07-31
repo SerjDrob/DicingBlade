@@ -155,6 +155,8 @@
     </ApplicationDefinition>
     <Compile Include="Classes\Blade.cs" />
     <Compile Include="Classes\Command.cs" />
+    <Compile Include="Classes\Parameters.cs" />
+    <Compile Include="Classes\Technology.cs" />
     <Compile Include="Converters\CrossPositionConverter.cs" />
     <Compile Include="Converters\CursorToPathConverter.cs" />
     <Compile Include="Classes\PropContainer.cs" />

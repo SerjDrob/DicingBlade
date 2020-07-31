@@ -17,7 +17,8 @@ namespace DicingBlade.Classes
         public static void WriteObject<T>(this T obj, string file)
         {
             XmlSerializer serializer = new XmlSerializer(typeof(T));
-            using (FileStream fileStream = new FileStream(file, FileMode.Truncate))
+            
+            using (FileStream fileStream = new FileStream(file, FileMode.OpenOrCreate))
             {
                 serializer.Serialize(fileStream, obj);
             }

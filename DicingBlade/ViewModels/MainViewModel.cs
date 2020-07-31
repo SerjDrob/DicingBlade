@@ -30,7 +30,7 @@ namespace DicingBlade.ViewModels
     [AddINotifyPropertyChangedInterface]
     class MainViewModel
     {
-        
+        private Parameters parameters;
         public Machine Machine { get; set; }
         public Process process { get; set; }
         public Wafer Wafer { get; set; }
@@ -133,7 +133,7 @@ namespace DicingBlade.ViewModels
                     if (Machine.SetOnChuck())
                     {
                         await Machine.GoThereAsync(Place.CameraChuckCenter);
-                        process = new Process(Machine, Wafer, new Blade(), BaseProcess);
+                        process = new Process(Machine, Wafer, new Blade(), new Technology(), BaseProcess);
                         process.ProcessStatus = Status.StartLearning;                        
                     }
                     
@@ -180,7 +180,13 @@ namespace DicingBlade.ViewModels
             {
                 Machine.GoWhile(AxisDirections.ZN);
             }
-            if (key.Key == Key.J) { }
+            if (key.Key == Key.J) 
+            {
+                parameters = new Parameters();
+                parameters.Technology = PropContainer.Technology;
+                parameters.WriteObject<Parameters>("firstPAR.xml");
+                //Wafer.WriteObject<Wafer>("firstPAR");
+            }
             if (key.Key == Key.K) { }
             if (key.Key == Key.L) { }
             if (key.Key == Key.I) { }

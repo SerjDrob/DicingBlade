@@ -667,6 +667,9 @@ namespace DicingBlade.Classes
                     //Motion.mAcm_AxMoveHome(Y.Handle, (uint)HomeMode.MODE2_Lmt, (uint)HomeDir.NegDir);
                     Motion.mAcm_AxHome(X.Handle, (uint)HomeMode.MODE6_Lmt_Ref, (uint)HomeDir.NegDir);
                     Motion.mAcm_AxHome(Y.Handle, (uint)HomeMode.MODE6_Lmt_Ref, (uint)HomeDir.NegDir);
+                    //Motion.mAcm_AxHome(Z.Handle, (uint)HomeMode.MODE2_Lmt, (uint)HomeDir.PosiDir);
+                    //while (!Z.MotionDone) ;
+                    //Motion.mAcm_AxMoveAbs(Z.Handle, -1);
                     break;
                 case Place.Loading:
                     break;
@@ -790,6 +793,7 @@ namespace DicingBlade.Classes
             CameraChuckCenter = new Vector2(Settings.Default.XObjective, Settings.Default.YObjective);
             CameraBladeOffset = Settings.Default.DiskShift;
             BladeChuckCenter = new Vector2(Settings.Default.XDisk, CameraChuckCenter.Y + CameraBladeOffset);
+            ZBladeTouch = Settings.Default.ZTouch;
         }
         
         //private void CheckDevEvents()

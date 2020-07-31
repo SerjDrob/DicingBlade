@@ -15,8 +15,9 @@ namespace DicingBlade.Converters
             double H = System.Convert.ToDouble(values[0]);
             double thickness = System.Convert.ToDouble(values[1]);
             double val = System.Convert.ToDouble(values[2]);
-            return Math.Abs(val * 3 * H/thickness)>H?H:Math.Abs(val * 3 * H / thickness);
-
+            double ztouch = System.Convert.ToDouble(values[3]);
+            var result = Math.Abs((-ztouch + val) * H / 3 * thickness);
+            return result > H ? H : result;
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

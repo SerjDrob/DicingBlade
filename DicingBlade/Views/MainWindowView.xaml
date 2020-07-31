@@ -124,6 +124,7 @@
                                                 <Binding Path="ActualHeight" RelativeSource="{RelativeSource AncestorType=Canvas, Mode=FindAncestor}"/>
                                                 <Binding Path="Wafer.Thickness" FallbackValue="1"/>
                                                 <Binding Path="Machine.Z.ActualPosition"/>
+                                                <Binding Path="Machine.ZBladeTouch"/>
                                             </MultiBinding>
                                         </Line.Y1>
                                     </Line>

@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace DicingBlade.Classes
 {
-    class Blade
+    public class Blade
     {
+        public Blade() { }
         public double Diameter { get; set; } = 1;
         public double Thickness { get; set; }
         public string Type { get; set; }

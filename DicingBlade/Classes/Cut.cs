@@ -45,8 +45,14 @@ namespace DicingBlade.Classes
             return Status;
         }
         public int CutCount { get; set; }
-        public double CutRatio { get { return (CurrentCut+1) / CutCount; } }
-        private int CurrentCut { get; set; } = 0;       
+        public double CutRatio
+        {
+            get
+            {
+                return (double)(CurrentCut + 1) / CutCount;
+            }
+        }
+        private int CurrentCut { get; set; } = 0;
         public double Offset { get; set; }     
         
         public void ResetCut() 

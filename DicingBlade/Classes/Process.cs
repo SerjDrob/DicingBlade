@@ -110,7 +110,7 @@ namespace DicingBlade.Classes
         //private Dictionary<int, double> AlignedAngles;
         private double OffsetAngle { get; set; }
         
-        public Process(Machine machine, Wafer wafer, Blade blade, Diagram[] proc) // В конструкторе происходит загрузка технологических параметров
+        public Process(Machine machine, Wafer wafer, Blade blade,ITechnology technology, Diagram[] proc) // В конструкторе происходит загрузка технологических параметров
         {
             Machine = machine;
             Wafer = wafer;
