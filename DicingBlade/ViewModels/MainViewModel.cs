@@ -158,11 +158,11 @@ namespace DicingBlade.ViewModels
             }
             if (key.Key == Key.X)
             {
-                Machine.GoWhile(AxisDirections.XN);
+                Machine.GoWhile(AxisDirections.XP);
             }
             if (key.Key == Key.C)
             {
-                Machine.GoWhile(AxisDirections.XP);
+                Machine.GoWhile(AxisDirections.XN);
             }
             if (key.Key == Key.S)
             {
@@ -174,16 +174,16 @@ namespace DicingBlade.ViewModels
             }
             if (key.Key == Key.V)
             {
-                Machine.GoWhile(AxisDirections.ZP);
+                Machine.GoWhile(AxisDirections.ZN);
             }
             if (key.Key == Key.B)
             {
-                Machine.GoWhile(AxisDirections.ZN);
+                Machine.GoWhile(AxisDirections.ZP);
             }
             if (key.Key == Key.J) 
             {
                 parameters = new Parameters();
-                parameters.Technology = PropContainer.Technology;
+                parameters.Technology = (Technology)PropContainer.Technology;
                 parameters.WriteObject<Parameters>("firstPAR.xml");
                 //Wafer.WriteObject<Wafer>("firstPAR");
             }

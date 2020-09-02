@@ -138,17 +138,17 @@ namespace DicingBlade.Classes
 
         private Axis[] axes;
 
-        private IntPtr Hand(AxisDirections direction)
-        {
-            switch (direction)
-            {
-                case AxisDirections.XP | AxisDirections.XN: return m_Axishand[0];
-                case AxisDirections.YP | AxisDirections.YN: return m_Axishand[1];
-                case AxisDirections.ZP | AxisDirections.ZN: return m_Axishand[2];
-                case AxisDirections.UP | AxisDirections.UN: return m_Axishand[3];
-                default: return new IntPtr();
-            }
-        }
+        //private IntPtr Hand(AxisDirections direction)
+        //{
+        //    switch (direction)
+        //    {
+        //        case AxisDirections.XP | AxisDirections.XN: return m_Axishand[0];
+        //        case AxisDirections.YP | AxisDirections.YN: return m_Axishand[1];
+        //        case AxisDirections.ZP | AxisDirections.ZN: return m_Axishand[2];
+        //        case AxisDirections.UP | AxisDirections.UN: return m_Axishand[3];
+        //        default: return new IntPtr();
+        //    }
+        //}
 
         private (IntPtr, ushort) MoveRelParam(AxisDirections direction)
         {
@@ -248,18 +248,19 @@ namespace DicingBlade.Classes
                 {
                     for (int i = 0; i < axes.Length; i++)
                     {
-                        //if ((AxEvtStatusArray[i] & (uint)EventType.EVT_AX_COMPARED) > 0)
-                        //{
-                        //    axes[i].Compared = true;
-                        //}
-                        //else axes[i].Compared = false;
-
+                                               
                         if ((AxEvtStatusArray[i] & (uint)EventType.EVT_AX_MOTION_DONE) > 0)
                         {
                             axes[i].MotionDone = true;                        
                         }                        
-                        //else axes[i].MotionDone = false;                    
-                       
+                        //else axes[i].MotionDone = false;
+
+                        if ((AxEvtStatusArray[i] & (uint)EventType.EVT_AX_HOME_DONE) > 0)
+                        {
+                            axes[i].HomeDone = true;
+                        }
+                        //else axes[i].HomeDone = false;
+
                     }                   
                     
                 }
@@ -304,7 +305,7 @@ namespace DicingBlade.Classes
         public void StartCamera()
         {
             LocalWebCamsCollection = new FilterInfoCollection(FilterCategory.VideoInputDevice);
-            try { LocalWebCam = new VideoCaptureDevice(LocalWebCamsCollection[1].MonikerString); }
+            try { LocalWebCam = new VideoCaptureDevice(LocalWebCamsCollection[0].MonikerString); }//1
             catch
             {
                 MessageBox.Show("Включите питание видеокамеры !");
@@ -312,7 +313,7 @@ namespace DicingBlade.Classes
             }
             finally
             {
-                LocalWebCam.VideoResolution = LocalWebCam.VideoCapabilities[8];
+                LocalWebCam.VideoResolution = LocalWebCam.VideoCapabilities[1];//8
                 LocalWebCam.NewFrame += new NewFrameEventHandler(Cam_NewFrame);
                 LocalWebCam.Start();
             }
@@ -408,16 +409,18 @@ namespace DicingBlade.Classes
                 Motion.mAcm_AxSetActualPosition(m_Axishand[i], cmdPosition);
 
                 axisEnableEvent[i] |= (uint)EventType.EVT_AX_MOTION_DONE;
-               // axisEnableEvent[i] |= (uint)EventType.EVT_AX_COMPARED;
+                axisEnableEvent[i] |= (uint)EventType.EVT_AX_HOME_DONE;
+                
+                // axisEnableEvent[i] |= (uint)EventType.EVT_AX_COMPARED;
                 Motion.mAcm_EnableMotionEvent(m_DeviceHandle, axisEnableEvent, GpEnableEvent, m_ulAxisCount, 1);
             }
             
             m_bInit = true;
                         
             X = new Axis(0, m_Axishand[0],0);
-            Y = new Axis(6.4, m_Axishand[1],1);
+            Y = new Axis(12.8, m_Axishand[3],3);
             Z = new Axis(0, m_Axishand[2],2);
-            U = new Axis(0, m_Axishand[3],3);
+            U = new Axis(0, m_Axishand[1],1);
             axes = new Axis[] { X, Y, Z, U };
 
             Result = Motion.mAcm_GpAddAxis(ref XYhandle, X.Handle);
@@ -657,6 +660,7 @@ namespace DicingBlade.Classes
         }
         public void GoWhile(AxisDirections direction)
         {
+            ResetErrors();
             Motion.mAcm_AxMoveVel(MoveRelParam(direction).Item1, MoveRelParam(direction).Item2);     
         }
         public async Task GoThereAsync(Place place)
@@ -664,12 +668,32 @@ namespace DicingBlade.Classes
             switch (place)
             {
                 case Place.Home:
-                    //Motion.mAcm_AxMoveHome(Y.Handle, (uint)HomeMode.MODE2_Lmt, (uint)HomeDir.NegDir);
-                    Motion.mAcm_AxHome(X.Handle, (uint)HomeMode.MODE6_Lmt_Ref, (uint)HomeDir.NegDir);
-                    Motion.mAcm_AxHome(Y.Handle, (uint)HomeMode.MODE6_Lmt_Ref, (uint)HomeDir.NegDir);
-                    //Motion.mAcm_AxHome(Z.Handle, (uint)HomeMode.MODE2_Lmt, (uint)HomeDir.PosiDir);
-                    //while (!Z.MotionDone) ;
-                    //Motion.mAcm_AxMoveAbs(Z.Handle, -1);
+                    ResetErrors();
+
+                    Motion.mAcm_AxHome(X.Handle, (uint)HomeMode.MODE2_Lmt, (uint)HomeDir.NegDir);
+                    Motion.mAcm_AxHome(Y.Handle, (uint)HomeMode.MODE6_Lmt_Ref, (uint)HomeDir.PosiDir);
+                    Motion.mAcm_AxHome(Z.Handle, (uint)HomeMode.MODE2_Lmt, (uint)HomeDir.NegDir);
+                    int done = 0;
+                    bool zlmt = true;
+                    bool xlmt = true;
+                    while (done != 2)
+                    {
+                        if (Z.LmtN & zlmt)
+                        {
+                            ResetErrors();
+                            Motion.mAcm_AxMoveAbs(Z.Handle, 5);
+                            done++;
+                            zlmt = !zlmt;
+                        }
+                        if (X.LmtN & xlmt)
+                        {
+                            ResetErrors();
+                            Motion.mAcm_AxMoveAbs(X.Handle, 5);
+                            done++;
+                            xlmt = !xlmt;
+                        }
+                    }
+
                     break;
                 case Place.Loading:
                     break;
@@ -943,6 +967,7 @@ namespace DicingBlade.Classes
         public int DOs { get; set; }
         public int PPU { get; set; }
         public bool MotionDone { get; set; }
+        public bool HomeDone { get; set; }
         public bool Compared { get; set; } 
         public bool GetDI(DI din)
         {

@@ -15,7 +15,7 @@
       <Value Profile="(Default)">180</Value>
     </Setting>
     <Setting Name="XPPU" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">6400</Value>
+      <Value Profile="(Default)">870</Value>
     </Setting>
     <Setting Name="XJerk" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">1</Value>
@@ -24,13 +24,13 @@
       <Value Profile="(Default)">30</Value>
     </Setting>
     <Setting Name="YAcc" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">180</Value>
+      <Value Profile="(Default)">200</Value>
     </Setting>
     <Setting Name="YDec" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">180</Value>
+      <Value Profile="(Default)">200</Value>
     </Setting>
     <Setting Name="YPPU" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">6400</Value>
+      <Value Profile="(Default)">12800</Value>
     </Setting>
     <Setting Name="YJerk" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">1</Value>
@@ -84,7 +84,7 @@
       <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="YVelLow" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">10</Value>
+      <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="XObjective" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0</Value>

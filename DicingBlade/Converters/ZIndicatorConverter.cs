@@ -12,12 +12,16 @@ namespace DicingBlade.Converters
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            double H = System.Convert.ToDouble(values[0]);
-            double thickness = System.Convert.ToDouble(values[1]);
-            double val = System.Convert.ToDouble(values[2]);
-            double ztouch = System.Convert.ToDouble(values[3]);
-            var result = Math.Abs((-ztouch + val) * H / 3 * thickness);
-            return result > H ? H : result;
+            try
+            {
+                double H = System.Convert.ToDouble(values[0]);
+                double thickness = System.Convert.ToDouble(values[1]);
+                double val = System.Convert.ToDouble(values[2]);
+                double ztouch = System.Convert.ToDouble(values[3]);
+                var result = Math.Abs((-ztouch + val) * H / 3 * thickness);
+                return result > H ? H : result;
+            }
+            catch { return 0; }
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

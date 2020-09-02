@@ -12,7 +12,7 @@ namespace DicingBlade.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.5.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.7.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -73,7 +73,7 @@ namespace DicingBlade.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("6400")]
+        [global::System.Configuration.DefaultSettingValueAttribute("870")]
         public int XPPU {
             get {
                 return ((int)(this["XPPU"]));
@@ -109,7 +109,7 @@ namespace DicingBlade.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("180")]
+        [global::System.Configuration.DefaultSettingValueAttribute("200")]
         public double YAcc {
             get {
                 return ((double)(this["YAcc"]));
@@ -121,7 +121,7 @@ namespace DicingBlade.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("180")]
+        [global::System.Configuration.DefaultSettingValueAttribute("200")]
         public double YDec {
             get {
                 return ((double)(this["YDec"]));
@@ -133,7 +133,7 @@ namespace DicingBlade.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("6400")]
+        [global::System.Configuration.DefaultSettingValueAttribute("12800")]
         public int YPPU {
             get {
                 return ((int)(this["YPPU"]));
@@ -349,7 +349,7 @@ namespace DicingBlade.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("10")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
         public double YVelLow {
             get {
                 return ((double)(this["YVelLow"]));
