@@ -24,10 +24,10 @@
       <Value Profile="(Default)">30</Value>
     </Setting>
     <Setting Name="YAcc" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">200</Value>
+      <Value Profile="(Default)">100</Value>
     </Setting>
     <Setting Name="YDec" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">200</Value>
+      <Value Profile="(Default)">100</Value>
     </Setting>
     <Setting Name="YPPU" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">12800</Value>
@@ -39,16 +39,16 @@
       <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="ZVelHigh" Type="System.UInt32" Scope="User">
-      <Value Profile="(Default)">3</Value>
+      <Value Profile="(Default)">5</Value>
     </Setting>
     <Setting Name="ZAcc" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">180</Value>
+      <Value Profile="(Default)">100</Value>
     </Setting>
     <Setting Name="ZDec" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">180</Value>
+      <Value Profile="(Default)">100</Value>
     </Setting>
     <Setting Name="ZPPU" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">6400</Value>
+      <Value Profile="(Default)">25600</Value>
     </Setting>
     <Setting Name="ZJerk" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">1</Value>

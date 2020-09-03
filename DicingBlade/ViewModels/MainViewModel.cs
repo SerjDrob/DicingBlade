@@ -106,6 +106,7 @@ namespace DicingBlade.ViewModels
             //test key
             if(key.Key==Key.Tab)
             {
+                Machine.GoTest();
                 //if(process==null) process = new Process(Machine, Wafer, new Blade());
                 //await process.ProcElementDispatcherAsync(Diagram.goCameraPointLearningXYZ);
             }
@@ -158,11 +159,11 @@ namespace DicingBlade.ViewModels
             }
             if (key.Key == Key.X)
             {
-                Machine.GoWhile(AxisDirections.XP);
+                Machine.GoWhile(AxisDirections.XN);
             }
             if (key.Key == Key.C)
             {
-                Machine.GoWhile(AxisDirections.XN);
+                Machine.GoWhile(AxisDirections.XP);
             }
             if (key.Key == Key.S)
             {
@@ -174,11 +175,11 @@ namespace DicingBlade.ViewModels
             }
             if (key.Key == Key.V)
             {
-                Machine.GoWhile(AxisDirections.ZN);
+                Machine.GoWhile(AxisDirections.ZP);
             }
             if (key.Key == Key.B)
             {
-                Machine.GoWhile(AxisDirections.ZP);
+                Machine.GoWhile(AxisDirections.ZN);
             }
             if (key.Key == Key.J) 
             {

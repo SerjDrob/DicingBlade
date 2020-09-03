@@ -152,16 +152,17 @@ namespace DicingBlade.Classes
 
         private (IntPtr, ushort) MoveRelParam(AxisDirections direction)
         {
+
             switch (direction)
             {
-                case AxisDirections.XP: return (X.Handle, 1);
-                case AxisDirections.XN: return (X.Handle, 0);
-                case AxisDirections.YP: return (Y.Handle, 1);
-                case AxisDirections.YN: return (Y.Handle, 0);
-                case AxisDirections.ZP: return (Z.Handle, 1);
-                case AxisDirections.ZN: return (Z.Handle, 0);
-                case AxisDirections.UP: return (U.Handle, 1);
-                case AxisDirections.UN: return (U.Handle, 0);
+                case AxisDirections.XP: return (X.Handle, (ushort)VelMoveDir.DIR_POSITIVE);
+                case AxisDirections.XN: return (X.Handle, (ushort)VelMoveDir.DIR_NEGATIVE);
+                case AxisDirections.YP: return (Y.Handle, (ushort)VelMoveDir.DIR_POSITIVE);
+                case AxisDirections.YN: return (Y.Handle, (ushort)VelMoveDir.DIR_NEGATIVE);
+                case AxisDirections.ZP: return (Z.Handle, (ushort)VelMoveDir.DIR_POSITIVE);
+                case AxisDirections.ZN: return (Z.Handle, (ushort)VelMoveDir.DIR_NEGATIVE);
+                case AxisDirections.UP: return (U.Handle, (ushort)VelMoveDir.DIR_POSITIVE);
+                case AxisDirections.UN: return (U.Handle, (ushort)VelMoveDir.DIR_NEGATIVE);
                 default: return (new IntPtr(), 1);
             }
         }
@@ -221,7 +222,7 @@ namespace DicingBlade.Classes
                     if (Result == (uint)ErrorCode.SUCCESS) ax.CmdPosition = position;
 
                     Result = Motion.mAcm_AxGetActualPosition(ax.Handle, ref position);
-                    if (Result == (uint)ErrorCode.SUCCESS) ax.ActualPosition = -position;
+                    if (Result == (uint)ErrorCode.SUCCESS) ax.ActualPosition = position;
 
                     //if (!SpindleWater) OnSpinWaterWanished(/*new DIEventArgs()*/);
                     //if (!CoolantWater) OnCoolWaterWanished(/*new DIEventArgs()*/);
@@ -251,13 +252,19 @@ namespace DicingBlade.Classes
                                                
                         if ((AxEvtStatusArray[i] & (uint)EventType.EVT_AX_MOTION_DONE) > 0)
                         {
-                            axes[i].MotionDone = true;                        
-                        }                        
-                        //else axes[i].MotionDone = false;
+                            axes[i].MotionDone = true;                               
+                        }
+
+                        //if ((AxEvtStatusArray[i] & (uint)EventType.EVT_AX_VH_START) == 0)
+                        //{
+                        //    axes[i].MotionDone = true;
+                        //}
+                        
 
                         if ((AxEvtStatusArray[i] & (uint)EventType.EVT_AX_HOME_DONE) > 0)
                         {
                             axes[i].HomeDone = true;
+                            
                         }
                         //else axes[i].HomeDone = false;
 
@@ -409,19 +416,25 @@ namespace DicingBlade.Classes
                 Motion.mAcm_AxSetActualPosition(m_Axishand[i], cmdPosition);
 
                 axisEnableEvent[i] |= (uint)EventType.EVT_AX_MOTION_DONE;
+                axisEnableEvent[i] |= (uint)EventType.EVT_AX_VH_START;
                 axisEnableEvent[i] |= (uint)EventType.EVT_AX_HOME_DONE;
                 
                 // axisEnableEvent[i] |= (uint)EventType.EVT_AX_COMPARED;
-                Motion.mAcm_EnableMotionEvent(m_DeviceHandle, axisEnableEvent, GpEnableEvent, m_ulAxisCount, 1);
+                
             }
-            
+
+            Motion.mAcm_EnableMotionEvent(m_DeviceHandle, axisEnableEvent, GpEnableEvent, m_ulAxisCount, 1);
             m_bInit = true;
                         
             X = new Axis(0, m_Axishand[0],0);
             Y = new Axis(12.8, m_Axishand[3],3);
             Z = new Axis(0, m_Axishand[2],2);
             U = new Axis(0, m_Axishand[1],1);
-            axes = new Axis[] { X, Y, Z, U };
+            axes = new Axis[4];
+            axes[X.AxisNum] = X;
+            axes[Y.AxisNum] = Y;
+            axes[Z.AxisNum] = Z;
+            axes[U.AxisNum] = U;
 
             Result = Motion.mAcm_GpAddAxis(ref XYhandle, X.Handle);
             if (Result != (uint)ErrorCode.SUCCESS)
@@ -518,39 +531,62 @@ namespace DicingBlade.Classes
             Motion.mAcm_SetProperty(XYhandle, (uint)PropertyID.PAR_GpAcc, ref YAcc, 8);
             Motion.mAcm_SetProperty(XYhandle, (uint)PropertyID.PAR_GpDec, ref YDec, 8);
 
-            int PlsInMde = 2;
-            int PlsInLogic = 2;
-            int PlsInSrc = 2;
-            int PlsOutMde = 1;
-            int Reset = 1;
+            int PlsInMde = (int)PulseInMode.AB_4X;
+            int PlsInLogic = (int)PulseInLogic.NOT_SUPPORT;
+            int PlsInSrc = (int)PulseInSource.NOT_SUPPORT;
+            int PlsOutMde = (int)PulseOutMode.OUT_DIR;
+            int AxDirLogic = (int)DirLogic.DIR_ACT_HIGH;
+
+            int Reset = (int)HomeReset.HOME_RESET_EN;
             uint cmpEna = (uint)CmpEnable.CMP_EN;
             uint cmpSrcAct = (uint)CmpSource.SRC_ACTUAL_POSITION;
             uint cmpSrcCmd = (uint)CmpSource.SRC_COMMAND_POSITION;
             uint cmpMethod = (uint)CmpMethod.MTD_GREATER_POSITION;
-            
 
-            for (int i = 0; i < axes.Length; i++)
-            {
-                Axis item = axes[i];
 
-                //if(i==5) Motion.mAcm_SetProperty(item.Handle, (uint)PropertyID.CFG_AxCmpSrc, ref cmpSrcAct, 8);
-                //else Motion.mAcm_SetProperty(item.Handle, (uint)PropertyID.CFG_AxCmpSrc, ref cmpSrcCmd, 8);
 
-                //Motion.mAcm_SetProperty(item.Handle, (uint)PropertyID.CFG_AxCmpEnable, ref cmpEna, 8);
-                //Motion.mAcm_SetProperty(item.Handle, (uint)PropertyID.CFG_AxCmpMethod, ref cmpMethod, 8);
 
-                Motion.mAcm_SetProperty(item.Handle, (uint)PropertyID.CFG_AxGenDoEnable, ref PlsOutMde, 8);
+            //if(i==5) Motion.mAcm_SetProperty(item.Handle, (uint)PropertyID.CFG_AxCmpSrc, ref cmpSrcAct, 8);
+            //else Motion.mAcm_SetProperty(item.Handle, (uint)PropertyID.CFG_AxCmpSrc, ref cmpSrcCmd, 8);
 
-                Motion.mAcm_SetProperty(item.Handle, (uint)PropertyID.CFG_AxPulseInMode, ref PlsInMde, 8);
-                Motion.mAcm_SetProperty(item.Handle, (uint)PropertyID.CFG_AxPulseInLogic, ref PlsInLogic, 8);
-                Motion.mAcm_SetProperty(item.Handle, (uint)PropertyID.CFG_AxPulseInSource, ref PlsInSrc, 8);
-                Motion.mAcm_SetProperty(item.Handle, (uint)PropertyID.CFG_AxPulseOutMode, ref PlsOutMde, 8);
-                Motion.mAcm_SetProperty(item.Handle, (uint)PropertyID.CFG_AxHomeResetEnable, ref Reset, 8);
-                Motion.mAcm_SetProperty(item.Handle, (uint)PropertyID.CFG_AxHomeResetEnable, ref Reset, 8);
-                Motion.mAcm_SetProperty(item.Handle, (uint)PropertyID.CFG_AxHomeResetEnable, ref Reset, 8);
-                Motion.mAcm_SetProperty(item.Handle, (uint)PropertyID.CFG_AxHomeResetEnable, ref Reset, 8);
-            }
-            
+            //Motion.mAcm_SetProperty(item.Handle, (uint)PropertyID.CFG_AxCmpEnable, ref cmpEna, 8);
+            //Motion.mAcm_SetProperty(item.Handle, (uint)PropertyID.CFG_AxCmpMethod, ref cmpMethod, 8);
+
+            Motion.mAcm_SetProperty(X.Handle, (uint)PropertyID.CFG_AxGenDoEnable, ref PlsOutMde, 8);
+            Motion.mAcm_SetProperty(X.Handle, (uint)PropertyID.CFG_AxPulseInMode, ref PlsInMde, 8);
+            Motion.mAcm_SetProperty(X.Handle, (uint)PropertyID.CFG_AxPulseInLogic, ref PlsInLogic, 8);
+            Motion.mAcm_SetProperty(X.Handle, (uint)PropertyID.CFG_AxPulseInSource, ref PlsInSrc, 8);
+            Motion.mAcm_SetProperty(X.Handle, (uint)PropertyID.CFG_AxPulseOutMode, ref PlsOutMde, 8);
+            Motion.mAcm_SetProperty(X.Handle, (uint)PropertyID.CFG_AxHomeResetEnable, ref Reset, 8);
+            Motion.mAcm_SetProperty(X.Handle, (uint)PropertyID.CFG_AxDirLogic, ref AxDirLogic, 8);
+           
+
+            Motion.mAcm_SetProperty(Z.Handle, (uint)PropertyID.CFG_AxGenDoEnable, ref PlsOutMde, 8);
+            Motion.mAcm_SetProperty(Z.Handle, (uint)PropertyID.CFG_AxPulseInMode, ref PlsInMde, 8);
+            Motion.mAcm_SetProperty(Z.Handle, (uint)PropertyID.CFG_AxPulseInLogic, ref PlsInLogic, 8);
+            Motion.mAcm_SetProperty(Z.Handle, (uint)PropertyID.CFG_AxPulseInSource, ref PlsInSrc, 8);
+            Motion.mAcm_SetProperty(Z.Handle, (uint)PropertyID.CFG_AxPulseOutMode, ref PlsOutMde, 8);
+            Motion.mAcm_SetProperty(Z.Handle, (uint)PropertyID.CFG_AxHomeResetEnable, ref Reset, 8);
+            Motion.mAcm_SetProperty(Z.Handle, (uint)PropertyID.CFG_AxDirLogic, ref AxDirLogic, 8);
+
+            Motion.mAcm_SetProperty(U.Handle, (uint)PropertyID.CFG_AxGenDoEnable, ref PlsOutMde, 8);
+            Motion.mAcm_SetProperty(U.Handle, (uint)PropertyID.CFG_AxPulseInMode, ref PlsInMde, 8);
+            Motion.mAcm_SetProperty(U.Handle, (uint)PropertyID.CFG_AxPulseInLogic, ref PlsInLogic, 8);
+            Motion.mAcm_SetProperty(U.Handle, (uint)PropertyID.CFG_AxPulseInSource, ref PlsInSrc, 8);
+            Motion.mAcm_SetProperty(U.Handle, (uint)PropertyID.CFG_AxPulseOutMode, ref PlsOutMde, 8);
+            Motion.mAcm_SetProperty(U.Handle, (uint)PropertyID.CFG_AxHomeResetEnable, ref Reset, 8);
+            Motion.mAcm_SetProperty(U.Handle, (uint)PropertyID.CFG_AxDirLogic, ref AxDirLogic, 8);
+
+            PlsOutMde = (int)PulseOutMode.OUT_DIR_ALL_NEG;
+            AxDirLogic = (int)DirLogic.DIR_ACT_HIGH;
+            PlsInLogic = (int)PulseInLogic.NO_INV_DIR;
+            Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxGenDoEnable, ref PlsOutMde, 8);
+            Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxPulseInMode, ref PlsInMde, 8);
+            Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxPulseInLogic, ref PlsInLogic, 8);
+            Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxPulseInSource, ref PlsInSrc, 8);
+            Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxPulseOutMode, ref PlsOutMde, 8);
+            Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxHomeResetEnable, ref Reset, 8);
+            Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxDirLogic, ref AxDirLogic, 8);
         }
         public void SetVelocity(Velocity velocity)
         {
@@ -663,6 +699,11 @@ namespace DicingBlade.Classes
             ResetErrors();
             Motion.mAcm_AxMoveVel(MoveRelParam(direction).Item1, MoveRelParam(direction).Item2);     
         }
+
+        public async Task GoTest() 
+        {
+            Motion.mAcm_AxMoveAbs(Z.Handle, 5);
+        }
         public async Task GoThereAsync(Place place)
         {
             switch (place)
@@ -671,26 +712,26 @@ namespace DicingBlade.Classes
                     ResetErrors();
 
                     Motion.mAcm_AxHome(X.Handle, (uint)HomeMode.MODE2_Lmt, (uint)HomeDir.NegDir);
-                    Motion.mAcm_AxHome(Y.Handle, (uint)HomeMode.MODE6_Lmt_Ref, (uint)HomeDir.PosiDir);
+                    Motion.mAcm_AxHome(Y.Handle, (uint)HomeMode.MODE6_Lmt_Ref, (uint)HomeDir.NegDir);
                     Motion.mAcm_AxHome(Z.Handle, (uint)HomeMode.MODE2_Lmt, (uint)HomeDir.NegDir);
                     int done = 0;
                     bool zlmt = true;
                     bool xlmt = true;
                     while (done != 2)
                     {
-                        if (Z.LmtN & zlmt)
+                        if (Z.LmtN & zlmt & Z.ActualPosition == 0)
                         {
-                            ResetErrors();
-                            Motion.mAcm_AxMoveAbs(Z.Handle, 5);
                             done++;
-                            zlmt = !zlmt;
+                            zlmt = false;
+                            ResetErrors();
+                            Motion.mAcm_AxMoveAbs(Z.Handle, 1);
                         }
-                        if (X.LmtN & xlmt)
+                        if (X.LmtN & xlmt & X.ActualPosition == 0)
                         {
-                            ResetErrors();
-                            Motion.mAcm_AxMoveAbs(X.Handle, 5);
                             done++;
-                            xlmt = !xlmt;
+                            xlmt = false;
+                            ResetErrors();
+                            Motion.mAcm_AxMoveAbs(X.Handle, 1);
                         }
                     }
 
@@ -948,7 +989,7 @@ namespace DicingBlade.Classes
             this.Handle = handle;
             this.AxisNum = AxisNum;
         }
-        private int AxisNum;
+        public int AxisNum { get; private set; }
         public IntPtr Handle { get; }
         public double LineCoefficient { get; }
         private double actualPosition;
@@ -1077,9 +1118,10 @@ namespace DicingBlade.Classes
             await Task.Run(() =>
             {
                 //sign = Math.Sign(position - Math.Round(ActualPosition, 3));
-                MotionDone = false;
+               
                 Motion.mAcm_AxGetActualPosition(Handle, ref difpos);
                 difpos = Math.Round(difpos * LineCoefficient, 3) + position;
+                 MotionDone = false;
                 Motion.mAcm_AxMoveRel(Handle, difpos*1.1);
                 do
                 {
@@ -1108,11 +1150,10 @@ namespace DicingBlade.Classes
                 double vel = 0.1;
                 int sign = 0;
                 int n = this.AxisNum;
-
+                MotionDone = false;
+                Motion.mAcm_AxMoveAbs(Handle, position);
                 await Task.Run(() =>
-                      {
-                          MotionDone = false;
-                          Motion.mAcm_AxMoveAbs(Handle, position);
+                      {   
                           while (!MotionDone) ;                          
                       }
                       );
