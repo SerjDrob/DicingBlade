@@ -151,19 +151,19 @@ namespace DicingBlade.ViewModels
             }
             if (key.Key == Key.A) 
             {
-                Machine.GoWhile(AxisDirections.YP);
+                Machine.Y.GoWhile(AxDir.POS);
             }
             if (key.Key == Key.Z) 
             {
-                Machine.GoWhile(AxisDirections.YN);
+                Machine.Y.GoWhile(AxDir.NEG);
             }
             if (key.Key == Key.X)
             {
-                Machine.GoWhile(AxisDirections.XN);
+                Machine.X.GoWhile(AxDir.NEG);
             }
             if (key.Key == Key.C)
             {
-                Machine.GoWhile(AxisDirections.XP);
+                Machine.X.GoWhile(AxDir.POS);
             }
             if (key.Key == Key.S)
             {
@@ -175,11 +175,11 @@ namespace DicingBlade.ViewModels
             }
             if (key.Key == Key.V)
             {
-                Machine.GoWhile(AxisDirections.ZP);
+                Machine.Z.GoWhile(AxDir.POS);
             }
             if (key.Key == Key.B)
             {
-                Machine.GoWhile(AxisDirections.ZN);
+                Machine.Z.GoWhile(AxDir.NEG);
             }
             if (key.Key == Key.J) 
             {

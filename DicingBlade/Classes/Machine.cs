@@ -268,8 +268,8 @@ namespace DicingBlade.Classes
                         }
                         //else axes[i].HomeDone = false;
 
-                    }                   
-                    
+                    }
+                    Thread.Sleep(100);
                 }
             }
         }
@@ -427,7 +427,7 @@ namespace DicingBlade.Classes
             m_bInit = true;
                         
             X = new Axis(0, m_Axishand[0],0);
-            Y = new Axis(12.8, m_Axishand[3],3);
+            Y = new Axis(0/*12.8*/, m_Axishand[3],3);
             Z = new Axis(0, m_Axishand[2],2);
             U = new Axis(0, m_Axishand[1],1);
             axes = new Axis[4];
@@ -840,9 +840,11 @@ namespace DicingBlade.Classes
                 do
                 {
                     Motion.mAcm_GpGetState(XYhandle, ref state);
-                } while (state == (uint)GroupState.STA_GP_BUSY);
+                } while (state == (uint)GroupState.STA_Gp_Motion);
             }
             );
+            X.MotionDone = true;
+            Y.MotionDone = true;
             await X.MoveAxisInPosAsync(position.X);
             await Y.MoveAxisInPosAsync(position.Y);
         }
@@ -956,6 +958,12 @@ namespace DicingBlade.Classes
         UN
     }
 
+    public enum AxDir
+    {
+        POS,
+        NEG
+    }
+
     public enum Place
     {
         Home,
@@ -1042,6 +1050,25 @@ namespace DicingBlade.Classes
             Motion.mAcm_SetProperty(Handle, (uint)PropertyID.CFG_AxMaxVel, ref AxMaxVel, 8);
             Motion.mAcm_SetProperty(Handle, (uint)PropertyID.PAR_AxVelHigh, ref VelHigh, 8);
             Motion.mAcm_SetProperty(Handle, (uint)PropertyID.PAR_AxVelLow, ref VelLow, 8);
+        }
+        public void GoWhile(AxDir direction)
+        {
+            ushort dir;
+            switch (direction)
+            {
+                case AxDir.POS:
+                    dir = (ushort)VelMoveDir.DIR_POSITIVE;
+                    break;
+                case AxDir.NEG:
+                    dir = (ushort)VelMoveDir.DIR_NEGATIVE;
+                    break;
+                default:
+                    dir = (ushort)VelMoveDir.NOT_SUPPORT;
+                    break;
+            }
+            Motion.mAcm_AxResetError(Handle);
+            MotionDone = false;
+            Motion.mAcm_AxMoveVel(Handle, dir);
         }
         public async Task MoveAxisInPos1Async(double position)
         {
@@ -1142,8 +1169,9 @@ namespace DicingBlade.Classes
         }
         public async Task MoveAxisInPosAsync(double position)
         {
-            double accuracy = 0.003;
-            if (Math.Abs(Math.Round(ActualPosition, 3) - position) >= accuracy)
+            double accuracy = 0.013;
+            double dif = Math.Abs(Math.Round(ActualPosition, 3) - position);
+            if (dif >= accuracy)
             {
                 position = Math.Round(position, 3);
                 double backlash = 0;
@@ -1151,9 +1179,11 @@ namespace DicingBlade.Classes
                 int sign = 0;
                 int n = this.AxisNum;
                 MotionDone = false;
-                Motion.mAcm_AxMoveAbs(Handle, position);
+                
                 await Task.Run(() =>
-                      {   
+                      {
+                          if (dif > 0) ;
+                          Motion.mAcm_AxMoveAbs(Handle, position);
                           while (!MotionDone) ;                          
                       }
                       );
