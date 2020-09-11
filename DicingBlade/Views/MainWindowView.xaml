@@ -81,7 +81,7 @@
                         <Button Content="Подложка" Command="{Binding WaferSettingsCmd}" Margin="3"/>
                         <Button Content="Приводы" Command="{Binding MachineSettingsCmd}" Grid.Column="1" Margin="3"/>
                         <Button Content="Технология" Command="{Binding TechnologySettingsCmd}" Grid.Column="2" Margin="3"/>
-                        <Button Grid.Row="1" Margin="3"/>
+                        <Button Content="Test" Command="{Binding TestCmd}" Grid.Row="1" Margin="3"/>
                         <Button Grid.Column="1" Grid.Row="1" Margin="3"/>
                         <Button Grid.Column="2" Grid.Row="1" Margin="3"/>
                         <Button Grid.Row="2" Margin="3"/>
@@ -270,7 +270,7 @@
                         </TransformGroup>
                     </Rectangle.RenderTransform>
                 </Rectangle>
-                <ItemsControl ItemsSource="{Binding WaferView.RawLines}" Panel.ZIndex="2">
+                <!--<ItemsControl ItemsSource="{Binding WaferView.RawLines}" Panel.ZIndex="2">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Canvas>
@@ -415,7 +415,7 @@
                             </Canvas>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
-                </ItemsControl>               
+                </ItemsControl>-->               
                 <Path x:Name="BladeCursor" Stroke="Green" StrokeThickness="1" Panel.ZIndex="3">
                     <Path.Data>
                         <MultiBinding Converter="{StaticResource GetCursor}">

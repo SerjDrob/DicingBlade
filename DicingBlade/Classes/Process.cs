@@ -257,7 +257,7 @@ namespace DicingBlade.Classes
                     break;
                 case Diagram.goDockHeightZ:
                     Machine.SetVelocity(Velocity.Service);
-                    await Machine.Z.MoveAxisInPosAsync(0);
+                    await Machine.Z.MoveAxisInPosAsync(1);
                     break;
                 case Diagram.goNextDirection:
                     if (InProcess & SideDone /*| ProcessStatus == Status.Learning*/)

@@ -67,6 +67,7 @@ namespace DicingBlade.ViewModels
         public ICommand WaferSettingsCmd { get; set; }
         public ICommand MachineSettingsCmd { get; set; }
         public ICommand TechnologySettingsCmd { get; set; }
+        public ICommand TestCmd { get; set; }
         public MainViewModel()
         {
             Test = false;
@@ -81,6 +82,7 @@ namespace DicingBlade.ViewModels
             WaferSettingsCmd = new Command(args => WaferSettings());
             MachineSettingsCmd = new Command(args => MachineSettings());
             TechnologySettingsCmd = new Command(args => TechnologySettings());
+            TestCmd = new Command(args => Func());
             Machine = new Machine(false);           
             BaseProcess = new Diagram[] {
                 Diagram.goNextCutXY,               
@@ -98,6 +100,10 @@ namespace DicingBlade.ViewModels
         private void Machine_OnAirWanished(DIEventArgs eventArgs)
         {
             throw new NotImplementedException();
+        }
+        private void Func() 
+        {
+            Machine.YGoToSwLmt(5);
         }
         private async Task KeyDownAsync(object args) 
         {
