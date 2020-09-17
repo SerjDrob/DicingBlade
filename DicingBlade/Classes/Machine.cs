@@ -50,6 +50,7 @@ namespace DicingBlade.Classes
     [AddINotifyPropertyChangedInterface]
     internal class Machine
     {
+        private bool tokenXY = true;
         private Bridge Bridge;
         private bool testRegime;
         public IntPtr[] m_Axishand = new IntPtr[32];
@@ -209,7 +210,7 @@ namespace DicingBlade.Classes
                 buf = (uint)SwLmtReact.SLMT_IMMED_STOP;
                 res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwPelReact, ref buf, 4);
                 res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwMelReact, ref buf, 4);
-                int tol = 10000;
+                int tol = 0;
                 switch (Math.Sign(diff))
                 {
                     case 1:
@@ -217,8 +218,8 @@ namespace DicingBlade.Classes
                         buf = (uint)SwLmtEnable.SLMT_EN;
                         res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwPelEnable, ref buf, 4);
                         buf = (uint)SwLmtToleranceEnable.TOLERANCE_ENABLE;
-                        res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxPelToleranceEnable, ref buf, 4);                        
-                        res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxPelToleranceValue, ref tol, 4);
+                        res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwPelToleranceEnable, ref buf, 4);                        
+                        res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwPelToleranceValue, ref tol, 4);
                         direction = (ushort)VelMoveDir.DIR_POSITIVE;
                         break;
                     case -1:
@@ -226,8 +227,8 @@ namespace DicingBlade.Classes
                         buf = (uint)SwLmtEnable.SLMT_EN;
                         res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwMelEnable, ref buf, 4);
                         buf = (uint)SwLmtToleranceEnable.TOLERANCE_ENABLE;
-                        res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxMelToleranceEnable, ref buf, 4);
-                        res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxMelToleranceValue, ref tol, 4);
+                        res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwMelToleranceEnable, ref buf, 4);
+                        res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwMelToleranceValue, ref tol, 4);
                         direction = (ushort)VelMoveDir.DIR_NEGATIVE;
                         break;                   
                 }
@@ -239,7 +240,7 @@ namespace DicingBlade.Classes
                 {
                     do
                     {
-                       // Thread.Sleep(1);
+                        Thread.Sleep(1);
                         Motion.mAcm_AxGetMotionIO(Y.Handle, ref status);
                         slmtp = status & (uint)Ax_Motion_IO.AX_MOTION_IO_SLMTP;
                         slmtn = status & (uint)Ax_Motion_IO.AX_MOTION_IO_SLMTN;
@@ -248,10 +249,10 @@ namespace DicingBlade.Classes
                 );
                 Y.SetVelocity(1);
                 Motion.mAcm_AxSetCmdPosition(Y.Handle, Y.ActualPosition);
-                YGoToSwLmt(position);
+                await YGoToSwLmt(position);
                 buf = (uint)SwLmtEnable.SLMT_DIS;
-                res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwPelEnable, ref buf, 4);
-                res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwMelEnable, ref buf, 4);
+                //res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwPelEnable, ref buf, 4);
+                //res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwMelEnable, ref buf, 4);
                 ResetErrors();
             }
         }
@@ -439,6 +440,7 @@ namespace DicingBlade.Classes
             catch (Exception ex)
             {
             }
+            Thread.Sleep(1);
         }
         public void StopCamera() => LocalWebCam.Stop();
         private bool DevicesConnection()
@@ -799,7 +801,15 @@ namespace DicingBlade.Classes
             ResetErrors();
             Motion.mAcm_AxMoveVel(MoveRelParam(direction).Item1, MoveRelParam(direction).Item2);     
         }
-
+        public void EmgStop() 
+        {
+            Motion.mAcm_AxStopEmg(m_Axishand[0]);
+            Motion.mAcm_AxStopEmg(m_Axishand[1]);
+            Motion.mAcm_AxStopEmg(m_Axishand[2]);
+            Motion.mAcm_AxStopEmg(m_Axishand[3]);
+           // m_Axishand.Select((hand) => Motion.mAcm_AxStopEmg(hand));
+            ResetErrors();
+        }
         public async Task GoTest() 
         {
             Motion.mAcm_AxMoveAbs(Z.Handle, 5);
@@ -930,23 +940,31 @@ namespace DicingBlade.Classes
         }
         public async Task MoveInPosXYAsync(Vector2 position)
         {
-            uint ElCount = 2;
-            ushort state = new ushort();            
-            await Task.Run(() =>
+            if (tokenXY)
             {
-                position.X = Math.Round(position.X, 3);
-                position.Y = Math.Round(position.Y, 3);
-                Motion.mAcm_GpMoveLinearAbs(XYhandle, new double[2] { position.X, position.Y }, ref ElCount);
-                do
+                tokenXY = false;
+                uint ElCount = 2;
+                ushort state = new ushort();
+                uint res = 0;
+                await Task.Run(() =>
                 {
-                    Motion.mAcm_GpGetState(XYhandle, ref state);
-                } while (state == (uint)GroupState.STA_Gp_Motion);
+                    position.X = Math.Round(position.X, 3);
+                    position.Y = Math.Round(position.Y, 3);
+                    double[] pos = new double[2] { position.X, position.Y };
+                    Motion.mAcm_GpResetError(XYhandle);
+                    res = Motion.mAcm_GpMoveDirectAbs(XYhandle, pos, ref ElCount);
+                    do
+                    {
+                        Motion.mAcm_GpGetState(XYhandle, ref state);
+                    } while ((state & (ushort)GroupState.STA_Gp_Motion) > 0);
+                }
+                );
+                X.MotionDone = true;
+                Y.MotionDone = true;
+                await X.MoveAxisInPosAsync(position.X);
+                await Y.MoveAxisInPosAsync(position.Y);
             }
-            );
-            X.MotionDone = true;
-            Y.MotionDone = true;
-            await X.MoveAxisInPosAsync(position.X);
-            await Y.MoveAxisInPosAsync(position.Y);
+            tokenXY = true;
         }
         public void RefreshSettings()
         {
@@ -1132,14 +1150,14 @@ namespace DicingBlade.Classes
         {
             return (Motion.mAcm_AxDoSetBit(Handle, (ushort)dout, val) == (uint)ErrorCode.SUCCESS) ? true : false; 
         }
+        private double storeSpeed;
         /// <summary>
         /// Установка скорости по оси
         /// </summary>
-        /// <param name="feed">unit per second</param>
-        
+        /// <param name="feed">unit per second</param>        
         public void SetVelocity(double feed)
         {
-           //uint result = 0;
+            //uint result = 0;           
             double VelHigh = feed;
             double VelLow = feed / 2;            
             double AxMaxVel = 30;
@@ -1150,6 +1168,14 @@ namespace DicingBlade.Classes
             Motion.mAcm_SetProperty(Handle, (uint)PropertyID.CFG_AxMaxVel, ref AxMaxVel, 8);
             Motion.mAcm_SetProperty(Handle, (uint)PropertyID.PAR_AxVelHigh, ref VelHigh, 8);
             Motion.mAcm_SetProperty(Handle, (uint)PropertyID.PAR_AxVelLow, ref VelLow, 8);
+        }
+        private double GetVelocity() 
+        {
+            uint res=0;
+            double vel = 0;
+            uint bufLength = 8;
+            res = Motion.mAcm_GetProperty(Handle, (uint)PropertyID.PAR_AxVelHigh, ref vel, ref bufLength);
+            return vel;
         }
         public void GoWhile(AxDir direction)
         {
@@ -1235,6 +1261,7 @@ namespace DicingBlade.Classes
                 );
             }
         }
+       
         private async Task SearchPositionAsync(double position, double accuracy)
         {
             bool flag = true;
@@ -1267,7 +1294,7 @@ namespace DicingBlade.Classes
                           );
             if (flag) await SearchPositionAsync(position, accuracy);
         }
-        public async Task MoveAxisInPosAsync(double position)
+        public async Task MoveAxisInPos2Async(double position)
         {
             double accuracy = 0.013;
             double dif = Math.Abs(Math.Round(ActualPosition, 3) - position);
@@ -1295,6 +1322,85 @@ namespace DicingBlade.Classes
                     }
 
             }
+        }
+
+        public void ResetErrors()
+        {
+            Motion.mAcm_AxResetError(Handle);
+        }
+        public async Task MoveAxisInPosAsync(double position, int rec = 0)
+        {
+            if (rec == 0) storeSpeed = GetVelocity();
+            //if (rec < 2)
+            {
+                uint buf = 0;
+                uint res = 0;
+                double tolerance = 0.003;
+                int pos = (int)(position * PPU);
+                ushort direction = 0;
+
+                buf = (uint)SwLmtEnable.SLMT_DIS;
+                res = Motion.mAcm_SetProperty(Handle, (uint)PropertyID.CFG_AxSwPelEnable, ref buf, 4);
+                res = Motion.mAcm_SetProperty(Handle, (uint)PropertyID.CFG_AxSwMelEnable, ref buf, 4);
+                ResetErrors();
+
+                double diff = position - ActualPosition;
+                if (Math.Abs(diff) > tolerance)
+                {
+                    buf = (uint)SwLmtReact.SLMT_IMMED_STOP;
+                    res = Motion.mAcm_SetProperty(Handle, (uint)PropertyID.CFG_AxSwPelReact, ref buf, 4);
+                    res = Motion.mAcm_SetProperty(Handle, (uint)PropertyID.CFG_AxSwMelReact, ref buf, 4);
+                    int tol = 0;
+                    switch (Math.Sign(diff))
+                    {
+                        case 1:
+                            res = Motion.mAcm_SetProperty(Handle, (uint)PropertyID.CFG_AxSwPelValue, ref pos, 4);
+                            buf = (uint)SwLmtEnable.SLMT_EN;
+                            res = Motion.mAcm_SetProperty(Handle, (uint)PropertyID.CFG_AxSwPelEnable, ref buf, 4);
+                            buf = (uint)SwLmtToleranceEnable.TOLERANCE_ENABLE;
+                            res = Motion.mAcm_SetProperty(Handle, (uint)PropertyID.CFG_AxSwPelToleranceEnable, ref buf, 4);
+                            res = Motion.mAcm_SetProperty(Handle, (uint)PropertyID.CFG_AxSwPelToleranceValue, ref tol, 4);
+                            direction = (ushort)VelMoveDir.DIR_POSITIVE;
+                            break;
+                        case -1:
+                            res = Motion.mAcm_SetProperty(Handle, (uint)PropertyID.CFG_AxSwMelValue, ref pos, 4);
+                            buf = (uint)SwLmtEnable.SLMT_EN;
+                            res = Motion.mAcm_SetProperty(Handle, (uint)PropertyID.CFG_AxSwMelEnable, ref buf, 4);
+                            buf = (uint)SwLmtToleranceEnable.TOLERANCE_ENABLE;
+                            res = Motion.mAcm_SetProperty(Handle, (uint)PropertyID.CFG_AxSwMelToleranceEnable, ref buf, 4);
+                            res = Motion.mAcm_SetProperty(Handle, (uint)PropertyID.CFG_AxSwMelToleranceValue, ref tol, 4);
+                            direction = (ushort)VelMoveDir.DIR_NEGATIVE;
+                            break;
+                    }
+                    Motion.mAcm_AxMoveVel(Handle, direction);
+                    uint status = 0;
+                    uint slmtp = 0;
+                    uint slmtn = 0;
+                    await Task.Run(() =>
+                    {
+                        do
+                        {
+                            Thread.Sleep(1);
+                            Motion.mAcm_AxGetMotionIO(Handle, ref status);
+                            slmtp = status & (uint)Ax_Motion_IO.AX_MOTION_IO_SLMTP;
+                            slmtn = status & (uint)Ax_Motion_IO.AX_MOTION_IO_SLMTN;
+                        } while ((slmtp == 0) & (slmtn == 0));
+                    }
+                    );
+                    SetVelocity(1);
+                    Motion.mAcm_AxSetCmdPosition(Handle, ActualPosition);
+                    //rec++;
+                    await MoveAxisInPosAsync(position, ++rec);
+                    rec--;
+                    //buf = (uint)SwLmtEnable.SLMT_DIS;
+                    //res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwPelEnable, ref buf, 4);
+                    //res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwMelEnable, ref buf, 4);
+                    ResetErrors();
+                    if (rec == 0) SetVelocity(storeSpeed);
+                }
+
+            }
+           // else SetVelocity(storeSpeed);
         }
     }
 }

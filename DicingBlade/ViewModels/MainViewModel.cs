@@ -103,7 +103,7 @@ namespace DicingBlade.ViewModels
         }
         private void Func() 
         {
-            Machine.YGoToSwLmt(5);
+            Machine.YGoToSwLmt(10);
         }
         private async Task KeyDownAsync(object args) 
         {

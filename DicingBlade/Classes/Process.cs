@@ -56,6 +56,7 @@ namespace DicingBlade.Classes
             return Math.Atan2(point2.Y-point1.Y, point2.X - point1.X);
         }
     }
+    public delegate void SetPause(bool pause);
     [AddINotifyPropertyChangedInterface]
     class Process
     {
@@ -64,10 +65,10 @@ namespace DicingBlade.Classes
         private Machine Machine { get; set; }
         private Blade Blade { get; set; }
         public Status ProcessStatus { get; set; }
-        private double  BladeTransferGapZ { get; set; }
+        private double BladeTransferGapZ { get; set; } = 1;
         private bool IsCutting { get; set; } = false;
         private bool InProcess { get; set; } = false;
-       
+        private bool procToken = true;
         private bool pauseProcess_;
         public bool PauseProcess 
         {
@@ -126,7 +127,9 @@ namespace DicingBlade.Classes
         }
         public async Task PauseScenarioAsync() 
         {
-            await ProcElementDispatcherAsync(Diagram.goCameraPointXYZ);
+            Machine.EmgStop();
+            //Machine.VelocityRegime = Velocity.Service;
+            //await ProcElementDispatcherAsync(Diagram.goCameraPointXYZ);
         }
         public async Task DoProcessAsync(Diagram[] diagrams)
         {
@@ -140,7 +143,11 @@ namespace DicingBlade.Classes
                 {
                     foreach (var item in diagrams)
                     {
-                        if (pauseToken.Equals(default)) await pauseToken.Token.WaitWhilePausedAsync();
+                        Task.Run(() =>
+                        {
+                            pauseToken.Token.WaitWhilePausedAsync();
+                        }).Wait();
+                        //if (pauseToken.Equals(default)) await pauseToken.Token.WaitWhilePausedAsync();
                         await ProcElementDispatcherAsync(item);
                     }
                 }
@@ -282,7 +289,7 @@ namespace DicingBlade.Classes
                         Machine.CameraChuckCenter.X,
                         y
                         ));
-                    await Machine.Z.MoveAxisInPosAsync(Machine.CameraFocus);
+                    await Machine.Z.MoveAxisInPosAsync(/*Machine.CameraFocus*/3.5);
                     break;
                 default:
                     break;
@@ -308,18 +315,20 @@ namespace DicingBlade.Classes
                     else
                     {
                         ProcessStatus = Status.Working;
-                        await DoProcessAsync(BaseProcess);
+                        /*await*/
+                        DoProcessAsync(BaseProcess);
                     }
 
                     break;
                 case Status.Working:
-                    PauseProcess = !PauseProcess;
+                    PauseProcess ^= true;
                     if (PauseProcess) await PauseScenarioAsync();
                     break;
                 case Status.Correcting:
                     break;
                 default:
                     break;
+
             }
         }
         private void Machine_OnVacuumWanished(/*DIEventArgs eventArgs*/)
