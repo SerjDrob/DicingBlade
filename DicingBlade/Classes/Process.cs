@@ -9,6 +9,7 @@ using Advantech.Motion;
 using netDxf;
 using Microsoft.VisualStudio.Workspace;
 using PropertyChanged;
+using System.ComponentModel;
 
 namespace DicingBlade.Classes
 {   
@@ -128,26 +129,23 @@ namespace DicingBlade.Classes
         public async Task PauseScenarioAsync() 
         {
             Machine.EmgStop();
-            //Machine.VelocityRegime = Velocity.Service;
-            //await ProcElementDispatcherAsync(Diagram.goCameraPointXYZ);
+            Machine.VelocityRegime = Velocity.Service;
+            await ProcElementDispatcherAsync(Diagram.goCameraPointXYZ);
         }
         public async Task DoProcessAsync(Diagram[] diagrams)
         {
             if (!InProcess)
             {
+                
                 PauseProcess = false;
                 pauseToken = new PauseTokenSource();
-                cancellationToken = new CancellationTokenSource();
+                //cancellationToken = new CancellationTokenSource();
                 InProcess = true;
                 while (InProcess)
                 {
                     foreach (var item in diagrams)
                     {
-                        Task.Run(() =>
-                        {
-                            pauseToken.Token.WaitWhilePausedAsync();
-                        }).Wait();
-                        //if (pauseToken.Equals(default)) await pauseToken.Token.WaitWhilePausedAsync();
+                        await pauseToken.Token.WaitWhilePausedAsync();
                         await ProcElementDispatcherAsync(item);
                     }
                 }
@@ -227,7 +225,7 @@ namespace DicingBlade.Classes
                     await Machine.Z.MoveAxisInPosAsync(Machine.ZBladeTouch - Wafer.Thickness - BladeTransferGapZ);
                     await Machine.MoveInPosXYAsync(new netDxf.Vector2(
                         Machine.CameraChuckCenter.X,
-                        Wafer.GetCurrentLine(CurrentLine).start.Y
+                        Machine.CtoBSystemCoors(Wafer.GetCurrentLine(CurrentLine!=0?CurrentLine-1:0).start).Y - Machine.CameraBladeOffset
                         ));
                     await Machine.Z.MoveAxisInPosAsync(Machine.CameraFocus);
                     break;

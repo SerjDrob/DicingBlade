@@ -270,7 +270,7 @@
                         </TransformGroup>
                     </Rectangle.RenderTransform>
                 </Rectangle>
-                <!--<ItemsControl ItemsSource="{Binding WaferView.RawLines}" Panel.ZIndex="2">
+                <ItemsControl ItemsSource="{Binding WaferView.RawLines}" Panel.ZIndex="2">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Canvas>
@@ -415,7 +415,7 @@
                             </Canvas>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
-                </ItemsControl>-->               
+                </ItemsControl>               
                 <Path x:Name="BladeCursor" Stroke="Green" StrokeThickness="1" Panel.ZIndex="3">
                     <Path.Data>
                         <MultiBinding Converter="{StaticResource GetCursor}">

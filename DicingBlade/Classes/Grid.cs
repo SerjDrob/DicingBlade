@@ -135,7 +135,6 @@ namespace DicingBlade.Classes
                     tempLines.Add(new Cut(new Vector3(dx, firstStep + direction.index * i + dy, 1), new Vector3(direction.length + dx, firstStep + direction.index * i + dy, 1)));
                 }
                 Lines.Add(direction.degree, tempLines);
-
             }            
         }
         public WaferView MakeGridView() 
