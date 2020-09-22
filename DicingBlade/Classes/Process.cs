@@ -128,6 +128,7 @@ namespace DicingBlade.Classes
         }
         public async Task PauseScenarioAsync() 
         {
+            await Machine.X.WaitUntilStopAsync();
             Machine.EmgStop();
             Machine.VelocityRegime = Velocity.Service;
             await ProcElementDispatcherAsync(Diagram.goCameraPointXYZ);

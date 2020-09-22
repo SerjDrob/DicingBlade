@@ -970,7 +970,7 @@ namespace DicingBlade.Classes
                 if (Y.LineCoefficient != 0) await Y.MoveAxisInPosAsync(position.Y);
             }
             tokenXY = true;
-        }
+        }        
         public void RefreshSettings()
         {
             Bridge = new Bridge()
@@ -1266,7 +1266,17 @@ namespace DicingBlade.Classes
                 );
             }
         }
-       
+        public async Task WaitUntilStopAsync() 
+        {
+            uint status = new uint();
+            await Task.Run(() =>
+            {
+                do
+                {
+                    Motion.mAcm_AxGetMotionStatus(Handle, ref status);
+                } while ((status & 0x1) == 0);
+            });
+        }
         private async Task SearchPositionAsync(double position, double accuracy)
         {
             bool flag = true;
