@@ -462,6 +462,28 @@
                         </Style>
                     </Path.Style>
                 </Path>
+                <ItemsControl ItemsSource="{Binding process.TracesView.Traces}" Panel.ZIndex="4">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Canvas>
+                                <Path>
+                                    <Path.Data>
+                                        <MultiBinding Converter="{StaticResource GetCursor}">
+                                            <Binding Path="EndPoint.X"/>
+                                            <Binding Path="EndPoint.Y"/>
+                                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Canvas}"/>
+                                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Canvas}"/>
+                                            <Binding Path="DataContext.Machine.BladeChuckCenter.X" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                            <Binding Path="DataContext.Machine.BladeChuckCenter.Y" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                            <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                            <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                        </MultiBinding>
+                                    </Path.Data>
+                                </Path>
+                            </Canvas>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
             </Canvas>
         </DockPanel>
         <GroupBox Grid.Row="2" VerticalAlignment="Top">

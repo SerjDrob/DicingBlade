@@ -10,6 +10,7 @@ using netDxf;
 using Microsoft.VisualStudio.Workspace;
 using PropertyChanged;
 using System.ComponentModel;
+using netDxf.Entities;
 
 namespace DicingBlade.Classes
 {   
@@ -66,6 +67,7 @@ namespace DicingBlade.Classes
         private Machine Machine { get; set; }
         private Blade Blade { get; set; }
         public Status ProcessStatus { get; set; }
+        public TracesView TracesView { get; private set; }
         private double BladeTransferGapZ { get; set; } = 1;
         private bool IsCutting { get; set; } = false;
         private bool InProcess { get; set; } = false;
@@ -129,8 +131,7 @@ namespace DicingBlade.Classes
         public async Task PauseScenarioAsync() 
         {
             await Machine.X.WaitUntilStopAsync();
-            Machine.EmgStop();
-            Machine.VelocityRegime = Velocity.Service;
+            //Machine.EmgStop();
             await ProcElementDispatcherAsync(Diagram.goCameraPointXYZ);
         }
         public async Task DoProcessAsync(Diagram[] diagrams)
@@ -213,6 +214,10 @@ namespace DicingBlade.Classes
                     Machine.X.SetVelocity(FeedSpeed);
                     IsCutting = true;
                     target = Machine.CtoBSystemCoors(Wafer.GetCurrentLine(CurrentLine).end);
+
+                    var trace = new Line(new Vector2(Machine.X.ActualPosition,Machine.Y.ActualPosition), new Vector2(Machine.X.ActualPosition + 10, Machine.Y.ActualPosition));
+                    TracesView.Traces.Add(trace);
+
                     await Machine.X.MoveAxisInPosAsync(target.X);
                     IsCutting = false;
                     Machine.SwitchOnCoolantWater = false;
@@ -315,6 +320,7 @@ namespace DicingBlade.Classes
                     {
                         ProcessStatus = Status.Working;
                         /*await*/
+                        TracesView = new TracesView();
                         DoProcessAsync(BaseProcess);
                     }
 

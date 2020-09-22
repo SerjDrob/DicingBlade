@@ -35,6 +35,7 @@ namespace DicingBlade.ViewModels
         public Process process { get; set; }
         public Wafer Wafer { get; set; }
         public WaferView WaferView { get; set; }
+        
         private TempWafer2D tempWafer2;
         private int[] cols;
         private int[] rows;
@@ -103,8 +104,7 @@ namespace DicingBlade.ViewModels
         }
         private void Func() 
         {
-            //Machine.YGoToSwLmt(10);
-            Machine.ResetErrors();
+            Machine.YGoToSwLmt(10);
         }
         private async Task KeyDownAsync(object args) 
         {

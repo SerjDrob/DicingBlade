@@ -176,17 +176,17 @@ namespace DicingBlade.Classes
                 StartCamera();
                 DevicesConnection();                
                 SetConfigs();
-                
-                VelocityRegime = Velocity.Slow;               
+                VelocityRegime = Velocity.Slow; 
+                 OnAirWanished += EMGScenario;
+                Thread threadCurrentState = new Thread(new ThreadStart(MachineState));
+                threadCurrentState.Start();
+                VelocityRegime = Velocity.Fast;
+                RefreshSettings();
             }
             
-            OnAirWanished += EMGScenario;           
-            Thread threadCurrentState = new Thread(new ThreadStart(MachineState));
-            //Thread threadCheckEvents = new Thread(new ThreadStart(MachineEvents));
-            threadCurrentState.Start();
-            //threadCheckEvents.Start();
-            VelocityRegime = Velocity.Fast;            
-            RefreshSettings();
+           
+            
+            
         }
         #region Методы
 
@@ -445,61 +445,59 @@ namespace DicingBlade.Classes
         public void StopCamera() => LocalWebCam.Stop();
         private bool DevicesConnection()
         {
-            uint Result;
+            uint result;
             string strTemp;
-            int ResAvlb;
             uint i = 0;
-            uint[] slaveDevs = new uint[16];
-            uint AxesPerDev = new uint();
+            uint axesPerDev = new uint();
             uint deviceCount = 0;
-            uint DeviceNum = 0;
-            DEV_LIST[] CurAvailableDevs = new DEV_LIST[Motion.MAX_DEVICES];
+            uint deviceNum = 0;
+            DEV_LIST[] curAvailableDevs = new DEV_LIST[Motion.MAX_DEVICES];
 
 
-            ResAvlb = Motion.mAcm_GetAvailableDevs(CurAvailableDevs, Motion.MAX_DEVICES, ref deviceCount);
+            var resAvlb = Motion.mAcm_GetAvailableDevs(curAvailableDevs, Motion.MAX_DEVICES, ref deviceCount);
 
-            if (ResAvlb != (int)ErrorCode.SUCCESS)
+            if (resAvlb != (int)ErrorCode.SUCCESS)
             {
-                strTemp = "Get Device Numbers Failed With Error Code: [0x" + Convert.ToString(ResAvlb, 16) + "]";
-                MessageBox.Show(strTemp + " " + ResAvlb);
+                strTemp = "Get Device Numbers Failed With Error Code: [0x" + Convert.ToString(resAvlb, 16) + "]";
+                MessageBox.Show(strTemp + " " + resAvlb);
                 return false;
             }
 
             if (deviceCount > 0)
             {
-                DeviceNum = CurAvailableDevs[0].DeviceNum;
+                deviceNum = curAvailableDevs[0].DeviceNum;
             }
 
-            DeviceNum = CurAvailableDevs[0].DeviceNum;
+            deviceNum = curAvailableDevs[0].DeviceNum;
 
-            Result = Motion.mAcm_DevOpen(DeviceNum, ref m_DeviceHandle);
-            if (Result != (uint)ErrorCode.SUCCESS)
+            result = Motion.mAcm_DevOpen(deviceNum, ref m_DeviceHandle);
+            if (result != (uint)ErrorCode.SUCCESS)
             {
-                strTemp = "Open Device Failed With Error Code: [0x" + Convert.ToString(Result, 16) + "]";
-                MessageBox.Show(strTemp + Result);
+                strTemp = "Open Device Failed With Error Code: [0x" + Convert.ToString(result, 16) + "]";
+                MessageBox.Show(strTemp + result);
                 return false;
             }
 
-            Result = Motion.mAcm_GetU32Property(m_DeviceHandle, (uint)PropertyID.FT_DevAxesCount, ref AxesPerDev);
-            if (Result != (uint)ErrorCode.SUCCESS)
+            result = Motion.mAcm_GetU32Property(m_DeviceHandle, (uint)PropertyID.FT_DevAxesCount, ref axesPerDev);
+            if (result != (uint)ErrorCode.SUCCESS)
             {
-                strTemp = "Get Axis Number Failed With Error Code: [0x" + Convert.ToString(Result, 16) + "]";
-                MessageBox.Show(strTemp + " " + Result);
+                strTemp = "Get Axis Number Failed With Error Code: [0x" + Convert.ToString(result, 16) + "]";
+                MessageBox.Show(strTemp + " " + result);
                 return false;
             }
 
-            m_ulAxisCount = AxesPerDev;
+            m_ulAxisCount = axesPerDev;
             uint[] axisEnableEvent = new uint[m_ulAxisCount];
-            uint[] GpEnableEvent = new uint[1];
+            uint[] gpEnableEvent = new uint[1];
 
             for (i = 0; i < m_ulAxisCount; i++)
             {
 
-                Result = Motion.mAcm_AxOpen(m_DeviceHandle, (UInt16)i, ref m_Axishand[i]);
-                if (Result != (uint)ErrorCode.SUCCESS)
+                result = Motion.mAcm_AxOpen(m_DeviceHandle, (UInt16)i, ref m_Axishand[i]);
+                if (result != (uint)ErrorCode.SUCCESS)
                 {
-                    strTemp = "Open Axis Failed With Error Code: [0x" + Convert.ToString(Result, 16) + "]";
-                    MessageBox.Show(strTemp + " " + Result);
+                    strTemp = "Open Axis Failed With Error Code: [0x" + Convert.ToString(result, 16) + "]";
+                    MessageBox.Show(strTemp + " " + result);
                     return false;
                 }
 
@@ -518,7 +516,7 @@ namespace DicingBlade.Classes
                 
             }
 
-            Motion.mAcm_EnableMotionEvent(m_DeviceHandle, axisEnableEvent, GpEnableEvent, m_ulAxisCount, 1);
+            Motion.mAcm_EnableMotionEvent(m_DeviceHandle, axisEnableEvent, gpEnableEvent, m_ulAxisCount, 1);
             m_bInit = true;
                         
             X = new Axis(0, m_Axishand[0],0);
@@ -531,18 +529,18 @@ namespace DicingBlade.Classes
             axes[Z.AxisNum] = Z;
             axes[U.AxisNum] = U;
 
-            Result = Motion.mAcm_GpAddAxis(ref XYhandle, X.Handle);
-            if (Result != (uint)ErrorCode.SUCCESS)
+            result = Motion.mAcm_GpAddAxis(ref XYhandle, X.Handle);
+            if (result != (uint)ErrorCode.SUCCESS)
             {
-                strTemp = "Open Axis Failed With Error Code: [0x" + Convert.ToString(Result, 16) + "]";
-                MessageBox.Show(strTemp + " " + Result);
+                strTemp = "Open Axis Failed With Error Code: [0x" + Convert.ToString(result, 16) + "]";
+                MessageBox.Show(strTemp + " " + result);
                 return false;
             }
-            Result = Motion.mAcm_GpAddAxis(ref XYhandle, Y.Handle);
-            if (Result != (uint)ErrorCode.SUCCESS)
+            result = Motion.mAcm_GpAddAxis(ref XYhandle, Y.Handle);
+            if (result != (uint)ErrorCode.SUCCESS)
             {
-                strTemp = "Open Axis Failed With Error Code: [0x" + Convert.ToString(Result, 16) + "]";
-                MessageBox.Show(strTemp + " " + Result);
+                strTemp = "Open Axis Failed With Error Code: [0x" + Convert.ToString(result, 16) + "]";
+                MessageBox.Show(strTemp + " " + result);
                 return false;
             }
             
@@ -803,7 +801,7 @@ namespace DicingBlade.Classes
         }
         public void EmgStop() 
         {           
-            m_Axishand.Select((hand) => Motion.mAcm_AxStopEmg(hand)).ToList();
+            m_Axishand.Select(Motion.mAcm_AxStopEmg).ToList();
             ResetErrors();
         }
         public async Task GoTest() 
@@ -1343,10 +1341,9 @@ namespace DicingBlade.Classes
         {
             Motion.mAcm_AxResetError(Handle);
         }
-        public async Task MoveAxisInPosAsync(double position, int rec = 0)
+        public async Task MoveAxisInPosAsync(double position, int rec = 0, double trace = 0)
         {
             uint state = new uint();
-
             if (rec == 0) storeSpeed = GetVelocity();
             uint buf = 0;
             uint res = 0;
@@ -1421,6 +1418,7 @@ namespace DicingBlade.Classes
                 {
                     do
                     {
+                        trace = ActualPosition;
                         Thread.Sleep(1);
                         Motion.mAcm_AxGetMotionStatus(Handle, ref state);
                     } while ((state & 0x1) == 0);

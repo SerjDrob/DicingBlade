@@ -181,6 +181,7 @@
     <Compile Include="Classes\Command.cs" />
     <Compile Include="Classes\Parameters.cs" />
     <Compile Include="Classes\Technology.cs" />
+    <Compile Include="Classes\TracesView.cs" />
     <Compile Include="Converters\CrossPositionConverter.cs" />
     <Compile Include="Converters\CursorToPathConverter.cs" />
     <Compile Include="Classes\PropContainer.cs" />
