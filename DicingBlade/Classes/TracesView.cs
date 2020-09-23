@@ -13,6 +13,10 @@ namespace DicingBlade.Classes
     [AddINotifyPropertyChangedInterface]
     class TracesView
     {
+        public TracesView() 
+        {
+            Traces = new ObservableCollection<Line>();
+        }
         public ObservableCollection<Line> Traces { get; set; }
     }
 }

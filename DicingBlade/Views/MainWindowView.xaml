@@ -463,11 +463,11 @@
                         </Style>
                     </Path.Style>
                 </Path>
-                <ItemsControl ItemsSource="{Binding process.TracesView.Traces}" Panel.ZIndex="4">
+                <ItemsControl ItemsSource="{Binding process.TracesView.Traces}" Panel.ZIndex="3">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Canvas>
-                                <Path>
+                                <Path Stroke="Navy" StrokeThickness="2">
                                     <Path.Data>
                                         <MultiBinding Converter="{StaticResource TraceConverter}">
                                             <Binding Path="StartPoint.X"/>

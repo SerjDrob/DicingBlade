@@ -67,7 +67,7 @@ namespace DicingBlade.Classes
         private Machine Machine { get; set; }
         private Blade Blade { get; set; }
         public Status ProcessStatus { get; set; }
-        public TracesView TracesView { get; private set; }
+        public TracesView TracesView { get; set; }
         private double BladeTransferGapZ { get; set; } = 1;
         private bool IsCutting { get; set; } = false;
         private bool InProcess { get; set; } = false;
@@ -215,7 +215,7 @@ namespace DicingBlade.Classes
                     IsCutting = true;
                     target = Machine.CtoBSystemCoors(Wafer.GetCurrentLine(CurrentLine).end);
 
-                    var trace = new Line(new Vector2(Machine.X.ActualPosition,Machine.Y.ActualPosition), new Vector2(Machine.X.ActualPosition + 10, Machine.Y.ActualPosition));
+                    var trace = new Line(new Vector2(Machine.X.ActualPosition,Machine.Y.ActualPosition), new Vector2(Machine.X.ActualPosition + 100, Machine.Y.ActualPosition));
                     TracesView.Traces.Add(trace);
 
                     await Machine.X.MoveAxisInPosAsync(target.X);
