@@ -173,11 +173,11 @@ namespace DicingBlade.Classes
             
             if (!testRegime)
             {
-                StartCamera();
-                DevicesConnection();                
+               // StartCamera();
+                DevicesConnection();
                 SetConfigs();
-                VelocityRegime = Velocity.Slow; 
-                 OnAirWanished += EMGScenario;
+                VelocityRegime = Velocity.Slow;
+                OnAirWanished += EMGScenario;
                 Thread threadCurrentState = new Thread(new ThreadStart(MachineState));
                 threadCurrentState.Start();
                 VelocityRegime = Velocity.Fast;

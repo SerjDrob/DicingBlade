@@ -11,6 +11,7 @@ using Microsoft.VisualStudio.Workspace;
 using PropertyChanged;
 using System.ComponentModel;
 using netDxf.Entities;
+using System.Collections.ObjectModel;
 
 namespace DicingBlade.Classes
 {   
@@ -58,6 +59,20 @@ namespace DicingBlade.Classes
             return Math.Atan2(point2.Y-point1.Y, point2.X - point1.X);
         }
     }
+    class TracePath
+    {
+        public TracePath(double Y, double X, double Xend, double InitAngle)
+        {
+            this.Y = Y;
+            this.X = X;
+            this.Xend = Xend;
+            this.InitAngle = InitAngle;
+        }
+        public double Y { get; set; }
+        public double X { get; set; }
+        public double Xend { get; set; }
+        public double InitAngle { get; set; }
+    }
     public delegate void SetPause(bool pause);
     [AddINotifyPropertyChangedInterface]
     class Process
@@ -67,8 +82,10 @@ namespace DicingBlade.Classes
         private Machine Machine { get; set; }
         private Blade Blade { get; set; }
         public Status ProcessStatus { get; set; }
-        public TracesView TracesView { get; set; }
-        public Line TracingLine { get; set; }
+        //public TracesView TracesView { get; set; }
+        public TracePath TracingLine { get; set; }
+        public ObservableCollection<TracePath> Traces { get; set; }
+        private List<TracePath> traces;
         private double BladeTransferGapZ { get; set; } = 1;
         private bool IsCutting { get; set; } = false;
         private bool InProcess { get; set; } = false;
@@ -215,22 +232,22 @@ namespace DicingBlade.Classes
                     Machine.X.SetVelocity(FeedSpeed);
                     IsCutting = true;
                     target = Machine.CtoBSystemCoors(Wafer.GetCurrentLine(CurrentLine).end);
-                    
-                    var endPoint = new Vector2(Machine.X.ActualPosition, Machine.Y.ActualPosition);
-                    TracingLine = new Line(new Vector2(Machine.X.ActualPosition, Machine.Y.ActualPosition), endPoint);
+                    var traceX = Machine.X.ActualPosition;
+                    var traceY = Machine.Y.ActualPosition;
+                    var angle = Machine.U.ActualPosition;
                     Thread tracingThread = new Thread(new ThreadStart(() =>
                     {
                         do
-                        {
-                            endPoint = new Vector2(Machine.X.ActualPosition, Machine.Y.ActualPosition);
+                        {                            
+                            TracingLine = new TracePath(traceY, traceX, Machine.X.ActualPosition, angle);
                         } while (IsCutting);
                     }));
                     tracingThread.Start();
-                   // TracesView.Traces.Add(trace);
-
                     await Machine.X.MoveAxisInPosAsync(target.X);
                     IsCutting = false;
-                    tracingThread.Abort();
+                    tracingThread.Abort();                   
+                    traces.Add(TracingLine);
+                    Traces = new ObservableCollection<TracePath>(traces);                    
                     Machine.SwitchOnCoolantWater = false;
                     if (!Wafer.CurrentCutIncrement(CurrentLine))
                     {
@@ -331,7 +348,8 @@ namespace DicingBlade.Classes
                     {
                         ProcessStatus = Status.Working;
                         /*await*/
-                        TracesView = new TracesView();
+                        //Traces = new ObservableCollection<Line>();
+                        traces = new List<TracePath>();
                         DoProcessAsync(BaseProcess);
                     }
 

@@ -194,6 +194,7 @@
     <Compile Include="Classes\StatMethods.cs" />
     <Compile Include="Classes\ITechnology.cs" />
     <Compile Include="Converters\ToPointConverter.cs" />
+    <Compile Include="Converters\TraceAngleConverter.cs" />
     <Compile Include="Converters\TraceConverter.cs" />
     <Compile Include="Converters\TransformPointConverter.cs" />
     <Compile Include="Converters\TranslateConverter.cs" />

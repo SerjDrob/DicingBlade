@@ -27,6 +27,7 @@
         <converters:ZIndicatorConverter x:Key="ZIndConverter"/>
         <converters:MatchEnumVisibilityConverter x:Key="MatchEnumConverter"/>
         <converters:TraceConverter x:Key="TraceConverter"/>
+        <converters:TraceAngleConverter x:Key="TraceAngleConvereter"/>
         <SolidColorBrush Color="MediumSpringGreen" x:Key="SignalGreen"/>
         <SolidColorBrush Color="IndianRed" x:Key="SignalRed"/>
         <System:Double x:Key="Zero">0</System:Double>
@@ -279,7 +280,8 @@
                                               X2="{Binding EndPoint.X}"
                                               Y1="{Binding StartPoint.Y}"
                                               Y2="{Binding EndPoint.Y}"
-                                              Stroke="Black"                                                                                            
+                                              Stroke="Black"
+                                              Opacity="0.3"
                                               UseLayoutRounding="True"                                                
                                               >
                                     <Line.StrokeThickness>
@@ -463,13 +465,12 @@
                         </Style>
                     </Path.Style>
                 </Path>
-
-                <Path Stroke="Navy" StrokeThickness="2">
+                <Path Stroke="Navy" StrokeThickness="2" StrokeDashArray="4 4" Panel.ZIndex="4">
                     <Path.Data>
                         <MultiBinding Converter="{StaticResource TraceConverter}">
-                            <Binding Path=" Process.TracingLine.StartPoint.X"/>
-                            <Binding Path="Process.TracingLine.StartPoint.Y"/>
-                            <Binding Path="Process.TracingLine.EndPoint.X"/>
+                            <Binding Path="Process.TracingLine.X"/>
+                            <Binding Path="Process.TracingLine.Y"/>
+                            <Binding Path="Process.TracingLine.Xend"/>
                             <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Canvas}"/>
                             <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Canvas}"/>
                             <Binding Path="DataContext.Machine.BladeChuckCenter.X" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
@@ -479,7 +480,51 @@
                         </MultiBinding>
                     </Path.Data>
                 </Path>
-
+                <ItemsControl ItemsSource="{Binding Process.Traces}" Panel.ZIndex="4">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Canvas>
+                                <Path Stroke="Navy" StrokeThickness="2" StrokeDashArray="4 4">
+                                    <Path.Data>
+                                        <MultiBinding Converter="{StaticResource TraceConverter}">
+                                            <Binding Path="X"/>
+                                            <Binding Path="Y"/>
+                                            <Binding Path="Xend"/>
+                                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=2,AncestorType=Canvas}"/>
+                                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=2,AncestorType=Canvas}"/>
+                                            <Binding Path="DataContext.Machine.BladeChuckCenter.X" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                            <Binding Path="DataContext.Machine.BladeChuckCenter.Y" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                            <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                            <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                        </MultiBinding>
+                                    </Path.Data>
+                                    <Path.RenderTransform>
+                                        <TransformGroup>
+                                            <RotateTransform>
+                                                <RotateTransform.CenterX>
+                                                    <MultiBinding Converter="{StaticResource CrossConverter}">                                                        
+                                                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=2,AncestorType=Canvas}"/>
+                                                    </MultiBinding>
+                                                </RotateTransform.CenterX>
+                                                <RotateTransform.CenterY>
+                                                    <MultiBinding Converter="{StaticResource CrossConverter}">
+                                                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=2,AncestorType=Canvas}"/>
+                                                    </MultiBinding>
+                                                </RotateTransform.CenterY>
+                                                <RotateTransform.Angle>
+                                                    <MultiBinding Converter="{StaticResource TraceAngleConvereter}">
+                                                        <Binding Path="DataContext.Machine.U.ActualPosition" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                                        <Binding Path="InitAngle"/>
+                                                    </MultiBinding> 
+                                                </RotateTransform.Angle>
+                                            </RotateTransform>
+                                        </TransformGroup>
+                                    </Path.RenderTransform>
+                                </Path>                                
+                            </Canvas>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
             </Canvas>
         </DockPanel>
         <GroupBox Grid.Row="2" VerticalAlignment="Top">
