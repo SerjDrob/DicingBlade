@@ -26,6 +26,7 @@
         <local:CursorToPathConverter x:Key="GetCursor"/>
         <converters:ZIndicatorConverter x:Key="ZIndConverter"/>
         <converters:MatchEnumVisibilityConverter x:Key="MatchEnumConverter"/>
+        <converters:TraceConverter x:Key="TraceConverter"/>
         <SolidColorBrush Color="MediumSpringGreen" x:Key="SignalGreen"/>
         <SolidColorBrush Color="IndianRed" x:Key="SignalRed"/>
         <System:Double x:Key="Zero">0</System:Double>
@@ -468,9 +469,10 @@
                             <Canvas>
                                 <Path>
                                     <Path.Data>
-                                        <MultiBinding Converter="{StaticResource GetCursor}">
+                                        <MultiBinding Converter="{StaticResource TraceConverter}">
+                                            <Binding Path="StartPoint.X"/>
+                                            <Binding Path="StartPoint.Y"/>
                                             <Binding Path="EndPoint.X"/>
-                                            <Binding Path="EndPoint.Y"/>
                                             <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Canvas}"/>
                                             <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Canvas}"/>
                                             <Binding Path="DataContext.Machine.BladeChuckCenter.X" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
