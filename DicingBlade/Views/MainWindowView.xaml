@@ -96,19 +96,19 @@
                             <StackPanel DockPanel.Dock="Top">
                                 <StackPanel Orientation="Horizontal">
                                     <Label Content="ProcessStatus"/>
-                                    <Label Content="{Binding process.ProcessStatus}"/>
+                                    <Label Content="{Binding Process.ProcessStatus}"/>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal">
                                     <Label Content="SideDone"/>
-                                    <Label Content="{Binding process.SideDone}"/>
+                                    <Label Content="{Binding Process.SideDone}"/>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal">
                                     <Label Content="SideCounter"/>
-                                    <Label Content="{Binding process.SideCounter}"/>
+                                    <Label Content="{Binding Process.SideCounter}"/>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal">
                                     <Label Content="CurrentLine"/>
-                                    <Label Content="{Binding process.CurrentLine}"/>
+                                    <Label Content="{Binding Process.CurrentLine}"/>
                                 </StackPanel>
                             </StackPanel>
                             
@@ -463,29 +463,23 @@
                         </Style>
                     </Path.Style>
                 </Path>
-                <ItemsControl ItemsSource="{Binding process.TracesView.Traces}" Panel.ZIndex="3">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Canvas>
-                                <Path Stroke="Navy" StrokeThickness="2">
-                                    <Path.Data>
-                                        <MultiBinding Converter="{StaticResource TraceConverter}">
-                                            <Binding Path="StartPoint.X"/>
-                                            <Binding Path="StartPoint.Y"/>
-                                            <Binding Path="EndPoint.X"/>
-                                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Canvas}"/>
-                                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Canvas}"/>
-                                            <Binding Path="DataContext.Machine.BladeChuckCenter.X" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
-                                            <Binding Path="DataContext.Machine.BladeChuckCenter.Y" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
-                                            <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
-                                            <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
-                                        </MultiBinding>
-                                    </Path.Data>
-                                </Path>
-                            </Canvas>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+
+                <Path Stroke="Navy" StrokeThickness="2">
+                    <Path.Data>
+                        <MultiBinding Converter="{StaticResource TraceConverter}">
+                            <Binding Path=" Process.TracingLine.StartPoint.X"/>
+                            <Binding Path="Process.TracingLine.StartPoint.Y"/>
+                            <Binding Path="Process.TracingLine.EndPoint.X"/>
+                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Canvas}"/>
+                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Canvas}"/>
+                            <Binding Path="DataContext.Machine.BladeChuckCenter.X" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                            <Binding Path="DataContext.Machine.BladeChuckCenter.Y" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                            <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                            <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                        </MultiBinding>
+                    </Path.Data>
+                </Path>
+
             </Canvas>
         </DockPanel>
         <GroupBox Grid.Row="2" VerticalAlignment="Top">

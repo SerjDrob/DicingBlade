@@ -32,7 +32,7 @@ namespace DicingBlade.ViewModels
     {
         private Parameters parameters;
         public Machine Machine { get; set; }
-        public Process process { get; set; }
+        public Process Process { get; set; }
         public Wafer Wafer { get; set; }
         public WaferView WaferView { get; set; }
         
@@ -136,23 +136,23 @@ namespace DicingBlade.ViewModels
             if (key.Key == Key.T) Change();
             if (key.Key == Key.Divide)
             {
-                if (process == null) 
+                if (Process == null) 
                 {
                     if (Machine.SetOnChuck())
                     {
                         await Machine.GoThereAsync(Place.CameraChuckCenter);
-                        process = new Process(Machine, Wafer, new Blade(), new Technology(), BaseProcess);
-                        process.ProcessStatus = Status.StartLearning;                        
+                        Process = new Process(Machine, Wafer, new Blade(), new Technology(), BaseProcess);
+                        Process.ProcessStatus = Status.StartLearning;                        
                     }
                     
                 }
                 else 
                 {
-                    if(process.ProcessStatus == Status.Done) 
+                    if(Process.ProcessStatus == Status.Done) 
                     {
-                        process = null;                        
+                        Process = null;                        
                     }
-                    else await process.StartPauseProc();
+                    else await Process.StartPauseProc();
                 }
                 //StartWorkAsync();
             }
@@ -205,7 +205,7 @@ namespace DicingBlade.ViewModels
             }
             if (key.Key == Key.OemMinus) 
             {
-                if (process.ProcessStatus == Status.Learning)
+                if (Process.ProcessStatus == Status.Learning)
                 {
                     if (tempWafer2.point1 == null)
                     {

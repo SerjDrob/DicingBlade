@@ -68,6 +68,7 @@ namespace DicingBlade.Classes
         private Blade Blade { get; set; }
         public Status ProcessStatus { get; set; }
         public TracesView TracesView { get; set; }
+        public Line TracingLine { get; set; }
         private double BladeTransferGapZ { get; set; } = 1;
         private bool IsCutting { get; set; } = false;
         private bool InProcess { get; set; } = false;
@@ -214,12 +215,22 @@ namespace DicingBlade.Classes
                     Machine.X.SetVelocity(FeedSpeed);
                     IsCutting = true;
                     target = Machine.CtoBSystemCoors(Wafer.GetCurrentLine(CurrentLine).end);
-
-                    var trace = new Line(new Vector2(Machine.X.ActualPosition,Machine.Y.ActualPosition), new Vector2(Machine.X.ActualPosition + 100, Machine.Y.ActualPosition));
-                    TracesView.Traces.Add(trace);
+                    
+                    var endPoint = new Vector2(Machine.X.ActualPosition, Machine.Y.ActualPosition);
+                    TracingLine = new Line(new Vector2(Machine.X.ActualPosition, Machine.Y.ActualPosition), endPoint);
+                    Thread tracingThread = new Thread(new ThreadStart(() =>
+                    {
+                        do
+                        {
+                            endPoint = new Vector2(Machine.X.ActualPosition, Machine.Y.ActualPosition);
+                        } while (IsCutting);
+                    }));
+                    tracingThread.Start();
+                   // TracesView.Traces.Add(trace);
 
                     await Machine.X.MoveAxisInPosAsync(target.X);
                     IsCutting = false;
+                    tracingThread.Abort();
                     Machine.SwitchOnCoolantWater = false;
                     if (!Wafer.CurrentCutIncrement(CurrentLine))
                     {
