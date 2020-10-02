@@ -5,16 +5,18 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using System.IO;
+using System.Reflection;
 using System.Windows;
 using netDxf.Entities;
 using netDxf.Entities;
 using netDxf;
+using Newtonsoft.Json;
 
 namespace DicingBlade.Classes
 {
     static class StatMethods
     {
-        public static void WriteObject<T>(this T obj, string file)
+        public static void WriteObject<T>(this object obj, string file)
         {
             XmlSerializer serializer = new XmlSerializer(typeof(T));
             
@@ -40,6 +42,32 @@ namespace DicingBlade.Classes
             K[] keys = new K[count];
             dictionary.Keys.CopyTo(keys, 0);
             return dictionary[keys[index]];
+        }
+        public static void CopyPropertiesTo<T>(this T source, T dest)
+        {
+            var plist = from prop in typeof(T).GetProperties() where prop.CanRead && prop.CanWrite select prop;
+
+            foreach (PropertyInfo prop in plist)
+            {
+                prop.SetValue(dest, prop.GetValue(source, null), null);
+            }
+        }
+
+        public static void SerializeObjectJson(this object obj, string filename)
+        {
+            using (StreamWriter file = File.CreateText(filename))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                serializer.Serialize(file, obj);
+            }
+        }
+        public static T DeSerializeObjectJson<T>(this T _, string filename)
+        {
+            using (StreamReader file = File.OpenText(filename))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                return (T)serializer.Deserialize(file,typeof(T));
+            }
         }
         /// <summary>
         /// Преобразует Vector3 в Vector2 отсекая Z

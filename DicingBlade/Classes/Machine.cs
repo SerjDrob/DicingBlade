@@ -183,10 +183,6 @@ namespace DicingBlade.Classes
                 VelocityRegime = Velocity.Fast;
                 RefreshSettings();
             }
-            
-           
-            
-            
         }
         #region Методы
 

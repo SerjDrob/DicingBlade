@@ -54,39 +54,25 @@ namespace DicingBlade.Classes
         public double YAngle;
         public Vector2 point1;
         public Vector2 point2;
-        public double GetAngle() 
+        public double GetAngle()
         {
-            return Math.Atan2(point2.Y-point1.Y, point2.X - point1.X);
+            return Math.Atan2(point2.Y - point1.Y, point2.X - point1.X);
         }
     }
-    class TracePath
-    {
-        public TracePath(double Y, double X, double Xend, double InitAngle)
-        {
-            this.Y = Y;
-            this.X = X;
-            this.Xend = Xend;
-            this.InitAngle = InitAngle;
-        }
-        public double Y { get; set; }
-        public double X { get; set; }
-        public double Xend { get; set; }
-        public double InitAngle { get; set; }
-    }
-    public delegate void SetPause(bool pause);
+
+    //public delegate void SetPause(bool pause);
     [AddINotifyPropertyChangedInterface]
     class Process
     {
-
-        private Wafer Wafer { get; set; }
-        private Machine Machine { get; set; }
-        private Blade Blade { get; set; }
+        private Wafer Wafer;// { get; set; }
+        private Machine Machine;// { get; set; }
+        private Blade Blade;// { get; set; }
         public Status ProcessStatus { get; set; }
-        //public TracesView TracesView { get; set; }
         public TracePath TracingLine { get; set; }
         public ObservableCollection<TracePath> Traces { get; set; }
+
         private List<TracePath> traces;
-        private double BladeTransferGapZ { get; set; } = 1;
+        private double BladeTransferGapZ /*{ get; set; }*/ = 1;
         private bool IsCutting { get; set; } = false;
         private bool InProcess { get; set; } = false;
         private bool procToken = true;
@@ -113,7 +99,6 @@ namespace DicingBlade.Classes
         private Diagram[] BaseProcess;
         
         private CancellationTokenSource cancellationToken;
-        //private bool WaferInProcessed { }
         public bool SideDone { get; private set; } = false;
         public int SideCounter { get; private set; } = 0;
         private bool BladeInWafer 
@@ -128,10 +113,7 @@ namespace DicingBlade.Classes
         private double RotationSpeed { get; set; } 
         private double FeedSpeed { get; set; }        
         private bool Aligned { get; set; }
-
-        //private Dictionary<int, double> AlignedAngles;
         private double OffsetAngle { get; set; }
-        
         public Process(Machine machine, Wafer wafer, Blade blade,ITechnology technology, Diagram[] proc) // В конструкторе происходит загрузка технологических параметров
         {
             Machine = machine;
@@ -231,6 +213,9 @@ namespace DicingBlade.Classes
                     Machine.SwitchOnCoolantWater = true;
                     Machine.X.SetVelocity(FeedSpeed);
                     IsCutting = true;
+
+
+                    
                     target = Machine.CtoBSystemCoors(Wafer.GetCurrentLine(CurrentLine).end);
                     var traceX = Machine.X.ActualPosition;
                     var traceY = Machine.Y.ActualPosition;
@@ -276,6 +261,8 @@ namespace DicingBlade.Classes
                 case Diagram.goWaferCenterXY:
                     if (BladeInWafer) break;
                     Machine.SetVelocity(Velocity.Service);
+                    Machine m;
+                    
                     await Machine.MoveInPosXYAsync(Machine.CameraChuckCenter);
                     break;
                 case Diagram.goNextCutY:
@@ -327,7 +314,6 @@ namespace DicingBlade.Classes
                     break;
             }
         }
-
         public async Task StartPauseProc()
         {
             switch (ProcessStatus)
@@ -370,19 +356,16 @@ namespace DicingBlade.Classes
             if (IsCutting) { }
             //throw new NotImplementedException();
         }
-
         private void Machine_OnSpinWaterWanished(/*DIEventArgs eventArgs*/)
         {
             if (IsCutting) { }
             //throw new NotImplementedException();
         }
-
         private void Machine_OnCoolWaterWanished(/*DIEventArgs eventArgs*/)
         {
             if (IsCutting) { }
             //throw new NotImplementedException();
         }
-
         private void Machine_OnAirWanished(/*DIEventArgs eventArgs*/)
         {
             if (IsCutting) { }

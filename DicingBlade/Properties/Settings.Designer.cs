@@ -490,5 +490,29 @@ namespace DicingBlade.Properties {
                 this["SpindleCntrlDsbl"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("D:/FirstTechnologyFile.json")]
+        public string TechnologyLastFile {
+            get {
+                return ((string)(this["TechnologyLastFile"]));
+            }
+            set {
+                this["TechnologyLastFile"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("D:/firstWafer.json")]
+        public string WaferLastFile {
+            get {
+                return ((string)(this["WaferLastFile"]));
+            }
+            set {
+                this["WaferLastFile"] = value;
+            }
+        }
     }
 }

@@ -9,7 +9,7 @@
         mc:Ignorable="d"
         Title="Технология резки" Height="auto" Width="auto" WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight"  ResizeMode="NoResize" WindowStyle="ToolWindow">
     <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Closing">
+        <i:EventTrigger EventName="Closed">
             <i:InvokeCommandAction Command="{Binding CloseCmd}"/>            
         </i:EventTrigger>
     </i:Interaction.Triggers>
@@ -115,10 +115,11 @@
                 </RadioButton>                
             </StackPanel>
         </GroupBox>
-        <DockPanel Grid.Row="9" Grid.ColumnSpan="2" Margin="3">
-            <Label Content="Файл технологии:" HorizontalAlignment="Left"/>
-            <Label Content="{Binding Technology.FileName}" HorizontalAlignment="Stretch"/>
-            <Button Content="..." Width="30" HorizontalAlignment="Right"/>
+        <DockPanel Grid.Row="9" Grid.ColumnSpan="2" LastChildFill="False" Margin="3">
+            <Label Content="Файл технологии:" DockPanel.Dock="Left"/>
+            <Label Content="{Binding FileName}" DockPanel.Dock="Left" HorizontalAlignment="Stretch"/>
+            <Button Content="Сохранить как" DockPanel.Dock="Right" Command="{Binding SaveFileAsCmd}" Margin="3"/>
+            <Button Content="Открыть" DockPanel.Dock="Right" Command="{Binding OpenFileCmd}" Margin="3"/>
         </DockPanel>
     </Grid>
 </Window>

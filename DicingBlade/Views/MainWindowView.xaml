@@ -148,6 +148,18 @@
                 <CheckBox Name="CameraCursorChk"/>
             </WrapPanel>
             <Canvas ClipToBounds="True"  Background="White" Margin="3" VerticalAlignment="Stretch">
+                
+                    <Rectangle
+                        Stroke="Blue"
+                    StrokeThickness="2"
+                    RadiusX="10"
+                    Width="{Binding Path=ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}"
+                    Height="100"
+                        Canvas.Top="100"
+                        RenderTransformOrigin="0,0.5"
+                    />
+                       
+                
                 <Ellipse Fill="AliceBlue" Panel.ZIndex="1">
                     <Ellipse.Visibility>
                         <Binding Path="WaferView.IsRound" Converter="{StaticResource VisConvert}" ConverterParameter="round"/>

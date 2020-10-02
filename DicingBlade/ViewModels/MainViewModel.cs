@@ -9,10 +9,12 @@ using Microsoft.Win32;
 using netDxf;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
+using System.IO;
 using PropertyChanged;
 using System.Windows;
 using DicingBlade.Properties;
 using System.Windows.Input;
+using Newtonsoft.Json;
 
 
 namespace DicingBlade.ViewModels
@@ -84,7 +86,7 @@ namespace DicingBlade.ViewModels
             MachineSettingsCmd = new Command(args => MachineSettings());
             TechnologySettingsCmd = new Command(args => TechnologySettings());
             TestCmd = new Command(args => Func());
-            Machine = new Machine(false);           
+           // Machine = new Machine(true);           
             BaseProcess = new Diagram[] {
                 Diagram.goNextCutXY,               
                 Diagram.goNextDepthZ,
@@ -97,6 +99,7 @@ namespace DicingBlade.ViewModels
 
             // machine = new Machine();
             //  machine.OnAirWanished += Machine_OnAirWanished;
+            AjustWaferTechnology();
         }
         private void Machine_OnAirWanished(DIEventArgs eventArgs)
         {
@@ -188,11 +191,14 @@ namespace DicingBlade.ViewModels
             {
                 Machine.Z.GoWhile(AxDir.NEG);
             }
-            if (key.Key == Key.J) 
+            if (key.Key == Key.J)
             {
-                parameters = new Parameters();
-                parameters.Technology = (Technology)PropContainer.Technology;
-                parameters.WriteObject<Parameters>("firstPAR.xml");
+                
+                
+                //Technology tech = new Technology(PropContainer.Technology);
+                //tech.SerializeObjectJson("D:/TechParams1.json");
+                
+
                 //Wafer.WriteObject<Wafer>("firstPAR");
             }
             if (key.Key == Key.K) { }
@@ -268,9 +274,10 @@ namespace DicingBlade.ViewModels
             {
                 DataContext = new WaferSettingsViewModel()
             }.ShowDialog();
-            Wafer = PropContainer.Wafer;           
-            WaferView = Wafer.MakeWaferView();
-            Thickness = 1;
+            //Wafer = PropContainer.Wafer;           
+            //WaferView = Wafer.MakeWaferView();
+            //Thickness = PropContainer.WaferTemp.Thickness;
+            AjustWaferTechnology();
         }
         private void MachineSettings() 
         {
@@ -281,12 +288,35 @@ namespace DicingBlade.ViewModels
             Settings.Default.Save();
             Machine.RefreshSettings();
         }
+
+        private void AjustWaferTechnology()
+        {
+            string fileName = Settings.Default.WaferLastFile;
+            TempWafer waf = new TempWafer();
+            Technology tech = new Technology();
+            ((IWafer)(new TempWafer().DeSerializeObjectJson(fileName))).CopyPropertiesTo(waf);
+            if (waf.IsRound)
+            {
+                Wafer = new Wafer(new Vector2(waf.Diameter / 2, waf.Diameter / 2), Thickness, waf.Diameter, (0, waf.IndexW), (90, waf.IndexH));
+            }
+            else
+            {
+                Wafer = new Wafer(new Vector2(waf.Width / 2, waf.Height / 2), Thickness, (0, waf.Height, waf.Width, waf.IndexW), (90, waf.Width, waf.Height, waf.IndexH));
+            }
+            fileName = Settings.Default.TechnologyLastFile;
+            ((ITechnology)(new Technology().DeSerializeObjectJson(fileName))).CopyPropertiesTo(tech);
+            PropContainer.Technology = tech;
+            Wafer.SetPassCount(PropContainer.Technology.PassCount);
+            WaferView = Wafer.MakeWaferView();
+            Thickness = waf.Thickness;
+        }
         private void TechnologySettings() 
         {
             new Views.TechnologySettingsView()
             {
                 DataContext = new TechnologySettingsViewModel()
             }.ShowDialog();
+
             if (Wafer != null) 
             {
                 Wafer.SetPassCount(PropContainer.Technology.PassCount);

@@ -11,6 +11,11 @@ namespace DicingBlade.Classes
     public class Technology : ITechnology
     {
         public Technology() { }
+
+        public Technology(ITechnology technology)
+        {
+            technology.CopyPropertiesTo(this);
+        }
         public string FileName { get; set; }
         public int SpindleFreq { get; set; }
         public double FeedSpeed { get; set; }

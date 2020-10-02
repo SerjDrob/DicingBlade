@@ -24,6 +24,10 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="0.5*"/>
         </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
         <StackPanel>            
             <Grid>
                 <Button Height="30" Width="30" HorizontalAlignment="Left" Visibility="{Binding ElementName=square, Path=Visibility}">
@@ -104,6 +108,11 @@
                 </Grid>
             </GroupBox>
         </StackPanel>
-
+        <DockPanel Grid.Row="1" LastChildFill="False" Margin="3">
+            <Label Content="Файл технологии:" DockPanel.Dock="Left"/>
+            <Label Content="{Binding FileName}" DockPanel.Dock="Left" HorizontalAlignment="Stretch"/>
+            <Button Content="Сохранить как" DockPanel.Dock="Right" Command="{Binding SaveFileAsCmd}" Margin="3"/>
+            <Button Content="Открыть" DockPanel.Dock="Right" Command="{Binding OpenFileCmd}" Margin="3"/>
+        </DockPanel>
     </Grid>
 </Window>

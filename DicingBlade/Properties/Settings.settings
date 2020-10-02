@@ -119,5 +119,11 @@
     <Setting Name="SpindleCntrlDsbl" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="TechnologyLastFile" Type="System.String" Scope="User">
+      <Value Profile="(Default)">D:/FirstTechnologyFile.json</Value>
+    </Setting>
+    <Setting Name="WaferLastFile" Type="System.String" Scope="User">
+      <Value Profile="(Default)">D:/firstWafer.json</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
