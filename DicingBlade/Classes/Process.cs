@@ -64,13 +64,15 @@ namespace DicingBlade.Classes
     [AddINotifyPropertyChangedInterface]
     class Process
     {
+
         private Wafer Wafer;// { get; set; }
         private Machine Machine;// { get; set; }
         private Blade Blade;// { get; set; }
         public Status ProcessStatus { get; set; }
         public TracePath TracingLine { get; set; }
         public ObservableCollection<TracePath> Traces { get; set; }
-
+        public double CutWidth { get; set; }
+        public double CutShift { get; set; }
         private List<TracePath> traces;
         private double BladeTransferGapZ /*{ get; set; }*/ = 1;
         private bool IsCutting { get; set; } = false;

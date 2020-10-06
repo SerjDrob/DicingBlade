@@ -23,7 +23,7 @@ namespace DicingBlade.Classes
             {
                 return false;
             }
-            return bit1 == bit2 ? true : false;
+            return bit1 == bit2;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

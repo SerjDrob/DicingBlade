@@ -28,6 +28,7 @@
         <converters:MatchEnumVisibilityConverter x:Key="MatchEnumConverter"/>
         <converters:TraceConverter x:Key="TraceConverter"/>
         <converters:TraceAngleConverter x:Key="TraceAngleConvereter"/>
+        <converters:GetRatioConverter x:Key="GetRatioConverter"/>
         <SolidColorBrush Color="MediumSpringGreen" x:Key="SignalGreen"/>
         <SolidColorBrush Color="IndianRed" x:Key="SignalRed"/>
         <System:Double x:Key="Zero">0</System:Double>
@@ -148,18 +149,6 @@
                 <CheckBox Name="CameraCursorChk"/>
             </WrapPanel>
             <Canvas ClipToBounds="True"  Background="White" Margin="3" VerticalAlignment="Stretch">
-                
-                    <Rectangle
-                        Stroke="Blue"
-                    StrokeThickness="2"
-                    RadiusX="10"
-                    Width="{Binding Path=ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}"
-                    Height="100"
-                        Canvas.Top="100"
-                        RenderTransformOrigin="0,0.5"
-                    />
-                       
-                
                 <Ellipse Fill="AliceBlue" Panel.ZIndex="1">
                     <Ellipse.Visibility>
                         <Binding Path="WaferView.IsRound" Converter="{StaticResource VisConvert}" ConverterParameter="round"/>
@@ -562,11 +551,11 @@
                 <Label Content="{Binding Machine.Y.CmdPosition, StringFormat=Ycmd:{0}}" Grid.Column="1" Grid.Row="1"/>
                 <Label Content="{Binding Machine.Z.CmdPosition, StringFormat=Zcmd:{0}}" Grid.Column="1" Grid.Row="2"/>
                 <Label Content="{Binding Machine.U.CmdPosition, StringFormat=Ucmd:{0}}" Grid.Column="1" Grid.Row="3"/>
-                
+
                 <StackPanel Orientation="Horizontal" Grid.Column="2">
                     <Rectangle>
                         <Rectangle.Style>
-                            <Style TargetType="Rectangle" BasedOn="{StaticResource Rec1}">                               
+                            <Style TargetType="Rectangle" BasedOn="{StaticResource Rec1}">
                                 <Style.Triggers>
                                     <DataTrigger Value="True">
                                         <DataTrigger.Binding>
@@ -577,10 +566,10 @@
                                 </Style.Triggers>
                             </Style>
                         </Rectangle.Style>
-                    </Rectangle>                    
+                    </Rectangle>
                     <Rectangle>
                         <Rectangle.Style>
-                            <Style TargetType="Rectangle" BasedOn="{StaticResource Rec1}">                                
+                            <Style TargetType="Rectangle" BasedOn="{StaticResource Rec1}">
                                 <Style.Triggers>
                                     <DataTrigger Value="True">
                                         <DataTrigger.Binding>
@@ -718,24 +707,24 @@
         </GroupBox>
         <GroupBox Grid.Row="2" HorizontalAlignment="Left" VerticalAlignment="Bottom">
             <StackPanel Orientation="Horizontal">
-                
-                    <GroupBox Header="Шпиндель">
-                        <StackPanel>
-                            <GroupBox Header="Об/мин.">
-                                <StackPanel>
-                                    <ProgressBar Minimum="0" Maximum="50000" Value="30000" HorizontalAlignment="Center" Margin="3" Height="10" Width="150"/>
-                                    <Label Content="0"/>
-                                </StackPanel>
-                            </GroupBox>
-                            <GroupBox Header="Ток, А">
-                                <StackPanel>
-                                    <ProgressBar Minimum="0" Maximum="50000" Value="30000" HorizontalAlignment="Center" Margin="3" Height="10" Width="150"/>
-                                    <Label Content="0"/>
-                                </StackPanel>
-                            </GroupBox>
-                        </StackPanel>
-                    </GroupBox>                    
-                
+
+                <GroupBox Header="Шпиндель">
+                    <StackPanel>
+                        <GroupBox Header="Об/мин.">
+                            <StackPanel>
+                                <ProgressBar Minimum="0" Maximum="50000" Value="30000" HorizontalAlignment="Center" Margin="3" Height="10" Width="150"/>
+                                <Label Content="0"/>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Header="Ток, А">
+                            <StackPanel>
+                                <ProgressBar Minimum="0" Maximum="50000" Value="30000" HorizontalAlignment="Center" Margin="3" Height="10" Width="150"/>
+                                <Label Content="0"/>
+                            </StackPanel>
+                        </GroupBox>
+                    </StackPanel>
+                </GroupBox>
+
                 <GroupBox Header="СОЖ">
                     <StackPanel>
                         <GroupBox Header="Бок.">
@@ -778,10 +767,10 @@
                             <Style TargetType="Border">
                                 <Setter Property="BorderBrush" Value="Transparent"/>
                                 <Style.Triggers>
-                                    <DataTrigger Value="True">                                        
-                                            <DataTrigger.Binding>
-                                                <Binding Path="Machine.SwitchOnCoolantWater"/>
-                                            </DataTrigger.Binding>                                        
+                                    <DataTrigger Value="True">
+                                        <DataTrigger.Binding>
+                                            <Binding Path="Machine.SwitchOnCoolantWater"/>
+                                        </DataTrigger.Binding>
                                         <Setter Property="BorderBrush" Value="{StaticResource SignalGreen}"/>
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -834,7 +823,7 @@
                                     <DataTrigger Value="True">
                                         <DataTrigger.Binding>
                                             <Binding Path="Machine.SwitchOnChuckVacuum"/>
-                                        </DataTrigger.Binding>                                        
+                                        </DataTrigger.Binding>
                                         <Setter Property="BorderBrush" Value="{StaticResource SignalGreen}"/>
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -849,7 +838,7 @@
                                         <Style.Triggers>
                                             <DataTrigger Value="True">
                                                 <DataTrigger.Binding>
-                                                    <Binding Path="Machine.ChuckVacuum"/>                                                    
+                                                    <Binding Path="Machine.ChuckVacuum"/>
                                                 </DataTrigger.Binding>
                                                 <Setter Property="Fill" Value="{StaticResource SignalGreen}"/>
                                             </DataTrigger>
@@ -866,7 +855,7 @@
                                 <Style.Triggers>
                                     <DataTrigger Value="True">
                                         <DataTrigger.Binding>
-                                            <Binding Path="Machine.SwitchOnBlowing"/>                                            
+                                            <Binding Path="Machine.SwitchOnBlowing"/>
                                         </DataTrigger.Binding>
                                         <Setter Property="BorderBrush" Value="{StaticResource SignalGreen}"/>
                                     </DataTrigger>
@@ -874,7 +863,7 @@
                             </Style>
                         </Border.Style>
                         <DockPanel LastChildFill="False">
-                            <Label Content="Обдув" DockPanel.Dock="Left"/>                            
+                            <Label Content="Обдув" DockPanel.Dock="Left"/>
                         </DockPanel>
                     </Border>
                 </StackPanel>
@@ -884,28 +873,65 @@
         </GroupBox>
         <Image Source="{Binding Machine.Bi, Mode=OneWay}" Grid.Column="{Binding Cols[1]}" Grid.RowSpan="{Binding Rows[1]}"/>
         <Canvas Grid.Column="{Binding Cols[1]}" Grid.RowSpan="{Binding Rows[1]}" Margin="3">
-            
+
+            <Rectangle
+                Height="{Binding CutWidth}"
+                Width="{Binding Path=ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}"
+                Canvas.Top="{Binding CutShift}"
+                Stroke="ForestGreen"
+            >
+                <Rectangle.StrokeThickness>
+                    <MultiBinding Converter="{StaticResource GetRatioConverter}">
+                        <Binding Path="1" FallbackValue="1"></Binding>
+                        <Binding Path="VideoScale"/>
+                    </MultiBinding>
+                </Rectangle.StrokeThickness>
+                <Rectangle.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform ScaleY="-1"/>
+                        <TranslateTransform>
+                            <TranslateTransform.Y>
+                                <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
+                                    <Binding Path="CutWidth"/>
+                                </MultiBinding>
+                            </TranslateTransform.Y>
+                        </TranslateTransform>
+
+                        <ScaleTransform ScaleY="{Binding VideoScale}"/>
+
+                        <TranslateTransform>
+                            <TranslateTransform.Y>
+                                <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
+                                    <Binding Path="ActualHeight"  RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}"/>
+                                </MultiBinding>
+                            </TranslateTransform.Y>
+                        </TranslateTransform>
+                    </TransformGroup>
+                </Rectangle.RenderTransform>
+            </Rectangle>
+
+
             <Line  Stroke="Red" StrokeThickness="1">
                 <Line.X1>
-                    <MultiBinding Converter="{StaticResource CrossConverter}" ConverterParameter="0,3">                        
+                    <MultiBinding Converter="{StaticResource CrossConverter}" ConverterParameter="0,3">
                         <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType=Canvas}"/>
                         <Binding Source="1"/>
                     </MultiBinding>
                 </Line.X1>
                 <Line.X2>
-                    <MultiBinding Converter="{StaticResource CrossConverter}" ConverterParameter="0,3">                        
+                    <MultiBinding Converter="{StaticResource CrossConverter}" ConverterParameter="0,3">
                         <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType=Canvas}"/>
                         <Binding Source="2"/>
                     </MultiBinding>
                 </Line.X2>
                 <Line.Y1>
                     <MultiBinding Converter="{StaticResource CrossConverter}" ConverterParameter="0,3">
-                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType=Canvas}"/>                        
+                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType=Canvas}"/>
                     </MultiBinding>
                 </Line.Y1>
                 <Line.Y2>
                     <MultiBinding Converter="{StaticResource CrossConverter}" ConverterParameter="0,3">
-                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType=Canvas}"/>                        
+                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType=Canvas}"/>
                     </MultiBinding>
                 </Line.Y2>
             </Line>

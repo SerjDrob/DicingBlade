@@ -32,6 +32,11 @@ namespace DicingBlade.ViewModels
     [AddINotifyPropertyChangedInterface]
     class MainViewModel
     {
+        public double CutWidth { get; set; } = 0.05;
+        public double CutShift { get; set; } = 0;
+        public double VideoScale { get; set; } = 1000;
+
+
         private Parameters parameters;
         public Machine Machine { get; set; }
         public Process Process { get; set; }
@@ -95,8 +100,7 @@ namespace DicingBlade.ViewModels
                 Diagram.goNextDirection
             };
 
-
-
+            
             // machine = new Machine();
             //  machine.OnAirWanished += Machine_OnAirWanished;
             AjustWaferTechnology();
@@ -145,6 +149,8 @@ namespace DicingBlade.ViewModels
                     {
                         await Machine.GoThereAsync(Place.CameraChuckCenter);
                         Process = new Process(Machine, Wafer, new Blade(), new Technology(), BaseProcess);
+                        //Process.CutWidth = 50;
+                        //Process.CutShift = 100;
                         Process.ProcessStatus = Status.StartLearning;                        
                     }
                     
@@ -247,6 +253,9 @@ namespace DicingBlade.ViewModels
             {
                 throw new NotImplementedException();
             }
+
+            if (key.Key == Key.N) CutShift++;
+            if (key.Key == Key.M) CutShift--;
         }
         private void KeyUp(object args) 
         {
