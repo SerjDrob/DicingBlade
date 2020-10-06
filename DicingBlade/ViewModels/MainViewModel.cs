@@ -30,19 +30,21 @@ namespace DicingBlade.ViewModels
         vacuumValve
     }
     [AddINotifyPropertyChangedInterface]
+    class CutPointer
+    {
+        public double Width { get; set; } = 50;
+        public double VideoScale { get; set; } = 1000;
+        public double Thickness { get; set; } = 1;
+    }
+    [AddINotifyPropertyChangedInterface]
     class MainViewModel
     {
-        public double CutWidth { get; set; } = 0.05;
-        public double CutShift { get; set; } = 0;
-        public double VideoScale { get; set; } = 1000;
-
-
-        private Parameters parameters;
+        //private Parameters parameters;
         public Machine Machine { get; set; }
         public Process Process { get; set; }
         public Wafer Wafer { get; set; }
         public WaferView WaferView { get; set; }
-        
+        public CutPointer CutPointer { get; set; }
         private TempWafer2D tempWafer2;
         private int[] cols;
         private int[] rows;
@@ -78,7 +80,8 @@ namespace DicingBlade.ViewModels
         public ICommand TestCmd { get; set; }
         public MainViewModel()
         {
-            Test = false;
+            Test = true;
+
             Cols = new int[] { 0, 1 };
             Rows = new int[] { 2, 1 };
             Condition = new Map();
@@ -91,7 +94,7 @@ namespace DicingBlade.ViewModels
             MachineSettingsCmd = new Command(args => MachineSettings());
             TechnologySettingsCmd = new Command(args => TechnologySettings());
             TestCmd = new Command(args => Func());
-           // Machine = new Machine(true);           
+            Machine = new Machine(Test);           
             BaseProcess = new Diagram[] {
                 Diagram.goNextCutXY,               
                 Diagram.goNextDepthZ,
@@ -100,7 +103,7 @@ namespace DicingBlade.ViewModels
                 Diagram.goNextDirection
             };
 
-            
+            CutPointer = new CutPointer();
             // machine = new Machine();
             //  machine.OnAirWanished += Machine_OnAirWanished;
             AjustWaferTechnology();
@@ -143,25 +146,30 @@ namespace DicingBlade.ViewModels
             if (key.Key == Key.T) Change();
             if (key.Key == Key.Divide)
             {
-                if (Process == null) 
+                if (!Test)
                 {
-                    if (Machine.SetOnChuck())
+                    if (Process == null) 
                     {
-                        await Machine.GoThereAsync(Place.CameraChuckCenter);
-                        Process = new Process(Machine, Wafer, new Blade(), new Technology(), BaseProcess);
-                        //Process.CutWidth = 50;
-                        //Process.CutShift = 100;
-                        Process.ProcessStatus = Status.StartLearning;                        
-                    }
+                        if (Machine.SetOnChuck())
+                        {
+                            await Machine.GoThereAsync(Place.CameraChuckCenter);
+                            Process = new Process(Machine, Wafer, new Blade(), new Technology(), BaseProcess);
+                            Process.ProcessStatus = Status.StartLearning;                        
+                        }
                     
-                }
-                else 
-                {
-                    if(Process.ProcessStatus == Status.Done) 
-                    {
-                        Process = null;                        
                     }
-                    else await Process.StartPauseProc();
+                    else 
+                    {
+                        if(Process.ProcessStatus == Status.Done) 
+                        {
+                            Process = null;                        
+                        }
+                        else await Process.StartPauseProc();
+                    }
+                }
+                else
+                {
+                    Process = new Process(Machine, Wafer, new Blade(), new Technology(), BaseProcess);
                 }
                 //StartWorkAsync();
             }
@@ -254,8 +262,8 @@ namespace DicingBlade.ViewModels
                 throw new NotImplementedException();
             }
 
-            if (key.Key == Key.N) CutShift++;
-            if (key.Key == Key.M) CutShift--;
+            if (key.Key == Key.N) Process.CutOffset++;
+            if (key.Key == Key.M) Process.CutOffset--;
         }
         private void KeyUp(object args) 
         {
@@ -297,7 +305,6 @@ namespace DicingBlade.ViewModels
             Settings.Default.Save();
             Machine.RefreshSettings();
         }
-
         private void AjustWaferTechnology()
         {
             string fileName = Settings.Default.WaferLastFile;

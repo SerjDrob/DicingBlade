@@ -875,15 +875,15 @@
         <Canvas Grid.Column="{Binding Cols[1]}" Grid.RowSpan="{Binding Rows[1]}" Margin="3">
 
             <Rectangle
-                Height="{Binding CutWidth}"
+                Height="{Binding Path=Process.CutWidth}"
                 Width="{Binding Path=ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}"
-                Canvas.Top="{Binding CutShift}"
+                Canvas.Top="{Binding Path=Process.CutOffset}"
                 Stroke="ForestGreen"
             >
                 <Rectangle.StrokeThickness>
                     <MultiBinding Converter="{StaticResource GetRatioConverter}">
-                        <Binding Path="1" FallbackValue="1"></Binding>
-                        <Binding Path="VideoScale"/>
+                        <Binding Path="1" FallbackValue="0.001"></Binding>
+                        <Binding Path="Machine.CameraScale"/>
                     </MultiBinding>
                 </Rectangle.StrokeThickness>
                 <Rectangle.RenderTransform>
@@ -892,13 +892,13 @@
                         <TranslateTransform>
                             <TranslateTransform.Y>
                                 <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
-                                    <Binding Path="CutWidth"/>
+                                    <Binding Path="Process.CutWidth"/>
                                 </MultiBinding>
                             </TranslateTransform.Y>
                         </TranslateTransform>
 
-                        <ScaleTransform ScaleY="{Binding VideoScale}"/>
-
+                        <ScaleTransform ScaleY="{Binding Path=Machine.CameraScale}"/>
+                        <ScaleTransform ScaleY="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}"/>
                         <TranslateTransform>
                             <TranslateTransform.Y>
                                 <MultiBinding Converter="{StaticResource TranslateConverterScheme}">

@@ -14,11 +14,11 @@ namespace DicingBlade.Classes
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             double offset = 0;
-            //try 
-            //{
+            try 
+            {
                 offset = System.Convert.ToDouble(values[0]) / 2;
-            //}
-            //catch { }
+            }
+            catch { }
             return offset;
         }
 

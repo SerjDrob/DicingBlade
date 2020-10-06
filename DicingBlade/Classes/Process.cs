@@ -71,8 +71,8 @@ namespace DicingBlade.Classes
         public Status ProcessStatus { get; set; }
         public TracePath TracingLine { get; set; }
         public ObservableCollection<TracePath> Traces { get; set; }
-        public double CutWidth { get; set; }
-        public double CutShift { get; set; }
+        public double CutWidth { get; set; } = 0.05;
+        public double CutOffset { get; set; } = 0;
         private List<TracePath> traces;
         private double BladeTransferGapZ /*{ get; set; }*/ = 1;
         private bool IsCutting { get; set; } = false;
