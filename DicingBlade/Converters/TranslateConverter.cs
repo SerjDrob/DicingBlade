@@ -32,11 +32,11 @@ namespace DicingBlade.Classes
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             double offset = 0;
-            //try 
-            //{
-            offset = - System.Convert.ToDouble(values[0]) / 2;
-            //}
-            //catch { }
+            try
+            {
+                offset = - System.Convert.ToDouble(values[0]) / 2;
+            }
+            catch { }
             return offset;
         }
 

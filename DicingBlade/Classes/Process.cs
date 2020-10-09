@@ -12,6 +12,9 @@ using PropertyChanged;
 using System.ComponentModel;
 using netDxf.Entities;
 using System.Collections.ObjectModel;
+using System.Windows;
+using System.Windows.Forms;
+using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace DicingBlade.Classes
 {   
@@ -64,10 +67,13 @@ namespace DicingBlade.Classes
     [AddINotifyPropertyChangedInterface]
     class Process
     {
-
-        private Wafer Wafer;// { get; set; }
-        private Machine Machine;// { get; set; }
-        private Blade Blade;// { get; set; }
+        public string ProcessMessage { get; set; } = "";
+        public bool UserConfirmation { get; set; } = false;
+        private readonly Wafer Wafer;
+        private readonly Machine Machine;
+        private readonly Blade Blade;
+        public Visibility TeachVScaleMarkersVisibility { get; set; } = Visibility.Hidden;
+        public Visibility CutWidthMarkerVisibility { get; set; } = Visibility.Hidden;
         public Status ProcessStatus { get; set; }
         public TracePath TracingLine { get; set; }
         public ObservableCollection<TracePath> Traces { get; set; }
@@ -77,14 +83,14 @@ namespace DicingBlade.Classes
         private double BladeTransferGapZ /*{ get; set; }*/ = 1;
         private bool IsCutting { get; set; } = false;
         private bool InProcess { get; set; } = false;
-        private bool procToken = true;
-        private bool pauseProcess_;
+        //private bool procToken = true;
+        private bool _pauseProcess;
         public bool PauseProcess 
         {
-            get { return pauseProcess_; }
+            get { return _pauseProcess; }
             set 
             {
-                pauseProcess_ = value;
+                _pauseProcess = value;
                 if (pauseToken != null) 
                 {
                     if (value)
@@ -100,7 +106,7 @@ namespace DicingBlade.Classes
 
         private Diagram[] BaseProcess;
         
-        private CancellationTokenSource cancellationToken;
+        //private CancellationTokenSource cancellationToken;
         public bool SideDone { get; private set; } = false;
         public int SideCounter { get; private set; } = 0;
         private bool BladeInWafer 
@@ -182,6 +188,29 @@ namespace DicingBlade.Classes
         private void PrevLine() 
         {
             if (CurrentLine > 0) CurrentLine--;
+        }
+        public async Task ToTeachVideoScale()
+        {
+            TeachVScaleMarkersVisibility = Visibility.Hidden;
+            ProcessMessage = "Подведите ориентир к одному из визиров и нажмите *";
+            await WaitForConfirmation();
+            var y = Machine.Y.ActualPosition;
+            ProcessMessage = "Подведите ориентир ко второму визиру и нажмите *";
+            await WaitForConfirmation();
+            Machine.CameraScale = Machine.TeachMarkersRatio / Math.Abs(y - Machine.Y.ActualPosition);
+            ProcessMessage = "";
+            TeachVScaleMarkersVisibility = Visibility.Hidden;
+        }
+        private async Task WaitForConfirmation()
+        {
+            UserConfirmation = false;
+            await Task.Run(() =>
+            {
+                while (!UserConfirmation)
+                {
+                    Thread.Sleep(1);
+                }
+            });
         }
         private async Task ProcElementDispatcherAsync(Diagram element) 
         {
@@ -325,7 +354,7 @@ namespace DicingBlade.Classes
                     ProcessStatus = Status.Learning;
                     break;
                 case Status.Learning:
-                    Wafer.SetCurrentDirectionIndexShift = Machine.COSystemCurrentCoors.Y - Wafer.GetNearestCut(Machine.COSystemCurrentCoors.Y).StartPoint.Y;
+                    Wafer.AddToCurrentDirectionIndexShift = Machine.COSystemCurrentCoors.Y - Wafer.GetNearestCut(Machine.COSystemCurrentCoors.Y).StartPoint.Y;
                     Wafer.SetCurrentDirectionAngle = Machine.U.ActualPosition;
                     if (Wafer.NextDir())
                     {
@@ -345,8 +374,15 @@ namespace DicingBlade.Classes
                 case Status.Working:
                     PauseProcess ^= true;
                     if (PauseProcess) await PauseScenarioAsync();
+                    CutWidthMarkerVisibility = Visibility.Visible;
+                    ProcessStatus = Status.Correcting;
                     break;
                 case Status.Correcting:
+                    var result  = MessageBox.Show($"Сместить следующие резы на {CutOffset} мм?","",MessageBoxButtons.OKCancel);
+                    if(result == DialogResult.OK) Wafer.AddToCurrentDirectionIndexShift = CutOffset;
+                    ProcessStatus = Status.Working;
+                    CutWidthMarkerVisibility = Visibility.Hidden;
+                    CutOffset = 0;
                     break;
                 default:
                     break;

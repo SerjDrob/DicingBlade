@@ -102,6 +102,7 @@ namespace DicingBlade.Classes
         public bool MachineInit { get; set; }
         public Vector2 BladeChuckCenter { get; set; }
         public double CameraScale { get; set; } = 1;
+        public double TeachMarkersRatio { get; set; } = 2;//means 1/2
         public double CameraBladeOffset { get; set; }
         public Vector2 CameraChuckCenter { get; set; }
 

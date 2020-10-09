@@ -8,6 +8,7 @@ using netDxf;
 using static System.Math;
 using netDxf.Entities;
 using System.ComponentModel;
+using System.Security;
 using System.Windows;
 using PropertyChanged;
 
@@ -58,11 +59,12 @@ namespace DicingBlade.Classes
                 Directions[CurrentAngleNum] = (value, Directions[CurrentAngleNum].indexShift);
             }
         }
-        public double SetCurrentDirectionIndexShift
+        public double AddToCurrentDirectionIndexShift
         {
             set
             {
-                Directions[CurrentAngleNum] = (Directions[CurrentAngleNum].angle, value);
+                var shift = Directions[CurrentAngleNum].indexShift;
+                Directions[CurrentAngleNum] = (Directions[CurrentAngleNum].angle, shift + value);
             }
         }
         public Wafer() { }
@@ -170,9 +172,14 @@ namespace DicingBlade.Classes
         {
             return Grid.Lines[Directions[CurrentAngleNum].angle][currentLine];
         }       
-        public (Vector2 start,Vector2 end) GetCurrentLine(int currentLine) 
+        public (Vector2 start,Vector2 end) GetCurrentLine(int currentLine)
         {
-            return Grid.GetCenteredLine(Directions[CurrentAngleNum].angle, currentLine);
+            Vector2 s;
+            Vector2 e;
+            (s, e) = Grid.GetCenteredLine(Directions[CurrentAngleNum].angle, currentLine);
+            s.Y += Directions[CurrentAngleNum].indexShift;
+            e.Y += Directions[CurrentAngleNum].indexShift;
+            return (s,e);
         }
         public double GetCurrentCutZ(int currentLine)
         {

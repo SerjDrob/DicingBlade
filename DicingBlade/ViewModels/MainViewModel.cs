@@ -29,13 +29,7 @@ namespace DicingBlade.ViewModels
         waterValve,
         vacuumValve
     }
-    [AddINotifyPropertyChangedInterface]
-    class CutPointer
-    {
-        public double Width { get; set; } = 50;
-        public double VideoScale { get; set; } = 1000;
-        public double Thickness { get; set; } = 1;
-    }
+   
     [AddINotifyPropertyChangedInterface]
     class MainViewModel
     {
@@ -44,7 +38,6 @@ namespace DicingBlade.ViewModels
         public Process Process { get; set; }
         public Wafer Wafer { get; set; }
         public WaferView WaferView { get; set; }
-        public CutPointer CutPointer { get; set; }
         private TempWafer2D tempWafer2;
         private int[] cols;
         private int[] rows;
@@ -103,7 +96,6 @@ namespace DicingBlade.ViewModels
                 Diagram.goNextDirection
             };
 
-            CutPointer = new CutPointer();
             // machine = new Machine();
             //  machine.OnAirWanished += Machine_OnAirWanished;
             AjustWaferTechnology();
@@ -128,6 +120,10 @@ namespace DicingBlade.ViewModels
                 //await process.ProcElementDispatcherAsync(Diagram.goCameraPointLearningXYZ);
             }
 
+            if (key.Key == Key.Multiply)
+            {
+                Process.UserConfirmation = true;
+            }
             if (key.Key == Key.Q)
             {                
                 Machine.SwitchOnChuckVacuum ^=true;
@@ -262,8 +258,15 @@ namespace DicingBlade.ViewModels
                 throw new NotImplementedException();
             }
 
-            if (key.Key == Key.N) Process.CutOffset++;
-            if (key.Key == Key.M) Process.CutOffset--;
+            if (key.Key == Key.N)
+            {
+                if(Process.PauseProcess) Process.CutOffset+=0.001;
+            }
+
+            if (key.Key == Key.M)
+            {
+                if (Process.PauseProcess) Process.CutOffset-=0.001;
+            }
         }
         private void KeyUp(object args) 
         {
@@ -357,7 +360,7 @@ namespace DicingBlade.ViewModels
              //Wafer = new Wafer(new Vector2(0, 0), 1, (0, 60000, 48000, 3100), (90, 48000, 60000, 5100));
             //Wafer = new Wafer(new Vector2(0, 0), 1, 5000, (0, 500), (60, 300));
             
-            Thickness = 1;
+            //Thickness = 1;
         }
                 
     }
