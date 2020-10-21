@@ -6,13 +6,14 @@
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" 
         xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"        
         xmlns:local="clr-namespace:DicingBlade.Classes"        
+        xmlns:converters="clr-namespace:DicingBlade.Converters"
         xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Platform"        
         mc:Ignorable="d"
         Title="Подложка" SizeToContent="WidthAndHeight" WindowStyle="ToolWindow" ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         >
     <Window.Resources>
-
+        <converters:InvertVisibilityConverter x:Key="VisConverter"/>
     </Window.Resources>
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Closed">
@@ -30,42 +31,16 @@
         </Grid.RowDefinitions>
         <StackPanel>            
             <Grid>
-                <Button Height="30" Width="30" HorizontalAlignment="Left" Visibility="{Binding ElementName=square, Path=Visibility}">
-                    <Path Fill="Black" Data="M 0 0 H 20 V 20 H 0"/>
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="Click">
-                            <ei:ChangePropertyAction TargetObject="{Binding ElementName=square}" PropertyName="Visibility"
-                                                 Value="Collapsed"
-                                                 >
-                            </ei:ChangePropertyAction>
-                        </i:EventTrigger>
-                        <i:EventTrigger EventName="Click">
-                            <ei:ChangePropertyAction TargetObject="{Binding ElementName=round}" PropertyName="Visibility"
-                                                 Value="Visible"
-                                                 >
-                            </ei:ChangePropertyAction>
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
+                <Button Command="{Binding ChangeShapeCmd}" Height="30" Width="30" HorizontalAlignment="Left" Visibility="{Binding SquareVisibility}">
+                    <Path Fill="Black" Data="M 0 0 H 20 V 20 H 0"/>                    
                 </Button>
-                <Button Height="30" Width="30" HorizontalAlignment="Left" Visibility="{Binding ElementName=round, Path=Visibility}">
-                    <Path Fill="Black" Data="M 15 1 A 10 10 360 1 1 10 0 "/>
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="Click">
-                            <ei:ChangePropertyAction TargetObject="{Binding ElementName=square}" PropertyName="Visibility"
-                                                 Value="Visible"
-                                                 >
-                            </ei:ChangePropertyAction>
-                            <ei:ChangePropertyAction TargetObject="{Binding ElementName=round}" PropertyName="Visibility"
-                                                 Value="Collapsed"
-                                                 >
-                            </ei:ChangePropertyAction>
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
+                <Button Command="{Binding ChangeShapeCmd}" Height="30" Width="30" HorizontalAlignment="Left" Visibility="{Binding SquareVisibility, Converter={StaticResource VisConverter}}">
+                    <Path Fill="Black" Data="M 15 1 A 10 10 360 1 1 10 0 "/>                    
                 </Button>
             </Grid>
             <GroupBox Width="200">
                 <Grid>
-                    <StackPanel x:Name="square" Visibility="{Binding SquareVisibility, Mode=TwoWay}">
+                    <StackPanel x:Name="square" Visibility="{Binding SquareVisibility}">
                         <DockPanel LastChildFill="False">
                             <Label Content="Длина" DockPanel.Dock="Left"/>
                             <TextBox Text="{Binding Height, StringFormat=G}" Width="70" Height="22" DockPanel.Dock="Right"/>
@@ -87,7 +62,7 @@
                             <TextBox Text="{Binding IndexH, StringFormat=F2}" Width="70" Height="22" DockPanel.Dock="Right"/>
                         </DockPanel>
                     </StackPanel>
-                    <StackPanel x:Name="round" Visibility="Collapsed">
+                    <StackPanel x:Name="round" Visibility="{Binding SquareVisibility, Converter={StaticResource VisConverter}}">
                         <DockPanel LastChildFill="False">
                             <Label Content="Диаметр" DockPanel.Dock="Left"/>
                             <TextBox Text="{Binding Diameter}" Width="70" Height="22" DockPanel.Dock="Right"/>

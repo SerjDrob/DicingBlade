@@ -8,7 +8,8 @@
         xmlns:converters="clr-namespace:DicingBlade.Converters"
         xmlns:model="clr-namespace:DicingBlade.ViewModels"
         xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Platform"
-        xmlns:System="clr-namespace:System;assembly=mscorlib"        
+        xmlns:System="clr-namespace:System;assembly=mscorlib" 
+        xmlns:syswin="clr-namespace:System.Windows;assembly=System.Windows"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance model:MainViewModel,IsDesignTimeCreatable=False}"
         Background="Beige"
@@ -32,7 +33,7 @@
         <SolidColorBrush Color="MediumSpringGreen" x:Key="SignalGreen"/>
         <SolidColorBrush Color="IndianRed" x:Key="SignalRed"/>
         <System:Double x:Key="Zero">0</System:Double>
-
+        <System:Double x:Key="Ycoor">69.515</System:Double>
     </Window.Resources>
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="KeyDown">
@@ -41,6 +42,7 @@
         <i:EventTrigger EventName="KeyUp">
             <cmd:EventToCommand Command="{Binding KeyUpCmd, Mode=OneWay}" PassEventArgsToCommand="True"/>
         </i:EventTrigger>
+        
     </i:Interaction.Triggers>
 
     <Grid>
@@ -53,6 +55,7 @@
                 <Setter Property="RadiusX" Value="5"/>
                 <Setter Property="RadiusY" Value="5"/>
             </Style>
+            
         </Grid.Resources>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2*"/>
@@ -109,21 +112,17 @@
                                             Height="{Binding Path=ActualHeight,RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Menu}}"
                                             RenderTransformOrigin="0.5,0.5"
                                             >
-                                            <TextBlock Text="Обучение" HorizontalAlignment="Center" VerticalAlignment="Center"
-                                                       
-                                                       />
+                                            <TextBlock Text="Обучение" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                         </Grid>
                                     </DataTemplate>
                                 </MenuItem.HeaderTemplate>
                                 <MenuItem Header="_Масштаб видео"/>
-                                <MenuItem Header="_Масштаб видео"/>
+                                <MenuItem Header="_Масштаб видео" Command="{Binding ToTeachChipSizeCmd}"/>
                                 <MenuItem Header="_Масштаб видео"/>
                                 <MenuItem Header="_Масштаб видео"/>
                                 <MenuItem Header="_Масштаб видео"/>
                             </MenuItem>
                         </Menu>
-
-
                     </Grid>
                 </GroupBox>
                 <GroupBox Header="Наладка">
@@ -147,12 +146,10 @@
                                     <Label Content="{Binding Process.CurrentLine}"/>
                                 </StackPanel>
                             </StackPanel>
-
-
                             <Border BorderThickness="2" BorderBrush="Black" Width="30">
                                 <Canvas Background="White" Width="30" Height="150">
 
-                                    <Rectangle Fill="Blue"
+                                    <Rectangle Fill="LightCyan"
                                                Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType={x:Type Canvas}}}"
                                                Height="50">
                                         <Rectangle.RenderTransform>
@@ -163,7 +160,7 @@
                                             </TransformGroup>
                                         </Rectangle.RenderTransform>
                                     </Rectangle>
-                                    <Line Stroke="Red" StrokeThickness="1"
+                                    <Line Stroke="OrangeRed" StrokeThickness="3"
                                               X1="0"
                                               X2="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType={x:Type Canvas}}}"
                                               Y2="{Binding Y1, RelativeSource={RelativeSource Mode=Self}}">
@@ -196,8 +193,20 @@
         <Border Grid.Column="1" BorderBrush="LightGray" BorderThickness="3"/>
         <DockPanel Grid.Column="{Binding Cols[0]}" Grid.RowSpan="{Binding Rows[0]}">
             <WrapPanel DockPanel.Dock="Top">
-                <CheckBox Name="ChuckCursorChk"/>
-                <CheckBox Name="CameraCursorChk"/>
+                <!--<CheckBox Name="ChuckCursorChk">                    
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="PreviewKeyDown">                            
+                            <cmd:EventToCommand Command="{Binding KeyDownCmd, Mode=OneWay}" PassEventArgsToCommand="True" />                            
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </CheckBox>
+                <CheckBox Name="CameraCursorChk">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="PreviewKeyDown">
+                            <cmd:EventToCommand Command="{Binding KeyDownCmd, Mode=OneWay}" PassEventArgsToCommand="True" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </CheckBox>-->
             </WrapPanel>
             <Canvas ClipToBounds="True"  Background="White" Margin="3" VerticalAlignment="Stretch">
                 <Ellipse Fill="AliceBlue" Panel.ZIndex="1">
@@ -386,7 +395,7 @@
                                         </TransformGroup>
                                     </Line.RenderTransform>
                                 </Line>
-                                <Line Name="mask" X1="{Binding StartPoint.X}"
+                                <!--<Line Name="mask" X1="{Binding StartPoint.X}"
                                               X2="{Binding EndPoint.X}"
                                               Y1="{Binding StartPoint.Y}"
                                               Y2="{Binding EndPoint.Y}"
@@ -466,7 +475,7 @@
                                             </TranslateTransform>
                                         </TransformGroup>
                                     </Line.RenderTransform>
-                                </Line>
+                                </Line>-->
                             </Canvas>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
@@ -577,6 +586,26 @@
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
+                <Line Stroke="YellowGreen" StrokeThickness="2"
+                      X1="0"
+                      X2="{Binding Path=ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}"
+                      Y1="{Binding Path=Y2, RelativeSource={RelativeSource Mode=Self}}"
+                      RenderTransformOrigin="0.5 0.5"
+                      >
+                    <Line.Y2>
+                        <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
+                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}"/>
+                        </MultiBinding>
+                    </Line.Y2>
+                    
+                    <Line.RenderTransform>                        
+                            <RotateTransform>
+                                <RotateTransform.Angle>
+                                    <Binding Path="DataContext.Machine.U.ActualPosition" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                </RotateTransform.Angle>
+                            </RotateTransform>                        
+                    </Line.RenderTransform>
+                </Line>
             </Canvas>
         </DockPanel>
         <GroupBox Grid.Row="2" VerticalAlignment="Top">
@@ -922,12 +951,20 @@
             </StackPanel>
 
         </GroupBox>
-        <Image Source="{Binding Machine.Bi, Mode=OneWay}" Grid.Column="{Binding Cols[1]}" Grid.RowSpan="{Binding Rows[1]}"/>
-        <Canvas ClipToBounds="True" Grid.Column="{Binding Cols[1]}" Grid.RowSpan="{Binding Rows[1]}" Margin="3">
+        <Image Source="{Binding Machine.Bi, Mode=OneWay}" Grid.Column="{Binding Cols[1]}" Grid.RowSpan="{Binding Rows[1]}" Margin="3"
+               Panel.ZIndex="0"
+               Name="VideoImg"
+               />
+
+        <Canvas ClipToBounds="True" Grid.Column="{Binding Cols[1]}" Grid.RowSpan="{Binding Rows[1]}"
+                Panel.ZIndex="1"
+                Width="{Binding ElementName=VideoImg, Path=ActualWidth}"
+                Height="{Binding ElementName=VideoImg, Path=ActualHeight}"
+                >
             <Grid 
                 Width="{Binding Path=ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}"
-                Height="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}"
-                  >
+                Height="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}"                  
+                >
                 <TextBlock
                     Text="{Binding Path=Process.ProcessMessage}"
                     TextAlignment="Center"
@@ -957,15 +994,48 @@
                                         <Binding Path="1" FallbackValue="100"></Binding>
                                     </MultiBinding>
                                 </ScaleTransform.ScaleY>
-                            </ScaleTransform>
-                            <!--<TranslateTransform>
-                                <TranslateTransform.X>
-                                    <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
+                            </ScaleTransform>                           
+                        </TransformGroup>
+                    </TextBlock.RenderTransform>
+                </TextBlock>
+                <TextBlock
+                   
+                    TextAlignment="Center"
+                    FontSize="3"
+                    FontStyle="Normal"
+                    FontFamily="TimesNewRoman"
+                    Foreground="GreenYellow"
+                    FontWeight="Bold"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Top"
+                    RenderTransformOrigin="0.5,-1"
+                    Visibility="{Binding Process.CutWidthMarkerVisibility}"
+                     Text="{Binding Path=Process.CutOffset, StringFormat= Корректировка реза\, мм:  {0}}"
+                    >
+                    <!--<TextBlock.Text>
+                        <MultiBinding Converter="{StaticResource GetRatioConverter}">
+                            <Binding Path="1" FallbackValue="10"/>
+                            <Binding Path="1" FallbackValue="20"/>
+                        </MultiBinding>
+                    </TextBlock.Text>-->
+                    <TextBlock.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform>
+                                <ScaleTransform.ScaleX>
+                                    <MultiBinding Converter="{StaticResource GetRatioConverter}">
                                         <Binding Path="ActualWidth"
                                                  RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                        <Binding Path="1" FallbackValue="100"></Binding>
                                     </MultiBinding>
-                                </TranslateTransform.X>
-                            </TranslateTransform>-->
+                                </ScaleTransform.ScaleX>
+                                <ScaleTransform.ScaleY>
+                                    <MultiBinding Converter="{StaticResource GetRatioConverter}">
+                                        <Binding Path="ActualWidth"
+                                                 RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                        <Binding Path="1" FallbackValue="100"></Binding>
+                                    </MultiBinding>
+                                </ScaleTransform.ScaleY>
+                            </ScaleTransform>
                         </TransformGroup>
                     </TextBlock.RenderTransform>
                 </TextBlock>
@@ -973,12 +1043,12 @@
             <Rectangle
                 Height="{Binding Path=Process.CutWidth}"
                 Width="{Binding Path=ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}"
-                Visibility="{Binding Process.CutWidthMarkerVisibility}"
+                Visibility="{Binding Process.CutWidthMarkerVisibility, FallbackValue= Hidden}"                
                 Stroke="ForestGreen"
             >
                 <Rectangle.StrokeThickness>
                     <MultiBinding Converter="{StaticResource GetRatioConverter}">
-                        <Binding Path="1" FallbackValue="0.001"></Binding>
+                        <Binding Path="1" FallbackValue="0.002"></Binding>
                         <Binding Path="Machine.CameraScale"/>
                     </MultiBinding>
                 </Rectangle.StrokeThickness>
@@ -1010,7 +1080,7 @@
                 Width="{Binding Path=ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}"
                 Stroke="OrangeRed"
                 StrokeThickness="1"
-                Visibility="{Binding  Process.TeachVScaleMarkersVisibility}"
+                Visibility="{Binding  Process.TeachVScaleMarkersVisibility, FallbackValue=Hidden}"
             >
                 <Rectangle.Height>
                     <MultiBinding Converter="{StaticResource GetRatioConverter}">

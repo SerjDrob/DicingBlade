@@ -70,10 +70,11 @@ namespace DicingBlade.ViewModels
         public ICommand WaferSettingsCmd { get; set; }
         public ICommand MachineSettingsCmd { get; set; }
         public ICommand TechnologySettingsCmd { get; set; }
+        public ICommand ToTeachChipSizeCmd { get; set; }
         public ICommand TestCmd { get; set; }
         public MainViewModel()
         {
-            Test = true;
+            Test = false;
 
             Cols = new int[] { 0, 1 };
             Rows = new int[] { 2, 1 };
@@ -86,7 +87,8 @@ namespace DicingBlade.ViewModels
             WaferSettingsCmd = new Command(args => WaferSettings());
             MachineSettingsCmd = new Command(args => MachineSettings());
             TechnologySettingsCmd = new Command(args => TechnologySettings());
-            TestCmd = new Command(args => Func());
+            ToTeachChipSizeCmd = new Command(args => ToTeachChipSize());
+            TestCmd = new Command(args => Func(args));
             Machine = new Machine(Test);           
             BaseProcess = new Diagram[] {
                 Diagram.goNextCutXY,               
@@ -95,7 +97,7 @@ namespace DicingBlade.ViewModels
                 Diagram.goTransferingHeightZ,
                 Diagram.goNextDirection
             };
-
+            
             // machine = new Machine();
             //  machine.OnAirWanished += Machine_OnAirWanished;
             AjustWaferTechnology();
@@ -104,9 +106,15 @@ namespace DicingBlade.ViewModels
         {
             throw new NotImplementedException();
         }
-        private void Func() 
+        private void Func(object args) 
         {
-            Machine.YGoToSwLmt(10);
+                
+        }
+        private async Task ToTeachChipSize() 
+        {
+            await Process.ToTeachChipSizeAsync();
+            new TempWafer(PropContainer.WaferTemp).SerializeObjectJson(Settings.Default.WaferLastFile);
+            AjustWaferTechnology();
         }
         private async Task KeyDownAsync(object args) 
         {
@@ -202,21 +210,24 @@ namespace DicingBlade.ViewModels
                 Machine.Z.GoWhile(AxDir.NEG);
             }
             if (key.Key == Key.J)
-            {
-                
-                
+            {   
                 //Technology tech = new Technology(PropContainer.Technology);
                 //tech.SerializeObjectJson("D:/TechParams1.json");
-                
-
                 //Wafer.WriteObject<Wafer>("firstPAR");
             }
             if (key.Key == Key.K) { }
             if (key.Key == Key.L) { }
-            if (key.Key == Key.I) { }
+            if (key.Key == Key.I) 
+            {
+                if(MessageBox.Show("Завершить процесс", "Процесс", MessageBoxButton.OKCancel) == MessageBoxResult.OK) 
+                {
+                    Process.CancelProcess = true;
+                }
+            }
             if (key.Key == Key.Home) 
             {
                 Machine.ResetErrors();
+                Machine.VelocityRegime = Velocity.Fast;
                 await Machine.GoThereAsync(Place.Home);
             }
             if (key.Key == Key.OemMinus) 
@@ -249,6 +260,7 @@ namespace DicingBlade.ViewModels
                     Machine.VelocityRegime = Velocity.Slow;
                 }
             }
+
             if (Keyboard.IsKeyDown(Key.RightCtrl) && Keyboard.IsKeyDown(Key.Oem6))//}
             {
                 throw new NotImplementedException();
@@ -267,6 +279,7 @@ namespace DicingBlade.ViewModels
             {
                 if (Process.PauseProcess) Process.CutOffset-=0.001;
             }
+            //key.Handled = true;
         }
         private void KeyUp(object args) 
         {
@@ -289,14 +302,12 @@ namespace DicingBlade.ViewModels
             }
         }
         private void WaferSettings() 
-        {            
+        {
             new DicingBlade.Views.WaferSettingsView()
             {
-                DataContext = new WaferSettingsViewModel()
+                DataContext = new WaferSettingsViewModel()                      
             }.ShowDialog();
-            //Wafer = PropContainer.Wafer;           
-            //WaferView = Wafer.MakeWaferView();
-            //Thickness = PropContainer.WaferTemp.Thickness;
+            
             AjustWaferTechnology();
         }
         private void MachineSettings() 
@@ -313,21 +324,30 @@ namespace DicingBlade.ViewModels
             string fileName = Settings.Default.WaferLastFile;
             TempWafer waf = new TempWafer();
             Technology tech = new Technology();
-            ((IWafer)(new TempWafer().DeSerializeObjectJson(fileName))).CopyPropertiesTo(waf);
-            if (waf.IsRound)
-            {
-                Wafer = new Wafer(new Vector2(waf.Diameter / 2, waf.Diameter / 2), Thickness, waf.Diameter, (0, waf.IndexW), (90, waf.IndexH));
-            }
-            else
-            {
-                Wafer = new Wafer(new Vector2(waf.Width / 2, waf.Height / 2), Thickness, (0, waf.Height, waf.Width, waf.IndexW), (90, waf.Width, waf.Height, waf.IndexH));
+            
+            
+            
+            if (File.Exists(fileName))
+            {                
+                ((IWafer)(new TempWafer().DeSerializeObjectJson(fileName))).CopyPropertiesTo(waf);
+                if (waf.IsRound)
+                {
+                    Wafer = new Wafer(new Vector2(0, 0), waf.Thickness, waf.Diameter, (0, waf.IndexW), (90, waf.IndexH));
+                }
+                else
+                {
+                    Wafer = new Wafer(new Vector2(0, 0), waf.Thickness, (0, waf.Height, waf.Width, waf.IndexW), (90, waf.Width, waf.Height, waf.IndexH));
+                }
             }
             fileName = Settings.Default.TechnologyLastFile;
-            ((ITechnology)(new Technology().DeSerializeObjectJson(fileName))).CopyPropertiesTo(tech);
-            PropContainer.Technology = tech;
-            Wafer.SetPassCount(PropContainer.Technology.PassCount);
-            WaferView = Wafer.MakeWaferView();
-            Thickness = waf.Thickness;
+            if (File.Exists(fileName))
+            {
+                ((ITechnology)(new Technology().DeSerializeObjectJson(fileName))).CopyPropertiesTo(tech);
+                PropContainer.Technology = tech;
+                Wafer.SetPassCount(PropContainer.Technology.PassCount);
+                WaferView = Wafer.MakeWaferView();
+                Thickness = waf.Thickness;
+            }
         }
         private void TechnologySettings() 
         {

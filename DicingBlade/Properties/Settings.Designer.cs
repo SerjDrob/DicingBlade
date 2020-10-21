@@ -514,5 +514,29 @@ namespace DicingBlade.Properties {
                 this["WaferLastFile"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public double XLoad {
+            get {
+                return ((double)(this["XLoad"]));
+            }
+            set {
+                this["XLoad"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("60")]
+        public double YLoad {
+            get {
+                return ((double)(this["YLoad"]));
+            }
+            set {
+                this["YLoad"] = value;
+            }
+        }
     }
 }

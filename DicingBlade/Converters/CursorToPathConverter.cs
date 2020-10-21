@@ -17,8 +17,8 @@ namespace DicingBlade.Classes
         {
             double x = 0;
             double y = 0;
-            double ActualHeight = 0;
-            double ActualWidth = 0;
+            double actualHeight = 0;
+            double actualWidth = 0;
             double xOffset = 0;
             double yOffset = 0;
             double shapeX = 0;
@@ -41,8 +41,8 @@ namespace DicingBlade.Classes
             {
                 x = System.Convert.ToDouble(values[0]);
                 y = System.Convert.ToDouble(values[1]);
-                ActualWidth = System.Convert.ToDouble(values[2]);
-                ActualHeight = System.Convert.ToDouble(values[3]);
+                actualWidth = System.Convert.ToDouble(values[2]);
+                actualHeight = System.Convert.ToDouble(values[3]);
                 xOffset = System.Convert.ToDouble(values[4]);
                 yOffset = System.Convert.ToDouble(values[5]);
                 shapeX = System.Convert.ToDouble(values[6]);
@@ -50,28 +50,28 @@ namespace DicingBlade.Classes
                 if (shapeX > shapeY)
                 {
                     res = shapeX;
-                    wh = ActualWidth;
+                    wh = actualWidth;
                 }
                 else
                 {
                     res = shapeY;
-                    wh = ActualHeight;
+                    wh = actualHeight;
                 }
             }
             catch { }
 
             translateTransform1x = new TranslateTransform(-xOffset, 0);
-            translateTransform2x = new TranslateTransform(ActualWidth / 2, 0);
+            translateTransform2x = new TranslateTransform(actualWidth / 2, 0);
             scaleTransformX = new ScaleTransform(wh / (1.4 * res), 1);
 
             translateTransform1y = new TranslateTransform(0, -yOffset);
-            translateTransform2y = new TranslateTransform(0, ActualHeight / 2);
+            translateTransform2y = new TranslateTransform(0, actualHeight / 2);
             scaleTransformY = new ScaleTransform(1, wh / (1.4 * res));
 
             Point StartPointX = new Point(x, 0);
-            Point EndPointX = new Point(x,ActualHeight);
+            Point EndPointX = new Point(x,actualHeight);
             Point StartPointY = new Point(0, y);
-            Point EndPointY = new Point(ActualWidth,y);
+            Point EndPointY = new Point(actualWidth,y);
 
 
             StartPointX = translateTransform2x.Transform(scaleTransformX.Transform(translateTransform1x.Transform(StartPointX)));

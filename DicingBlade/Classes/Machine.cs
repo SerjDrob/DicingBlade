@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Drawing.Printing;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -75,7 +76,7 @@ namespace DicingBlade.Classes
 
             if (!testRegime)
             {
-                // StartCamera();
+                StartCamera();
                 DevicesConnection();
                 SetConfigs();
                 VelocityRegime = Velocity.Slow;
@@ -105,7 +106,7 @@ namespace DicingBlade.Classes
         public double TeachMarkersRatio { get; set; } = 2;//means 1/2
         public double CameraBladeOffset { get; set; }
         public Vector2 CameraChuckCenter { get; set; }
-
+        public Vector2 WaferLoadCenter { get; set; }
         /// <summary>
         ///     Возвращает текущие координаты в системе центр столика - ось объектива камеры.
         /// </summary>
@@ -115,8 +116,25 @@ namespace DicingBlade.Classes
         /// <summary>
         ///     Возвращает текущие координаты в системе центр столика - центр кромки диска.
         /// </summary>
-        public Vector2 CBSystemCurrentCoors =>
-            new Vector2(X.ActualPosition - BladeChuckCenter.X, Y.ActualPosition - BladeChuckCenter.Y);
+        public Vector2 CBSystemCurrentCoors => new Vector2(X.ActualPosition - BladeChuckCenter.X, Y.ActualPosition - BladeChuckCenter.Y);
+
+        /// <summary>
+        ///     Перевод системы центр столика в систему центр кромки диска
+        /// </summary>
+        public Vector2 CtoBSystemCoors(Vector2 coordinates)
+        {
+            return new Vector2(coordinates.X + BladeChuckCenter.X, coordinates.Y + BladeChuckCenter.Y);
+        }
+
+        /// <summary>
+        /// Перевод системы центр столика в систему центр столика - ось объектива камеры
+        /// </summary>
+        /// <param name="coordinates"></param>
+        /// <returns></returns>
+        public Vector2 CtoCSystemCoors(Vector2 coordinates)
+        {
+            return new Vector2(coordinates.X + CameraChuckCenter.X, coordinates.Y + CameraChuckCenter.Y);
+        }
 
         public double CameraFocus { get; set; }
         public bool SpindleWater { get; set; }
@@ -176,13 +194,7 @@ namespace DicingBlade.Classes
         /// </summary>
         public double ZBladeTouch { get; set; }
 
-        /// <summary>
-        ///     Перевод системы центр столика в систему центр кромки диска
-        /// </summary>
-        public Vector2 CtoBSystemCoors(Vector2 coordinates)
-        {
-            return new Vector2(coordinates.X + BladeChuckCenter.X, coordinates.Y + BladeChuckCenter.Y);
-        }
+        
 
         //private IntPtr Hand(AxisDirections direction)
         //{
@@ -422,6 +434,7 @@ namespace DicingBlade.Classes
             U.PPU = UPPU;
 
             CameraChuckCenter = new Vector2(Settings.Default.XObjective, Settings.Default.YObjective);
+            WaferLoadCenter = new Vector2(Settings.Default.XLoad, Settings.Default.YLoad);
             CameraFocus = Settings.Default.ZObjective;
             BladeChuckCenter = new Vector2(Settings.Default.XDisk,
                 Settings.Default.YObjective + Settings.Default.DiskShift);
@@ -696,6 +709,8 @@ namespace DicingBlade.Classes
 
                     break;
                 case Place.Loading:
+                    await Z.MoveAxisInPosAsync(0);
+                    await MoveInPosXYAsync(WaferLoadCenter);
                     break;
                 case Place.CameraChuckCenter:
                     await MoveInPosXYAsync(CameraChuckCenter);
@@ -838,6 +853,7 @@ namespace DicingBlade.Classes
             CameraChuckCenter = new Vector2(Settings.Default.XObjective, Settings.Default.YObjective);
             CameraBladeOffset = Settings.Default.DiskShift;
             BladeChuckCenter = new Vector2(Settings.Default.XDisk, CameraChuckCenter.Y + CameraBladeOffset);
+            WaferLoadCenter = new Vector2(Settings.Default.XLoad, Settings.Default.YLoad);
             ZBladeTouch = Settings.Default.ZTouch;
         }
 

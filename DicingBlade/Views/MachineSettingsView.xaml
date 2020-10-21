@@ -99,24 +99,44 @@
                             <TextBox Grid.Column="4" Grid.Row="4" TextWrapping="Wrap" Text="{Binding Source={x:Static st:Settings.Default}, Path=UVelHigh}"/>
                         </Grid>
                     </GroupBox>
-                    <GroupBox Header="Центр столика в микроскопе" Grid.Row="1" HorizontalAlignment="Left">
-                        <Grid >
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="auto"/>
-                                <ColumnDefinition Width="auto"/>
-                                <ColumnDefinition Width="auto"/>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="auto"/>
-                                <RowDefinition Height="auto"/>
-                            </Grid.RowDefinitions>
-                            <Label Content="X"/>
-                            <Label Content="Y" Grid.Row="1"/>
-                            <TextBox Text="{Binding Source={x:Static st:Settings.Default}, Path=XObjective}" Grid.Column="1"/>
-                            <TextBox Text="{Binding Source={x:Static st:Settings.Default}, Path=YObjective}" Grid.Column="1" Grid.Row="1"/>
-                            <Button Command="{Binding XYObjectiveTeachCmd}" Content="Обучить" Grid.Column="2" Grid.RowSpan="2" />
-                        </Grid>
-                    </GroupBox>
+                    <DockPanel Grid.Row="1">
+                        <GroupBox DockPanel.Dock="Left" Header="Центр столика в микроскопе" HorizontalAlignment="Left">
+                            <Grid >
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="auto"/>
+                                </Grid.RowDefinitions>
+                                <Label Content="X"/>
+                                <Label Content="Y" Grid.Row="1"/>
+                                <TextBox Text="{Binding Source={x:Static st:Settings.Default}, Path=XObjective}" Grid.Column="1"/>
+                                <TextBox Text="{Binding Source={x:Static st:Settings.Default}, Path=YObjective}" Grid.Column="1" Grid.Row="1"/>
+                                <Button Command="{Binding XYObjectiveTeachCmd}" Content="Обучить" Grid.Column="2" Grid.RowSpan="2" />
+                            </Grid>
+                        </GroupBox>
+                        <GroupBox DockPanel.Dock="Right" Header="Координаты загрузки" HorizontalAlignment="Left">
+                            <Grid >
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="auto"/>
+                                </Grid.RowDefinitions>
+                                <Label Content="X"/>
+                                <Label Content="Y" Grid.Row="1"/>
+                                <TextBox Text="{Binding Source={x:Static st:Settings.Default}, Path=XLoad}" Grid.Column="1"/>
+                                <TextBox Text="{Binding Source={x:Static st:Settings.Default}, Path=YLoad}" Grid.Column="1" Grid.Row="1"/>
+                                <Button Command="{Binding XYLoadTeachCmd}" Content="Обучить" Grid.Column="2" Grid.RowSpan="2" />
+                            </Grid>
+                        </GroupBox>
+                    </DockPanel>
                     <GroupBox Header="Ось диска над центром СП" Grid.Row="2" HorizontalAlignment="Left">
                         <Grid >
                             <Grid.ColumnDefinitions>

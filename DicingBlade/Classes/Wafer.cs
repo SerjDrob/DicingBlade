@@ -155,11 +155,11 @@ namespace DicingBlade.Classes
         //private void RotateWafer(double angle, Vector2 origin) => Grid.RotateRawLines(angle);
         public Cut GetNearestCut(double y) 
         {
-            double diff = Math.Abs(Grid.Lines[Directions[CurrentAngleNum].angle].First().StartPoint.Y-y);
             int index = 0;
+            double diff = Math.Abs(Grid.Lines[Directions[CurrentAngleNum].angle][index].StartPoint.Y-y);
+            
             for (int i = 0; i < Grid.Lines[Directions[CurrentAngleNum].angle].Count; i++)
-            {
-                Cut item = (Cut)Grid.Lines[Directions[CurrentAngleNum].angle][i];
+            {                
                 if (Math.Abs(Grid.Lines[Directions[CurrentAngleNum].angle][i].StartPoint.Y - y) < diff)
                 {
                     diff = (Math.Abs(Grid.Lines[Directions[CurrentAngleNum].angle][i].StartPoint.Y - y));

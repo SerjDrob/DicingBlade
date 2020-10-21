@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using System.ComponentModel;
 using System.Windows.Input;
 using Newtonsoft.Json;
+using System.IO;
 
 namespace DicingBlade.ViewModels
 {
@@ -25,7 +26,7 @@ namespace DicingBlade.ViewModels
             OpenFileCmd=new Command(args=>OpenFile());
             SaveFileAsCmd = new Command(args=>SaveFileAs());
             FileName = Settings.Default.TechnologyLastFile;
-            if (FileName == null) 
+            if (FileName == null | !File.Exists(FileName)) 
             {
                 SpindleFreq = 25000;
                 FeedSpeed = 2;

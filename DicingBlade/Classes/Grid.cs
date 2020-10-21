@@ -128,11 +128,12 @@ namespace DicingBlade.Classes
                 List<Cut> tempLines = new List<Cut>();
                 int count = (int)Floor(direction.side / direction.index);
                 double firstStep = (direction.side - direction.index * count) / 2;
+                var dx = GridCenter.X - direction.length / 2;
+                var dy = GridCenter.Y - direction.side / 2;
                 for (int i = 0; i < count+1; i++)
                 {
-                    var dx = GridCenter.X - direction.length / 2;
-                    var dy = GridCenter.Y - direction.side / 2;
-                    tempLines.Add(new Cut(new Vector3(dx, firstStep + direction.index * i + dy, 1), new Vector3(direction.length + dx, firstStep + direction.index * i + dy, 1)));
+                    var y = firstStep + direction.index * i + dy;
+                    tempLines.Add(new Cut(new Vector3(dx, y, 1), new Vector3(direction.length + dx, y, 1)));
                 }
                 Lines.Add(direction.degree, tempLines);
             }            

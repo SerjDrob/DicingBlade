@@ -13,23 +13,23 @@ namespace DicingBlade.Classes
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            double height = System.Convert.ToDouble(values[0]);
-            double width = System.Convert.ToDouble(values[1]);
+            double actualHeight = System.Convert.ToDouble(values[0]);
+            double actualWidth = System.Convert.ToDouble(values[1]);
             double wh = 0;
             double res = 1;
             try
             {
-                double x = System.Convert.ToDouble(values[2]);
-                double y = System.Convert.ToDouble(values[3]);                
-                if (x > y) 
+                double shapeX = System.Convert.ToDouble(values[2]);
+                double shapeY = System.Convert.ToDouble(values[3]);                
+                if (shapeX > shapeY) 
                 {
-                    res = x;
-                    wh = width;
+                    res = shapeX;
+                    wh = actualWidth;
                 }
                 else 
                 {
-                    res = y;
-                    wh = height;
+                    res = shapeY;
+                    wh = actualHeight;
                 }
             }
             catch { }

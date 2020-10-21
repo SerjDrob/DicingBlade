@@ -101,12 +101,27 @@ namespace DicingBlade.Classes
                 }
             }
         }
-        
+        private bool _cancelProcess;
+        public bool CancelProcess
+        {            
+            set
+            {
+                _cancelProcess = value;
+                if (cancellationToken != null)
+                {
+                    if (value)
+                    {
+                        cancellationToken.Cancel();
+                    }                    
+                }
+            }
+        }
+
         private PauseTokenSource pauseToken;
 
         private Diagram[] BaseProcess;
         
-        //private CancellationTokenSource cancellationToken;
+        private CancellationTokenSource cancellationToken;
         public bool SideDone { get; private set; } = false;
         public int SideCounter { get; private set; } = 0;
         private bool BladeInWafer 
@@ -128,7 +143,7 @@ namespace DicingBlade.Classes
             Wafer = wafer;
             Blade = blade;
             BaseProcess = proc;
-
+            CancelProcess = false;
             FeedSpeed = PropContainer.Technology.FeedSpeed;
 
             Machine.OnAirWanished += Machine_OnAirWanished;
@@ -149,18 +164,26 @@ namespace DicingBlade.Classes
                 
                 PauseProcess = false;
                 pauseToken = new PauseTokenSource();
-                //cancellationToken = new CancellationTokenSource();
+                cancellationToken = new CancellationTokenSource();
                 InProcess = true;
                 while (InProcess)
                 {
                     foreach (var item in diagrams)
                     {
+                        if (cancellationToken.IsCancellationRequested) 
+                        {
+                            InProcess = false;
+                            cancellationToken.Dispose();
+                            CancelProcess = false;
+                            break;
+                        }
                         await pauseToken.Token.WaitWhilePausedAsync();
                         await ProcElementDispatcherAsync(item);
                     }
                 }
                 ProcessStatus = Status.Done;
                 Wafer.ResetWafer();
+                await Machine.GoThereAsync(Place.Loading);
             }
         }
         private void NextLine() 
@@ -193,15 +216,32 @@ namespace DicingBlade.Classes
         {
             TeachVScaleMarkersVisibility = Visibility.Hidden;
             ProcessMessage = "Подведите ориентир к одному из визиров и нажмите *";
-            await WaitForConfirmation();
+            await WaitForConfirmationAsync();
             var y = Machine.Y.ActualPosition;
             ProcessMessage = "Подведите ориентир ко второму визиру и нажмите *";
-            await WaitForConfirmation();
+            await WaitForConfirmationAsync();
             Machine.CameraScale = Machine.TeachMarkersRatio / Math.Abs(y - Machine.Y.ActualPosition);
             ProcessMessage = "";
             TeachVScaleMarkersVisibility = Visibility.Hidden;
         }
-        private async Task WaitForConfirmation()
+        public async Task ToTeachChipSizeAsync()
+        {
+            if (System.Windows.MessageBox.Show("Обучить размер кристалла?", "Обучение", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+            {
+                ProcessMessage = "Подведите ориентир к перекрестию и нажмите *";
+                await WaitForConfirmationAsync();
+                var y = Machine.Y.ActualPosition;
+                ProcessMessage = "Подведите следующий ориентир к перекрестию и нажмите *";
+                await WaitForConfirmationAsync();
+                var size = Math.Round(Math.Abs(y - Machine.Y.ActualPosition),3);
+                ProcessMessage = "";
+                if (System.Windows.MessageBox.Show($"\rНовый размер кристалла {size} мм.\n Запомнить?" , "Обучение", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+                {
+                    PropContainer.WaferTemp.IndexH=size;//currentIndex?                    
+                }    
+            }
+        }
+        private async Task WaitForConfirmationAsync()
         {
             UserConfirmation = false;
             await Task.Run(() =>
@@ -245,8 +285,6 @@ namespace DicingBlade.Classes
                     Machine.X.SetVelocity(FeedSpeed);
                     IsCutting = true;
 
-
-                    
                     target = Machine.CtoBSystemCoors(Wafer.GetCurrentLine(CurrentLine).end);
                     var traceX = Machine.X.ActualPosition;
                     var traceY = Machine.Y.ActualPosition;
@@ -333,12 +371,11 @@ namespace DicingBlade.Classes
                 case Diagram.goCameraPointLearningXYZ:
                     Machine.SetVelocity(Velocity.Service);
                     await Machine.Z.MoveAxisInPosAsync(Machine.ZBladeTouch - Wafer.Thickness - BladeTransferGapZ);
-                    double y = Wafer.GetNearestCut(/*Machine.CameraChuckCenter.Y*/0).StartPoint.Y
-                        + Machine.CameraChuckCenter.Y;
-                    await Machine.MoveInPosXYAsync(new netDxf.Vector2(
-                        Machine.CameraChuckCenter.X,
-                        y
-                        ));
+
+                    var y = Wafer.GetNearestCut(0).StartPoint.Y;
+                    var point = Machine.CtoCSystemCoors(new Vector2(0, Wafer.GetNearestCut(0).StartPoint.Y));
+                   
+                    await Machine.MoveInPosXYAsync(point);
                     await Machine.Z.MoveAxisInPosAsync(/*Machine.CameraFocus*/3.5);
                     break;
                 default:
@@ -363,16 +400,14 @@ namespace DicingBlade.Classes
                     }
                     else
                     {
-                        ProcessStatus = Status.Working;
-                        /*await*/
+                        ProcessStatus = Status.Working;                        
                         //Traces = new ObservableCollection<Line>();
                         traces = new List<TracePath>();
                         DoProcessAsync(BaseProcess);
                     }
-
                     break;
                 case Status.Working:
-                    PauseProcess ^= true;
+                    PauseProcess = true;
                     if (PauseProcess) await PauseScenarioAsync();
                     CutWidthMarkerVisibility = Visibility.Visible;
                     ProcessStatus = Status.Correcting;
@@ -383,6 +418,7 @@ namespace DicingBlade.Classes
                     ProcessStatus = Status.Working;
                     CutWidthMarkerVisibility = Visibility.Hidden;
                     CutOffset = 0;
+                    PauseProcess = false;
                     break;
                 default:
                     break;
