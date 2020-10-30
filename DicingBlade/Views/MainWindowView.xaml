@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:local="clr-namespace:DicingBlade.Classes"  
         xmlns:converters="clr-namespace:DicingBlade.Converters"
         xmlns:model="clr-namespace:DicingBlade.ViewModels"
@@ -30,19 +30,20 @@
         <converters:TraceConverter x:Key="TraceConverter"/>
         <converters:TraceAngleConverter x:Key="TraceAngleConvereter"/>
         <converters:GetRatioConverter x:Key="GetRatioConverter"/>
+        <converters:DoubleToDurationConverter x:Key="DoubleToDurationConverter"/>
         <SolidColorBrush Color="MediumSpringGreen" x:Key="SignalGreen"/>
         <SolidColorBrush Color="IndianRed" x:Key="SignalRed"/>
         <System:Double x:Key="Zero">0</System:Double>
         <System:Double x:Key="Ycoor">69.515</System:Double>
+       
     </Window.Resources>
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="KeyDown">
-            <cmd:EventToCommand Command="{Binding KeyDownCmd, Mode=OneWay}" PassEventArgsToCommand="True"/>
+            <i:InvokeCommandAction Command="{Binding KeyDownCmd, Mode=OneWay}" PassEventArgsToCommand="True"/>
         </i:EventTrigger>
         <i:EventTrigger EventName="KeyUp">
-            <cmd:EventToCommand Command="{Binding KeyUpCmd, Mode=OneWay}" PassEventArgsToCommand="True"/>
-        </i:EventTrigger>
-        
+            <i:InvokeCommandAction Command="{Binding KeyUpCmd, Mode=OneWay}" PassEventArgsToCommand="True"/>
+        </i:EventTrigger>        
     </i:Interaction.Triggers>
 
     <Grid>
@@ -54,8 +55,7 @@
                 <Setter Property="Fill"  Value="{StaticResource SignalRed}"/>
                 <Setter Property="RadiusX" Value="5"/>
                 <Setter Property="RadiusY" Value="5"/>
-            </Style>
-            
+            </Style>            
         </Grid.Resources>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2*"/>
@@ -271,7 +271,7 @@
                         </TransformGroup>
                     </Ellipse.RenderTransform>
                 </Ellipse>
-                <Rectangle Fill="AliceBlue" Panel.ZIndex="1">
+                <Rectangle Fill="AliceBlue" Panel.ZIndex="1" x:Name="SquareWafer" >
                     <Rectangle.Visibility>
                         <Binding Path="WaferView.IsRound" Converter="{StaticResource VisConvert}" ConverterParameter="square"/>
                     </Rectangle.Visibility>
@@ -281,6 +281,21 @@
                     <Rectangle.Height>
                         <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" FallbackValue="0"/>
                     </Rectangle.Height>
+                    <Rectangle.Resources>
+                        <Storyboard x:Key="WaferAnimation">
+                            <DoubleAnimation   
+                                        Storyboard.Target="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Rectangle}}"
+                                        Storyboard.TargetProperty="RenderTransform.Children[1].Angle"
+                                        By="{Binding WVAngle}"                                        
+                                        Duration="{Binding RotatingTime, Converter={StaticResource DoubleToDurationConverter}}"
+                                        />
+                        </Storyboard>
+                    </Rectangle.Resources>
+                    <i:Interaction.Triggers>
+                        <i:PropertyChangedTrigger Binding="{Binding WVRotate}">
+                            <i:ControlStoryboardAction Storyboard="{StaticResource WaferAnimation}"/>
+                        </i:PropertyChangedTrigger>
+                    </i:Interaction.Triggers>
                     <Rectangle.RenderTransform>
                         <TransformGroup>
                             <TranslateTransform>
@@ -295,11 +310,12 @@
                                     </MultiBinding>
                                 </TranslateTransform.Y>
                             </TranslateTransform>
-                            <RotateTransform>
+                            <RotateTransform></RotateTransform>
+                            <!--<RotateTransform>                               
                                 <RotateTransform.Angle>
-                                    <Binding Path="DataContext.Machine.U.ActualPosition" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                                    <Binding Path="DataContext.WVAngle" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
                                 </RotateTransform.Angle>
-                            </RotateTransform>
+                            </RotateTransform>-->
                             <ScaleTransform>
                                 <ScaleTransform.ScaleX>
                                     <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
@@ -330,13 +346,14 @@
                                     </MultiBinding>
                                 </TranslateTransform.Y>
                             </TranslateTransform>
-                        </TransformGroup>
+                        </TransformGroup>                        
                     </Rectangle.RenderTransform>
+                    
                 </Rectangle>
                 <ItemsControl ItemsSource="{Binding WaferView.RawLines}" Panel.ZIndex="2">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Canvas>
+                            <Canvas> 
                                 <Line X1="{Binding StartPoint.X}"
                                               X2="{Binding EndPoint.X}"
                                               Y1="{Binding StartPoint.Y}"
@@ -345,6 +362,25 @@
                                               Opacity="0.3"
                                               UseLayoutRounding="True"                                                
                                               >
+                                    <Line.Resources>
+                                        <Storyboard x:Key="LineAnimation">
+                                            <DoubleAnimation   
+                                        Storyboard.Target="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Line}}"
+                                        Storyboard.TargetProperty="RenderTransform.Children[0].Angle"
+                                        By="90"                                        
+                                        Duration="0:0:1"
+                                        />
+                                        </Storyboard>
+                                    </Line.Resources>
+                                    <i:Interaction.Triggers>
+                                        <!--<i:EventTrigger EventName="MouseEnter">
+                                            <i:ControlStoryboardAction Storyboard="{StaticResource LineAnimation}"/>
+                                        </i:EventTrigger>-->
+                                        <i:PropertyChangedTrigger Binding="{Binding DataContext.WVRotate, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}">
+                                            <i:ControlStoryboardAction Storyboard="{StaticResource LineAnimation}"/>
+                                        </i:PropertyChangedTrigger>
+                                    </i:Interaction.Triggers>
+                                    
                                     <Line.StrokeThickness>
                                         <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
                                             <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=2,AncestorType=Canvas}"/>
@@ -356,11 +392,12 @@
                                     </Line.StrokeThickness>
                                     <Line.RenderTransform>
                                         <TransformGroup>
-                                            <RotateTransform>
+                                            <RotateTransform></RotateTransform>
+                                            <!--<RotateTransform>
                                                 <RotateTransform.Angle>
                                                     <Binding Path="DataContext.Machine.U.ActualPosition" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
                                                 </RotateTransform.Angle>
-                                            </RotateTransform>
+                                            </RotateTransform>-->
                                             <ScaleTransform>
                                                 <ScaleTransform.ScaleX>
                                                     <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
@@ -590,7 +627,7 @@
                       X1="0"
                       X2="{Binding Path=ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}"
                       Y1="{Binding Path=Y2, RelativeSource={RelativeSource Mode=Self}}"
-                      RenderTransformOrigin="0.5 0.5"
+                      RenderTransformOrigin="0.5,1"
                       >
                     <Line.Y2>
                         <MultiBinding Converter="{StaticResource TranslateConverterScheme}">

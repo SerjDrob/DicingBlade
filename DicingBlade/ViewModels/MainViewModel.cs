@@ -38,6 +38,10 @@ namespace DicingBlade.ViewModels
         public Process Process { get; set; }
         public Wafer Wafer { get; set; }
         public WaferView WaferView { get; set; }
+        public double WVAngle { get; set; } = 90;
+        public bool WVRotate { get; set; }
+        public double RotatingTime { get; set; } = 1;
+
         private TempWafer2D tempWafer2;
         private int[] cols;
         private int[] rows;
@@ -110,6 +114,10 @@ namespace DicingBlade.ViewModels
         {
                 
         }
+        private void GetWVAngle(bool changing) 
+        {
+
+        }
         private async Task ToTeachChipSize() 
         {
             await Process.ToTeachChipSizeAsync();
@@ -123,7 +131,8 @@ namespace DicingBlade.ViewModels
             //test key
             if(key.Key==Key.Tab)
             {
-                Machine.GoTest();
+                WVRotate ^= true;
+                //Machine.GoTest();
                 //if(process==null) process = new Process(Machine, Wafer, new Blade());
                 //await process.ProcElementDispatcherAsync(Diagram.goCameraPointLearningXYZ);
             }
