@@ -261,7 +261,7 @@ namespace DicingBlade.Classes
             LocalWebCamsCollection = new FilterInfoCollection(FilterCategory.VideoInputDevice);
             try
             {
-                LocalWebCam = new VideoCaptureDevice(LocalWebCamsCollection[0].MonikerString);
+                LocalWebCam = new VideoCaptureDevice(LocalWebCamsCollection[1].MonikerString);
             } //1
             catch
             {
@@ -440,7 +440,7 @@ namespace DicingBlade.Classes
                 Settings.Default.YObjective + Settings.Default.DiskShift);
             CameraBladeOffset = Settings.Default.DiskShift;
 
-            double AxMaxVel = 30;
+            double AxMaxVel = 50;
             double AxMaxDec = 180;
             double AxMaxAcc = 180;
             uint res;
@@ -588,7 +588,7 @@ namespace DicingBlade.Classes
                     break;
             }
 
-            double AxMaxVel = 30;
+            double AxMaxVel = 100;
             double AxMaxDec = 180;
             double AxMaxAcc = 180;
             uint res = 0;
@@ -623,12 +623,14 @@ namespace DicingBlade.Classes
             YVel /= 3;
             ZVel /= 3;
             UVel /= 3;
+            XYVel /= 3;
 
             res = Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.PAR_AxVelLow, ref XVel, 8);
             res = Motion.mAcm_SetProperty(Y.Handle, (uint) PropertyID.PAR_AxVelLow, ref YVel, 8);
             res = Motion.mAcm_SetProperty(Z.Handle, (uint) PropertyID.PAR_AxVelLow, ref ZVel, 8);
             res = Motion.mAcm_SetProperty(U.Handle, (uint) PropertyID.PAR_AxVelLow, ref UVel, 8);
             res = Motion.mAcm_SetProperty(XYhandle, (uint) PropertyID.PAR_GpVelLow, ref XYVel, 8);
+            //ErrorCode
         }
 
         private void SaveParams()
@@ -747,6 +749,7 @@ namespace DicingBlade.Classes
                             position.X = Math.Round(position.X, 3);
                             position.Y = Math.Round(position.Y, 3);
                             Motion.mAcm_GpMoveLinearAbs(XYhandle, new double[2] {position.X, position.Y}, ref ElCount);
+
                             while (state != (uint) GroupState.STA_Gp_Ready) Motion.mAcm_GpGetState(XYhandle, ref state);
                             Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.PAR_AxVelLow, ref vel, 8);
                             Motion.mAcm_SetProperty(Y.Handle, (uint) PropertyID.PAR_AxVelLow, ref vel, 8);

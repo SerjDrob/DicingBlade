@@ -59,6 +59,20 @@ namespace DicingBlade.Classes
                 return Directions[CurrentAngleNum].actualAngle;
             }
         }
+        public double GetPrevDiretionAngle
+        {
+            get
+            {
+                return CurrentAngleNum != 0 ? Directions[CurrentAngleNum - 1].angle : Directions.Last().angle;
+            }
+        }
+        public double GetPrevDiretionActualAngle
+        {
+            get
+            {
+                return CurrentAngleNum != 0 ? Directions[CurrentAngleNum - 1].actualAngle : Directions.Last().actualAngle;
+            }
+        }
         public double SetCurrentDirectionAngle
         {
             set
@@ -75,7 +89,7 @@ namespace DicingBlade.Classes
             }
         }
         public Wafer() { }
-        public void ResetWafer() 
+        public void ResetWafer()
         {
             foreach (var key in Grid.Lines.Keys)
             {

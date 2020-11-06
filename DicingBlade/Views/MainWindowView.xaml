@@ -638,7 +638,7 @@
                         </Style>
                     </Path.Style>
                 </Path>
-                <Path Stroke="Navy" StrokeThickness="2" StrokeDashArray="4 4" Panel.ZIndex="4">
+                <Path Name="BladeTrace" Stroke="Navy" StrokeThickness="2" StrokeDashArray="4 4" Panel.ZIndex="4">
                     <Path.Data>
                         <MultiBinding Converter="{StaticResource TraceConverter}">
                             <Binding Path="Process.TracingLine.X"/>
@@ -653,7 +653,7 @@
                         </MultiBinding>
                     </Path.Data>
                 </Path>
-                <ItemsControl ItemsSource="{Binding Process.Traces}" Panel.ZIndex="4">
+                <ItemsControl Name="BladeTraces" ItemsSource="{Binding Process.Traces}" Panel.ZIndex="4">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Canvas>
@@ -688,6 +688,7 @@
                                                     <MultiBinding Converter="{StaticResource TraceAngleConvereter}">
                                                         <Binding Path="DataContext.Machine.U.ActualPosition" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
                                                         <Binding Path="InitAngle"/>
+                                                        <Binding Path="DataContext.Process.Rotation" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
                                                     </MultiBinding>
                                                 </RotateTransform.Angle>
                                             </RotateTransform>
@@ -698,7 +699,7 @@
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
-                <Line Stroke="YellowGreen" StrokeThickness="2"
+                <Line Name="AnglePosition" Stroke="YellowGreen" StrokeThickness="2"
                       X1="0"
                       X2="{Binding Path=ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}"
                       Y1="{Binding Path=Y2, RelativeSource={RelativeSource Mode=Self}}"

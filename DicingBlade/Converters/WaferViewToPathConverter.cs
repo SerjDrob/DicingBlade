@@ -19,7 +19,7 @@ namespace DicingBlade.Converters
         {
             ObservableCollection<Line> waferView = new ObservableCollection<Line>();
             try
-            {
+            {                
                 waferView = ((WaferView)value).RawLines;
             }
             catch { }
