@@ -21,7 +21,7 @@
       <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="YVelHigh" Type="System.UInt32" Scope="User">
-      <Value Profile="(Default)">30</Value>
+      <Value Profile="(Default)">5</Value>
     </Setting>
     <Setting Name="YAcc" Type="System.Double" Scope="User">
       <Value Profile="(Default)">100</Value>

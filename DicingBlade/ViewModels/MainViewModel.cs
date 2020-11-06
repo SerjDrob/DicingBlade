@@ -38,9 +38,9 @@ namespace DicingBlade.ViewModels
         public Process Process { get; set; }
         public Wafer Wafer { get; set; }
         public WaferView WaferView { get; set; }
-        public double WVAngle { get; set; } = 90;
-        public bool WVRotate { get; set; }
-        public double RotatingTime { get; set; } = 1;
+        public double WVAngle { get; set; }        
+        public bool WVRotate { get; set; } = false;
+        public double RotatingTime { get; set; } = 1;        
 
         private TempWafer2D tempWafer2;
         private int[] cols;
@@ -101,10 +101,17 @@ namespace DicingBlade.ViewModels
                 Diagram.goTransferingHeightZ,
                 Diagram.goNextDirection
             };
-            
+
             // machine = new Machine();
             //  machine.OnAirWanished += Machine_OnAirWanished;
+            
             AjustWaferTechnology();
+        }
+        private void SetRotation(double angle, double time)
+        {
+            WVAngle = angle;
+            RotatingTime = time;
+            WVRotate ^= true;
         }
         private void Machine_OnAirWanished(DIEventArgs eventArgs)
         {
@@ -165,8 +172,11 @@ namespace DicingBlade.ViewModels
                     {
                         if (Machine.SetOnChuck())
                         {
+                            Machine.SetVelocity(Velocity.Service);
                             await Machine.GoThereAsync(Place.CameraChuckCenter);
+
                             Process = new Process(Machine, Wafer, new Blade(), new Technology(), BaseProcess);
+                            Process.GetRotation += SetRotation;
                             Process.ProcessStatus = Status.StartLearning;                        
                         }
                     

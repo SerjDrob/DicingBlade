@@ -14,7 +14,10 @@ namespace DicingBlade
     /// </summary>
     public partial class App : Application
     {
-        public App() { }
+        public App() 
+        {
+            
+        }
         protected override void OnStartup(StartupEventArgs e)
         {          
             new Views.MainWindowView()

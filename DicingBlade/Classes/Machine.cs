@@ -328,7 +328,7 @@ namespace DicingBlade.Classes
 
             if (deviceCount > 0) deviceNum = curAvailableDevs[0].DeviceNum;
 
-            deviceNum = curAvailableDevs[0].DeviceNum;
+            //deviceNum = curAvailableDevs[0].DeviceNum;
 
             result = Motion.mAcm_DevOpen(deviceNum, ref m_DeviceHandle);
             if (result != (uint) ErrorCode.SUCCESS)
@@ -363,9 +363,9 @@ namespace DicingBlade.Classes
                 var cmdPosition = new double();
                 cmdPosition = 0;
                 //Set command position for the specified axis
-                Motion.mAcm_AxSetCmdPosition(m_Axishand[i], cmdPosition);
+                result = Motion.mAcm_AxSetCmdPosition(m_Axishand[i], cmdPosition);
                 //Set actual position for the specified axis
-                Motion.mAcm_AxSetActualPosition(m_Axishand[i], cmdPosition);
+                result = Motion.mAcm_AxSetActualPosition(m_Axishand[i], cmdPosition);
 
                 axisEnableEvent[i] |= (uint) EventType.EVT_AX_MOTION_DONE;
                 axisEnableEvent[i] |= (uint) EventType.EVT_AX_VH_START;
@@ -445,46 +445,46 @@ namespace DicingBlade.Classes
             double AxMaxAcc = 180;
             uint res;
 
-            Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.CFG_AxPPU, ref XPPU, 4);
-            Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.PAR_AxJerk, ref XJerk, 8);
-            Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.CFG_AxMaxAcc, ref AxMaxAcc, 8);
-            Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.CFG_AxMaxDec, ref AxMaxDec, 8);
-            Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.CFG_AxMaxVel, ref AxMaxVel, 8);
-            Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.PAR_AxAcc, ref XAcc, 8);
-            Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.PAR_AxDec, ref XDec, 8);
+            res = Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.CFG_AxPPU, ref XPPU, 4);
+            res = Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.PAR_AxJerk, ref XJerk, 8);
+            res = Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.CFG_AxMaxAcc, ref AxMaxAcc, 8);
+            res = Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.CFG_AxMaxDec, ref AxMaxDec, 8);
+            res = Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.CFG_AxMaxVel, ref AxMaxVel, 8);
+            res = Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.PAR_AxAcc, ref XAcc, 8);
+            res = Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.PAR_AxDec, ref XDec, 8);
 
-            Motion.mAcm_SetProperty(Y.Handle, (uint) PropertyID.CFG_AxPPU, ref YPPU, 4);
-            Motion.mAcm_SetProperty(Y.Handle, (uint) PropertyID.PAR_AxJerk, ref YJerk, 8);
-            Motion.mAcm_SetProperty(Y.Handle, (uint) PropertyID.CFG_AxMaxAcc, ref AxMaxAcc, 8);
-            Motion.mAcm_SetProperty(Y.Handle, (uint) PropertyID.CFG_AxMaxDec, ref AxMaxDec, 8);
-            Motion.mAcm_SetProperty(Y.Handle, (uint) PropertyID.CFG_AxMaxVel, ref AxMaxVel, 8);
-            Motion.mAcm_SetProperty(Y.Handle, (uint) PropertyID.PAR_AxAcc, ref YAcc, 8);
-            Motion.mAcm_SetProperty(Y.Handle, (uint) PropertyID.PAR_AxDec, ref YDec, 8);
+            res = Motion.mAcm_SetProperty(Y.Handle, (uint) PropertyID.CFG_AxPPU, ref YPPU, 4);
+            res = Motion.mAcm_SetProperty(Y.Handle, (uint) PropertyID.PAR_AxJerk, ref YJerk, 8);
+            res = Motion.mAcm_SetProperty(Y.Handle, (uint) PropertyID.CFG_AxMaxAcc, ref AxMaxAcc, 8);
+            res = Motion.mAcm_SetProperty(Y.Handle, (uint) PropertyID.CFG_AxMaxDec, ref AxMaxDec, 8);
+            res = Motion.mAcm_SetProperty(Y.Handle, (uint) PropertyID.CFG_AxMaxVel, ref AxMaxVel, 8);
+            res = Motion.mAcm_SetProperty(Y.Handle, (uint) PropertyID.PAR_AxAcc, ref YAcc, 8);
+            res = Motion.mAcm_SetProperty(Y.Handle, (uint) PropertyID.PAR_AxDec, ref YDec, 8);
 
-            Motion.mAcm_SetProperty(Z.Handle, (uint) PropertyID.CFG_AxPPU, ref ZPPU, 4);
-            Motion.mAcm_SetProperty(Z.Handle, (uint) PropertyID.PAR_AxJerk, ref ZJerk, 8);
-            Motion.mAcm_SetProperty(Z.Handle, (uint) PropertyID.CFG_AxMaxAcc, ref AxMaxAcc, 8);
-            Motion.mAcm_SetProperty(Z.Handle, (uint) PropertyID.CFG_AxMaxDec, ref AxMaxDec, 8);
-            Motion.mAcm_SetProperty(Z.Handle, (uint) PropertyID.CFG_AxMaxVel, ref AxMaxVel, 8);
-            Motion.mAcm_SetProperty(Z.Handle, (uint) PropertyID.PAR_AxAcc, ref ZAcc, 8);
-            Motion.mAcm_SetProperty(Z.Handle, (uint) PropertyID.PAR_AxDec, ref ZDec, 8);
+            res = Motion.mAcm_SetProperty(Z.Handle, (uint) PropertyID.CFG_AxPPU, ref ZPPU, 4);
+            res = Motion.mAcm_SetProperty(Z.Handle, (uint) PropertyID.PAR_AxJerk, ref ZJerk, 8);
+            res = Motion.mAcm_SetProperty(Z.Handle, (uint) PropertyID.CFG_AxMaxAcc, ref AxMaxAcc, 8);
+            res = Motion.mAcm_SetProperty(Z.Handle, (uint) PropertyID.CFG_AxMaxDec, ref AxMaxDec, 8);
+            res = Motion.mAcm_SetProperty(Z.Handle, (uint) PropertyID.CFG_AxMaxVel, ref AxMaxVel, 8);
+            res = Motion.mAcm_SetProperty(Z.Handle, (uint) PropertyID.PAR_AxAcc, ref ZAcc, 8);
+            res = Motion.mAcm_SetProperty(Z.Handle, (uint) PropertyID.PAR_AxDec, ref ZDec, 8);
 
-            Motion.mAcm_SetProperty(U.Handle, (uint) PropertyID.CFG_AxPPU, ref UPPU, 4);
-            Motion.mAcm_SetProperty(U.Handle, (uint) PropertyID.PAR_AxJerk, ref UJerk, 8);
-            Motion.mAcm_SetProperty(U.Handle, (uint) PropertyID.CFG_AxMaxAcc, ref AxMaxAcc, 8);
-            Motion.mAcm_SetProperty(U.Handle, (uint) PropertyID.CFG_AxMaxDec, ref AxMaxDec, 8);
-            Motion.mAcm_SetProperty(U.Handle, (uint) PropertyID.CFG_AxMaxVel, ref AxMaxVel, 8);
-            Motion.mAcm_SetProperty(U.Handle, (uint) PropertyID.PAR_AxAcc, ref UAcc, 8);
-            Motion.mAcm_SetProperty(U.Handle, (uint) PropertyID.PAR_AxDec, ref UDec, 8);
+            res = Motion.mAcm_SetProperty(U.Handle, (uint) PropertyID.CFG_AxPPU, ref UPPU, 4);
+            res = Motion.mAcm_SetProperty(U.Handle, (uint) PropertyID.PAR_AxJerk, ref UJerk, 8);
+            res = Motion.mAcm_SetProperty(U.Handle, (uint) PropertyID.CFG_AxMaxAcc, ref AxMaxAcc, 8);
+            res = Motion.mAcm_SetProperty(U.Handle, (uint) PropertyID.CFG_AxMaxDec, ref AxMaxDec, 8);
+            res = Motion.mAcm_SetProperty(U.Handle, (uint) PropertyID.CFG_AxMaxVel, ref AxMaxVel, 8);
+            res = Motion.mAcm_SetProperty(U.Handle, (uint) PropertyID.PAR_AxAcc, ref UAcc, 8);
+            res = Motion.mAcm_SetProperty(U.Handle, (uint) PropertyID.PAR_AxDec, ref UDec, 8);
 
 
-            Motion.mAcm_SetProperty(XYhandle, (uint) PropertyID.CFG_GpPPU, ref YPPU, 4);
-            Motion.mAcm_SetProperty(XYhandle, (uint) PropertyID.PAR_GpJerk, ref YJerk, 8);
-            Motion.mAcm_SetProperty(XYhandle, (uint) PropertyID.CFG_GpMaxAcc, ref AxMaxAcc, 8);
-            Motion.mAcm_SetProperty(XYhandle, (uint) PropertyID.CFG_GpMaxDec, ref AxMaxDec, 8);
-            Motion.mAcm_SetProperty(XYhandle, (uint) PropertyID.CFG_GpMaxVel, ref AxMaxVel, 8);
-            Motion.mAcm_SetProperty(XYhandle, (uint) PropertyID.PAR_GpAcc, ref YAcc, 8);
-            Motion.mAcm_SetProperty(XYhandle, (uint) PropertyID.PAR_GpDec, ref YDec, 8);
+            res = Motion.mAcm_SetProperty(XYhandle, (uint)PropertyID.CFG_GpPPU, ref YPPU, 4);
+            res = Motion.mAcm_SetProperty(XYhandle, (uint)PropertyID.PAR_GpJerk, ref YJerk, 8);
+            res = Motion.mAcm_SetProperty(XYhandle, (uint)PropertyID.CFG_GpMaxAcc, ref AxMaxAcc, 8);
+            res = Motion.mAcm_SetProperty(XYhandle, (uint)PropertyID.CFG_GpMaxDec, ref AxMaxDec, 8);
+            res = Motion.mAcm_SetProperty(XYhandle, (uint)PropertyID.CFG_GpMaxVel, ref AxMaxVel, 8);
+            res = Motion.mAcm_SetProperty(XYhandle, (uint)PropertyID.PAR_GpAcc, ref YAcc, 8);
+            res = Motion.mAcm_SetProperty(XYhandle, (uint)PropertyID.PAR_GpDec, ref YDec, 8);
 
             var PlsInMde = (int) PulseInMode.AB_4X;
             var PlsInLogic = (int) PulseInLogic.NOT_SUPPORT;
@@ -505,41 +505,41 @@ namespace DicingBlade.Classes
             //Motion.mAcm_SetProperty(item.Handle, (uint)PropertyID.CFG_AxCmpEnable, ref cmpEna, 8);
             //Motion.mAcm_SetProperty(item.Handle, (uint)PropertyID.CFG_AxCmpMethod, ref cmpMethod, 8);
 
-            Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.CFG_AxGenDoEnable, ref PlsOutMde, 4);
-            Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.CFG_AxPulseInMode, ref PlsInMde, 4);
-            Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.CFG_AxPulseInLogic, ref PlsInLogic, 4);
-            Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.CFG_AxPulseInSource, ref PlsInSrc, 4);
-            Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.CFG_AxPulseOutMode, ref PlsOutMde, 4);
-            Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.CFG_AxHomeResetEnable, ref Reset, 4);
-            Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.CFG_AxDirLogic, ref AxDirLogic, 4);
+            res = Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.CFG_AxGenDoEnable, ref PlsOutMde, 4);
+            res = Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.CFG_AxPulseInMode, ref PlsInMde, 4);
+            res = Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.CFG_AxPulseInLogic, ref PlsInLogic, 4);
+            res = Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.CFG_AxPulseInSource, ref PlsInSrc, 4);
+            res = Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.CFG_AxPulseOutMode, ref PlsOutMde, 4);
+            res = Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.CFG_AxHomeResetEnable, ref Reset, 4);
+            res = Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.CFG_AxDirLogic, ref AxDirLogic, 4);
 
 
-            Motion.mAcm_SetProperty(Z.Handle, (uint) PropertyID.CFG_AxGenDoEnable, ref PlsOutMde, 4);
-            Motion.mAcm_SetProperty(Z.Handle, (uint) PropertyID.CFG_AxPulseInMode, ref PlsInMde, 4);
-            Motion.mAcm_SetProperty(Z.Handle, (uint) PropertyID.CFG_AxPulseInLogic, ref PlsInLogic, 4);
-            Motion.mAcm_SetProperty(Z.Handle, (uint) PropertyID.CFG_AxPulseInSource, ref PlsInSrc, 4);
-            Motion.mAcm_SetProperty(Z.Handle, (uint) PropertyID.CFG_AxPulseOutMode, ref PlsOutMde, 4);
-            Motion.mAcm_SetProperty(Z.Handle, (uint) PropertyID.CFG_AxHomeResetEnable, ref Reset, 4);
-            Motion.mAcm_SetProperty(Z.Handle, (uint) PropertyID.CFG_AxDirLogic, ref AxDirLogic, 4);
+            res = Motion.mAcm_SetProperty(Z.Handle, (uint) PropertyID.CFG_AxGenDoEnable, ref PlsOutMde, 4);
+            res = Motion.mAcm_SetProperty(Z.Handle, (uint) PropertyID.CFG_AxPulseInMode, ref PlsInMde, 4);
+            res = Motion.mAcm_SetProperty(Z.Handle, (uint) PropertyID.CFG_AxPulseInLogic, ref PlsInLogic, 4);
+            res = Motion.mAcm_SetProperty(Z.Handle, (uint) PropertyID.CFG_AxPulseInSource, ref PlsInSrc, 4);
+            res = Motion.mAcm_SetProperty(Z.Handle, (uint) PropertyID.CFG_AxPulseOutMode, ref PlsOutMde, 4);
+            res = Motion.mAcm_SetProperty(Z.Handle, (uint) PropertyID.CFG_AxHomeResetEnable, ref Reset, 4);
+            res = Motion.mAcm_SetProperty(Z.Handle, (uint) PropertyID.CFG_AxDirLogic, ref AxDirLogic, 4);
 
-            Motion.mAcm_SetProperty(U.Handle, (uint) PropertyID.CFG_AxGenDoEnable, ref PlsOutMde, 4);
-            Motion.mAcm_SetProperty(U.Handle, (uint) PropertyID.CFG_AxPulseInMode, ref PlsInMde, 4);
-            Motion.mAcm_SetProperty(U.Handle, (uint) PropertyID.CFG_AxPulseInLogic, ref PlsInLogic, 4);
-            Motion.mAcm_SetProperty(U.Handle, (uint) PropertyID.CFG_AxPulseInSource, ref PlsInSrc, 4);
-            Motion.mAcm_SetProperty(U.Handle, (uint) PropertyID.CFG_AxPulseOutMode, ref PlsOutMde, 4);
-            Motion.mAcm_SetProperty(U.Handle, (uint) PropertyID.CFG_AxHomeResetEnable, ref Reset, 4);
-            Motion.mAcm_SetProperty(U.Handle, (uint) PropertyID.CFG_AxDirLogic, ref AxDirLogic, 4);
+            res = Motion.mAcm_SetProperty(U.Handle, (uint) PropertyID.CFG_AxGenDoEnable, ref PlsOutMde, 4);
+            res = Motion.mAcm_SetProperty(U.Handle, (uint) PropertyID.CFG_AxPulseInMode, ref PlsInMde, 4);
+            res = Motion.mAcm_SetProperty(U.Handle, (uint) PropertyID.CFG_AxPulseInLogic, ref PlsInLogic, 4);
+            res = Motion.mAcm_SetProperty(U.Handle, (uint) PropertyID.CFG_AxPulseInSource, ref PlsInSrc, 4);
+            res = Motion.mAcm_SetProperty(U.Handle, (uint) PropertyID.CFG_AxPulseOutMode, ref PlsOutMde, 4);
+            res = Motion.mAcm_SetProperty(U.Handle, (uint) PropertyID.CFG_AxHomeResetEnable, ref Reset, 4);
+            res = Motion.mAcm_SetProperty(U.Handle, (uint) PropertyID.CFG_AxDirLogic, ref AxDirLogic, 4);
 
             PlsOutMde = (int) PulseOutMode.OUT_DIR_ALL_NEG;
             AxDirLogic = (int) DirLogic.DIR_ACT_HIGH;
             PlsInLogic = (int) PulseInLogic.NO_INV_DIR;
             //res = Motion.mAcm_AxSetSvOn(Y.Handle, 1);
-            Motion.mAcm_SetProperty(Y.Handle, (uint) PropertyID.CFG_AxGenDoEnable, ref PlsOutMde, 4);
-            Motion.mAcm_SetProperty(Y.Handle, (uint) PropertyID.CFG_AxPulseInMode, ref PlsInMde, 4);
-            Motion.mAcm_SetProperty(Y.Handle, (uint) PropertyID.CFG_AxPulseInLogic, ref PlsInLogic, 4);
-            Motion.mAcm_SetProperty(Y.Handle, (uint) PropertyID.CFG_AxPulseInSource, ref PlsInSrc, 4);
-            Motion.mAcm_SetProperty(Y.Handle, (uint) PropertyID.CFG_AxPulseOutMode, ref PlsOutMde, 4);
-            Motion.mAcm_SetProperty(Y.Handle, (uint) PropertyID.CFG_AxHomeResetEnable, ref Reset, 4);
+            res = Motion.mAcm_SetProperty(Y.Handle, (uint) PropertyID.CFG_AxGenDoEnable, ref PlsOutMde, 4);
+            res = Motion.mAcm_SetProperty(Y.Handle, (uint) PropertyID.CFG_AxPulseInMode, ref PlsInMde, 4);
+            res = Motion.mAcm_SetProperty(Y.Handle, (uint) PropertyID.CFG_AxPulseInLogic, ref PlsInLogic, 4);
+            res = Motion.mAcm_SetProperty(Y.Handle, (uint) PropertyID.CFG_AxPulseInSource, ref PlsInSrc, 4);
+            res = Motion.mAcm_SetProperty(Y.Handle, (uint) PropertyID.CFG_AxPulseOutMode, ref PlsOutMde, 4);
+            res = Motion.mAcm_SetProperty(Y.Handle, (uint) PropertyID.CFG_AxHomeResetEnable, ref Reset, 4);
             res = Motion.mAcm_SetProperty(Y.Handle, (uint) PropertyID.CFG_AxDirLogic, ref AxDirLogic, 4);
 
 
@@ -555,42 +555,47 @@ namespace DicingBlade.Classes
             double YVel = 0;
             double ZVel = 0;
             double UVel = 0;
+            double XYVel = 0;
 
             switch (velocity)
             {
                 case Velocity.Fast:
-                {
-                    XVel = Settings.Default.XVelHigh;
-                    YVel = Settings.Default.YVelHigh;
-                    ZVel = Settings.Default.ZVelHigh;
-                    UVel = Settings.Default.UVelHigh;
-                }
+                    {
+                        XVel = Settings.Default.XVelHigh;
+                        YVel = Settings.Default.YVelHigh;
+                        ZVel = Settings.Default.ZVelHigh;
+                        UVel = Settings.Default.UVelHigh;
+                        XYVel = Math.Sqrt(XVel * XVel + YVel * YVel);
+                    }
                     break;
                 case Velocity.Slow:
-                {
-                    XVel = Settings.Default.XVelLow;
-                    YVel = Settings.Default.YVelLow;
-                    ZVel = Settings.Default.ZVelLow;
-                    UVel = Settings.Default.UVelLow;
-                }
+                    {
+                        XVel = Settings.Default.XVelLow;
+                        YVel = Settings.Default.YVelLow;
+                        ZVel = Settings.Default.ZVelLow;
+                        UVel = Settings.Default.UVelLow; 
+                        XYVel = Math.Sqrt(XVel * XVel + YVel * YVel);
+                    }
                     break;
                 case Velocity.Service:
-                {
-                    XVel = Settings.Default.XVelService;
-                    YVel = Settings.Default.YVelService;
-                    ZVel = Settings.Default.ZVelService;
-                    UVel = Settings.Default.UVelService;
-                }
+                    {
+                        XVel = Settings.Default.XVelService;
+                        YVel = Settings.Default.YVelService;
+                        ZVel = Settings.Default.ZVelService;
+                        UVel = Settings.Default.UVelService;
+                        XYVel = Math.Sqrt(XVel * XVel + YVel * YVel);
+                    }
                     break;
             }
 
             double AxMaxVel = 30;
             double AxMaxDec = 180;
             double AxMaxAcc = 180;
+            uint res = 0;
 
-            Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.CFG_AxMaxAcc, ref AxMaxAcc, 8);
-            Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.CFG_AxMaxDec, ref AxMaxDec, 8);
-            Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.CFG_AxMaxVel, ref AxMaxVel, 8);
+            res = Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.CFG_AxMaxAcc, ref AxMaxAcc, 8);
+            res = Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.CFG_AxMaxDec, ref AxMaxDec, 8);
+            res = Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.CFG_AxMaxVel, ref AxMaxVel, 8);
 
             Motion.mAcm_SetProperty(Y.Handle, (uint) PropertyID.CFG_AxMaxAcc, ref AxMaxAcc, 8);
             Motion.mAcm_SetProperty(Y.Handle, (uint) PropertyID.CFG_AxMaxDec, ref AxMaxDec, 8);
@@ -608,22 +613,22 @@ namespace DicingBlade.Classes
             Motion.mAcm_SetProperty(XYhandle, (uint) PropertyID.CFG_GpMaxDec, ref AxMaxDec, 8);
             Motion.mAcm_SetProperty(XYhandle, (uint) PropertyID.CFG_GpMaxVel, ref AxMaxVel, 8);
 
-            Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.PAR_AxVelHigh, ref XVel, 8);
-            Motion.mAcm_SetProperty(Y.Handle, (uint) PropertyID.PAR_AxVelHigh, ref YVel, 8);
-            Motion.mAcm_SetProperty(Z.Handle, (uint) PropertyID.PAR_AxVelHigh, ref ZVel, 8);
-            Motion.mAcm_SetProperty(U.Handle, (uint) PropertyID.PAR_AxVelHigh, ref UVel, 8);
-            Motion.mAcm_SetProperty(XYhandle, (uint) PropertyID.PAR_GpVelHigh, ref YVel, 8);
+            res = Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.PAR_AxVelHigh, ref XVel, 8);
+            res = Motion.mAcm_SetProperty(Y.Handle, (uint) PropertyID.PAR_AxVelHigh, ref YVel, 8);
+            res = Motion.mAcm_SetProperty(Z.Handle, (uint) PropertyID.PAR_AxVelHigh, ref ZVel, 8);
+            res = Motion.mAcm_SetProperty(U.Handle, (uint) PropertyID.PAR_AxVelHigh, ref UVel, 8);
+            res = Motion.mAcm_SetProperty(XYhandle, (uint) PropertyID.PAR_GpVelHigh, ref XYVel, 8);
 
             XVel /= 3;
             YVel /= 3;
             ZVel /= 3;
             UVel /= 3;
 
-            Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.PAR_AxVelLow, ref XVel, 8);
-            Motion.mAcm_SetProperty(Y.Handle, (uint) PropertyID.PAR_AxVelLow, ref YVel, 8);
-            Motion.mAcm_SetProperty(Z.Handle, (uint) PropertyID.PAR_AxVelLow, ref ZVel, 8);
-            Motion.mAcm_SetProperty(U.Handle, (uint) PropertyID.PAR_AxVelLow, ref UVel, 8);
-            Motion.mAcm_SetProperty(XYhandle, (uint) PropertyID.PAR_GpVelLow, ref YVel, 8);
+            res = Motion.mAcm_SetProperty(X.Handle, (uint) PropertyID.PAR_AxVelLow, ref XVel, 8);
+            res = Motion.mAcm_SetProperty(Y.Handle, (uint) PropertyID.PAR_AxVelLow, ref YVel, 8);
+            res = Motion.mAcm_SetProperty(Z.Handle, (uint) PropertyID.PAR_AxVelLow, ref ZVel, 8);
+            res = Motion.mAcm_SetProperty(U.Handle, (uint) PropertyID.PAR_AxVelLow, ref UVel, 8);
+            res = Motion.mAcm_SetProperty(XYhandle, (uint) PropertyID.PAR_GpVelLow, ref XYVel, 8);
         }
 
         private void SaveParams()
@@ -824,7 +829,8 @@ namespace DicingBlade.Classes
                         var pos = new double[2] {position.X, position.Y};
                         //ResetErrors();
                         Motion.mAcm_GpResetError(XYhandle);
-                        res = Motion.mAcm_GpMoveDirectAbs(XYhandle, pos, ref ElCount);
+                        //res = Motion.mAcm_GpMoveDirectAbs(XYhandle, pos, ref ElCount);
+                        res = Motion.mAcm_GpMoveLinearAbs(XYhandle, pos, ref ElCount);
                         do
                         {
                             Thread.Sleep(1);
@@ -1230,7 +1236,7 @@ namespace DicingBlade.Classes
             Motion.mAcm_SetProperty(Handle, (uint) PropertyID.PAR_AxVelLow, ref VelLow, 8);
         }
 
-        private double GetVelocity()
+        public double GetVelocity()
         {
             uint res = 0;
             double vel = 0;
@@ -1397,6 +1403,13 @@ namespace DicingBlade.Classes
                     }
             }
         }
+
+        //public double GetOperationTime()
+        //{
+        //    //double vel
+        //    //Motion.mAcm_AxGetCmdVelocity(Handle,)
+        //    return ;
+        //}
 
         public void ResetErrors()
         {

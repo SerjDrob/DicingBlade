@@ -17,7 +17,8 @@ using System.Windows.Forms;
 using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace DicingBlade.Classes
-{   
+{
+    public delegate void GetRotation(double angle, double time);
     enum Diagram 
     {
         goWaferStartX,
@@ -137,6 +138,7 @@ namespace DicingBlade.Classes
         private double FeedSpeed { get; set; }        
         private bool Aligned { get; set; }
         private double OffsetAngle { get; set; }
+        public GetRotation GetRotation;
         public Process(Machine machine, Wafer wafer, Blade blade,ITechnology technology, Diagram[] proc) // В конструкторе происходит загрузка технологических параметров
         {
             Machine = machine;
@@ -144,8 +146,7 @@ namespace DicingBlade.Classes
             Blade = blade;
             BaseProcess = proc;
             CancelProcess = false;
-            FeedSpeed = PropContainer.Technology.FeedSpeed;
-
+            FeedSpeed = PropContainer.Technology.FeedSpeed;            
             Machine.OnAirWanished += Machine_OnAirWanished;
             Machine.OnCoolWaterWanished += Machine_OnCoolWaterWanished;
             Machine.OnSpinWaterWanished += Machine_OnSpinWaterWanished;
@@ -193,19 +194,21 @@ namespace DicingBlade.Classes
             {
                 SideDone = true;
             }
-        }     
+        }
+        
         private async Task MoveNextDirAsync() 
         {
             if (!Wafer.NextDir(true))
-            {
-                await Machine.U.MoveAxisInPosAsync(Wafer.GetCurrentDiretionAngle);
+            {                
+                GetRotation(Wafer.GetCurrentDiretionAngle, Wafer.GetCurrentDiretionAngle/Machine.U.GetVelocity());
+                await Machine.U.MoveAxisInPosAsync(Wafer.GetCurrentDiretionActualAngle);
             }
         }
         private async Task MovePrevDirAsync() 
         {
             if (Wafer.PrevDir())
             {
-                await Machine.U.MoveAxisInPosAsync(Wafer.GetCurrentDiretionAngle);
+                await Machine.U.MoveAxisInPosAsync(Wafer.GetCurrentDiretionActualAngle);
             }
         }
         private void PrevLine() 
@@ -355,7 +358,7 @@ namespace DicingBlade.Classes
                     await Machine.Z.MoveAxisInPosAsync(1);
                     break;
                 case Diagram.goNextDirection:
-                    if (InProcess & SideDone /*| ProcessStatus == Status.Learning*/)
+                    if (InProcess & SideDone /*| ProcessStatus == Status.Learning*/) //if the blade isn't in the wafer
                     {
                         Machine.SetVelocity(Velocity.Service);
                         await MoveNextDirAsync();
@@ -395,7 +398,9 @@ namespace DicingBlade.Classes
                     Wafer.SetCurrentDirectionAngle = Machine.U.ActualPosition;
                     if (Wafer.NextDir())
                     {
-                        await Machine.U.MoveAxisInPosAsync(Wafer.GetCurrentDiretionAngle);
+                        Machine.SetVelocity(Velocity.Service);
+                        GetRotation(Wafer.GetCurrentDiretionAngle, Wafer.GetCurrentDiretionAngle / Machine.U.GetVelocity());
+                        await Machine.U.MoveAxisInPosAsync(Wafer.GetCurrentDiretionActualAngle);
                         await ProcElementDispatcherAsync(Diagram.goCameraPointLearningXYZ);
                     }
                     else

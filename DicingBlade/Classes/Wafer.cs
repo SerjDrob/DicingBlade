@@ -44,7 +44,7 @@ namespace DicingBlade.Classes
         public int CurrentAngleNum { get; private set; }
         private Grid Grid { get; set; }
         public double Thickness { get; set; }
-        private List<(double angle,double indexShift)> Directions { get; set; }
+        private List<(double angle, double actualAngle, double indexShift)> Directions { get; set; }
         public double GetCurrentDiretionAngle
         {
             get
@@ -52,11 +52,18 @@ namespace DicingBlade.Classes
                 return Directions[CurrentAngleNum].angle;
             }
         }
+        public double GetCurrentDiretionActualAngle
+        {
+            get
+            {
+                return Directions[CurrentAngleNum].actualAngle;
+            }
+        }
         public double SetCurrentDirectionAngle
         {
             set
             {
-                Directions[CurrentAngleNum] = (value, Directions[CurrentAngleNum].indexShift);
+                Directions[CurrentAngleNum] = (Directions[CurrentAngleNum].angle, value, Directions[CurrentAngleNum].indexShift);
             }
         }
         public double AddToCurrentDirectionIndexShift
@@ -64,7 +71,7 @@ namespace DicingBlade.Classes
             set
             {
                 var shift = Directions[CurrentAngleNum].indexShift;
-                Directions[CurrentAngleNum] = (Directions[CurrentAngleNum].angle, shift + value);
+                Directions[CurrentAngleNum] = (Directions[CurrentAngleNum].angle, Directions[CurrentAngleNum].actualAngle, shift + value);
             }
         }
         public Wafer() { }
@@ -98,10 +105,10 @@ namespace DicingBlade.Classes
         }
         private void MakeDirections(List<double> list) 
         {
-            Directions = new List<(double, double)>();
+            Directions = new List<(double, double, double)>();
             foreach (var item in list)
             {
-                Directions.Add((item, 0));
+                Directions.Add((item, item, 0));
             }
         }
         public Wafer(Vector2 origin, double thickness, params (double degree, double length, double side, double index)[] directions)

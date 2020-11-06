@@ -212,6 +212,7 @@
     <Compile Include="Converters\TranslateConverter.cs" />
     <Compile Include="Converters\VisibilityConverter.cs" />
     <Compile Include="Classes\WaferView.cs" />
+    <Compile Include="Converters\WaferViewToPathConverter.cs" />
     <Compile Include="Converters\ZIndicatorConverter.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="ViewModels\MachineSettingsViewModel.cs" />

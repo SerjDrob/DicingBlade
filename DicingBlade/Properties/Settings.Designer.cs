@@ -97,7 +97,7 @@ namespace DicingBlade.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("30")]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
         public uint YVelHigh {
             get {
                 return ((uint)(this["YVelHigh"]));
