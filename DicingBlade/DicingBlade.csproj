@@ -85,6 +85,9 @@
     <Reference Include="CommonServiceLocator, Version=2.0.2.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
       <HintPath>..\packages\CommonServiceLocator.2.0.2\lib\net45\CommonServiceLocator.dll</HintPath>
     </Reference>
+    <Reference Include="EasyModbus, Version=5.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\EasyModbusTCP.5.5.0\lib\EasyModbus.dll</HintPath>
+    </Reference>
     <Reference Include="FluentValidation, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7de548da2fbae0f0, processorArchitecture=MSIL">
       <HintPath>..\packages\FluentValidation.8.6.2\lib\net45\FluentValidation.dll</HintPath>
     </Reference>
@@ -197,10 +200,12 @@
     <Compile Include="Converters\ConditionConverter.cs" />
     <Compile Include="Classes\Grid.cs" />
     <Compile Include="Classes\Map.cs" />
+    <Compile Include="Converters\DisableBindingConverter.cs" />
     <Compile Include="Converters\DoubleToDurationConverter.cs" />
     <Compile Include="Converters\GetRatioConverter.cs" />
     <Compile Include="Converters\InvertVisibilityConverter.cs" />
     <Compile Include="Converters\MatchEnumVisibilityConverter.cs" />
+    <Compile Include="Converters\MulZeroConverter.cs" />
     <Compile Include="Converters\RadioEnumConverter.cs" />
     <Compile Include="Converters\ScaleConverter.cs" />
     <Compile Include="Classes\StatMethods.cs" />

@@ -15,22 +15,22 @@ namespace DicingBlade.Classes
         {
             if (values.Length > 1)
             {
-                double length = System.Convert.ToDouble(values[0]);                
+                double length = System.Convert.ToDouble(values[0]);
                 int pointNum = System.Convert.ToInt32(values[1]);
                 double lengthRatio = System.Convert.ToDouble(parameter);
                 switch (pointNum)
                 {
                     case 1: return length * (1 - lengthRatio) / 2;
-                    case 2: return length * (1 + lengthRatio) / 2;                   
+                    case 2: return length * (1 + lengthRatio) / 2;
                     default:
-                        return 0;                        
+                        return 0;
                 }
             }
-            else 
+            else
             {
                 return System.Convert.ToDouble(values[0]) / 2;
             }
-            
+
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

@@ -16,6 +16,7 @@ using AForge.Video.DirectShow;
 using DicingBlade.Properties;
 using netDxf;
 using PropertyChanged;
+using EasyModbus;
 
 namespace DicingBlade.Classes
 {
@@ -69,19 +70,19 @@ namespace DicingBlade.Classes
         private bool tokenXY = true;
         private Velocity velocityRegime;
         private IntPtr XYhandle = IntPtr.Zero;
-
+        private ModbusClient _spindleModbus;
         public Machine(bool test) // В конструкторе происходит инициализация всех устройств, загрузка параметров.
         {
             testRegime = test;
 
             if (!testRegime)
             {
-                StartCamera();
+                _spindleModbus = new ModbusClient("COM1");
+                StartCamera();                
                 DevicesConnection();
                 SetConfigs();
                 VelocityRegime = Velocity.Slow;
-                OnAirWanished += EMGScenario;
-                
+                OnAirWanished += EMGScenario;                
                 VelocityRegime = Velocity.Fast;
                 RefreshSettings();
             }
@@ -139,6 +140,8 @@ namespace DicingBlade.Classes
         public double CameraFocus { get; set; }
         public bool SpindleWater { get; set; }
         public bool CoolantWater { get; set; }
+        public double SpindleFreq { get; set; }
+        public double SpindleCurrent { get; set; }
 
         public bool SwitchOnCoolantWater
         {
@@ -193,8 +196,6 @@ namespace DicingBlade.Classes
         ///     Координата касания диском стола
         /// </summary>
         public double ZBladeTouch { get; set; }
-
-        
 
         //private IntPtr Hand(AxisDirections direction)
         //{
@@ -403,10 +404,38 @@ namespace DicingBlade.Classes
                 return false;
             }
 
+            _spindleModbus.Connect();
+
             if (m_bInit) MachineInit = true;
+
             return true;
         }
 
+        public void SpindleModbus() 
+        {
+            //ModbusClient modbusClient = new ModbusClient("COM1");
+            //modbusClient.UnitIdentifier = 1; Not necessary since default slaveID = 1;
+            //modbusClient.Baudrate = 9600;	// Not necessary since default baudrate = 9600
+            //modbusClient.Parity = System.IO.Ports.Parity.None;
+            //modbusClient.StopBits = System.IO.Ports.StopBits.Two;
+            //modbusClient.ConnectionTimeout = 500;			
+            //modbusClient.Connect();
+            //modbusClient.ConnectionTimeout = 100;
+            //Console.WriteLine("Value of Discr. Input #1: " + modbusClient.ReadHoldingRegisters(0xF004, 1)[0].ToString());  //Reads Discrete Input #1
+            _spindleModbus.WriteSingleRegister(0x1001, 0x0001);
+            //Console.WriteLine("Value of Input Reg. #10: " + modbusClient.ReadInputRegisters(9, 1)[0].ToString());   //Reads Inp. Reg. #10
+
+            //modbusClient.WriteSingleCoil(4, true);      //Writes Coil #5
+            //modbusClient.WriteSingleRegister(19, 4711); //Writes Holding Reg. #20
+
+            //Console.WriteLine("Value of Coil #5: " + modbusClient.ReadCoils(4, 1)[0].ToString());   //Reads Discrete Input #1
+            //Console.WriteLine("Value of Holding Reg.. #20: " + modbusClient.ReadHoldingRegisters(19, 1)[0].ToString()); //Reads Inp. Reg. #10
+            //modbusClient.WriteMultipleRegisters(49, new int[10] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 });
+            //modbusClient.WriteMultipleCoils(29, new bool[10] { true, true, true, true, true, true, true, true, true, true, });
+
+            //Console.Write("Press any key to continue . . . ");
+            //Console.ReadKey(true);
+        }
         public void SetConfigs()
         {
             var XAcc = Settings.Default.XAcc;
@@ -951,7 +980,9 @@ namespace DicingBlade.Classes
             uint res = 0;
             while (true)
             {
-                CheckSensors();
+                CheckSensors();                
+                SpindleFreq = _spindleModbus.ReadHoldingRegisters(0xD000, 1)[0]/10;
+                SpindleCurrent = _spindleModbus.ReadHoldingRegisters(0xD001, 1)[0]/10;
                 if (!testRegime)
                 {
                     res = Motion.mAcm_CheckMotionEvent(m_DeviceHandle, AxEvtStatusArray, GpEvtStatusArray, m_ulAxisCount, 0, 10);                
@@ -987,14 +1018,16 @@ namespace DicingBlade.Classes
                         ////trig.trigger(Air, (dI)=>OnAirWanished);
                         ///
 
-                        if (res == (uint) ErrorCode.SUCCESS)
+                        if (res == (uint)ErrorCode.SUCCESS)
+                        {
                             for (var i = 0; i < axes.Length; i++)
                             {
-                                if ((AxEvtStatusArray[i] & (uint) EventType.EVT_AX_MOTION_DONE) > 0)
+                                if ((AxEvtStatusArray[i] & (uint)EventType.EVT_AX_MOTION_DONE) > 0)
                                     axes[i].MotionDone = true;
 
-                                if ((AxEvtStatusArray[i] & (uint) EventType.EVT_AX_HOME_DONE) > 0) axes[i].HomeDone = true;
+                                if ((AxEvtStatusArray[i] & (uint)EventType.EVT_AX_HOME_DONE) > 0) axes[i].HomeDone = true;
                             }
+                        }
                     }
                 }
                 Thread.Sleep(1);

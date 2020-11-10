@@ -1,4 +1,7 @@
-﻿using System;
+﻿
+//#nullable enable
+
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -16,6 +19,7 @@ using System.Windows;
 using System.Windows.Forms;
 using MessageBox = System.Windows.Forms.MessageBox;
 using System.Reflection.PortableExecutable;
+using System.Windows.Media;
 
 namespace DicingBlade.Classes
 {
@@ -85,6 +89,7 @@ namespace DicingBlade.Classes
         private double BladeTransferGapZ /*{ get; set; }*/ = 1;
         private bool IsCutting { get; set; } = false;
         private bool InProcess { get; set; } = false;
+        public bool CutsRotate { get; set; } = false;
         //private bool procToken = true;
         private bool _pauseProcess;
         public bool PauseProcess 
@@ -146,6 +151,7 @@ namespace DicingBlade.Classes
             Machine = machine;
             Wafer = wafer;
             Blade = blade;
+            Traces = new ObservableCollection<TracePath>();
             BaseProcess = proc;
             CancelProcess = false;
             FeedSpeed = PropContainer.Technology.FeedSpeed;            
@@ -218,12 +224,7 @@ namespace DicingBlade.Classes
                 }
                 Rotation = true;
                 GetRotation(deltaAngle, time);
-                await Machine.U.MoveAxisInPosAsync(angle);
-                //if (traces.Count != 0) 
-                //{
-                //    traces.Select(t => t.InitAngle += deltaAngle).ToList();
-                //    Traces = new ObservableCollection<TracePath>(traces);
-                //}
+                await Machine.U.MoveAxisInPosAsync(angle);                
                 Rotation = false;
             }
 
@@ -327,10 +328,18 @@ namespace DicingBlade.Classes
                     tracingThread.Start();
                     await Machine.X.MoveAxisInPosAsync(target.X);
                     IsCutting = false;
-                    tracingThread.Abort();                   
-                    traces.Add(TracingLine);
+                    tracingThread.Abort();
+                    //traces.Add(TracingLine);
+
+                    RotateTransform rotateTransform = new RotateTransform(
+                        30,
+                        Machine.BladeChuckCenter.X,
+                        Machine.BladeChuckCenter.Y
+                        );
                     
-                    Traces = new ObservableCollection<TracePath>(traces);
+                    var point1 = rotateTransform.Transform(new System.Windows.Point(traceX, traceY));
+                    var point2 = rotateTransform.Transform(new System.Windows.Point(Machine.X.ActualPosition, traceY));
+                    Traces.Add(new TracePath(point1.Y, point1.X, point2.X, angle)); /*new ObservableCollection<TracePath>(traces);*/
                     
                     Machine.SwitchOnCoolantWater = false;
                     if (!Wafer.CurrentCutIncrement(CurrentLine))
@@ -359,8 +368,7 @@ namespace DicingBlade.Classes
                     break;
                 case Diagram.goWaferCenterXY:
                     if (BladeInWafer) break;
-                    Machine.SetVelocity(Velocity.Service);
-                    Machine m;
+                    Machine.SetVelocity(Velocity.Service);                  
                     
                     await Machine.MoveInPosXYAsync(Machine.CameraChuckCenter);
                     break;
@@ -388,7 +396,9 @@ namespace DicingBlade.Classes
                     if (InProcess & SideDone /*| ProcessStatus == Status.Learning*/) //if the blade isn't in the wafer
                     {
                         Machine.SetVelocity(Velocity.Service);
+                       
                         await MoveNextDirAsync();
+                        
                         SideDone = false;
                         CurrentLine = 0;
                         SideCounter++;
@@ -426,15 +436,15 @@ namespace DicingBlade.Classes
                     if (Wafer.NextDir())
                     {
                         Machine.SetVelocity(Velocity.Service);
-
                         await MoveNextDirAsync(false);
                         await ProcElementDispatcherAsync(Diagram.goCameraPointLearningXYZ);
                     }
                     else
                     {
                         ProcessStatus = Status.Working;                        
-                        //Traces = new ObservableCollection<Line>();
+                        
                         traces = new List<TracePath>();
+                        
                         DoProcessAsync(BaseProcess);
                     }
                     break;

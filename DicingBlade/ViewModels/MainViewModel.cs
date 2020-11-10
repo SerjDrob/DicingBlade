@@ -38,6 +38,7 @@ namespace DicingBlade.ViewModels
         public Process Process { get; set; }
         public Wafer Wafer { get; set; }
         public WaferView WaferView { get; set; }
+        public ObservableCollection<TracePath> Traces { get; set; }
         public double WVAngle { get; set; }        
         public bool WVRotate { get; set; } = false;
         public double RotatingTime { get; set; } = 1;        
@@ -101,7 +102,7 @@ namespace DicingBlade.ViewModels
                 Diagram.goTransferingHeightZ,
                 Diagram.goNextDirection
             };
-
+            Traces = new ObservableCollection<TracePath>();
             // machine = new Machine();
             //  machine.OnAirWanished += Machine_OnAirWanished;
             
@@ -113,6 +114,7 @@ namespace DicingBlade.ViewModels
             RotatingTime = time;
             WVRotate ^= true;
         }
+        
         private void Machine_OnAirWanished(DIEventArgs eventArgs)
         {
             throw new NotImplementedException();
@@ -138,7 +140,8 @@ namespace DicingBlade.ViewModels
             //test key
             if(key.Key==Key.Tab)
             {
-                WVRotate ^= true;
+                Machine.SpindleModbus();
+                //WVRotate ^= true;
                 //Machine.GoTest();
                 //if(process==null) process = new Process(Machine, Wafer, new Blade());
                 //await process.ProcElementDispatcherAsync(Diagram.goCameraPointLearningXYZ);
