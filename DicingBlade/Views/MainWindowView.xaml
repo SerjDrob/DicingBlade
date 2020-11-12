@@ -494,6 +494,7 @@
                         </MultiBinding>
                     </Path.Data>
                 </Path>
+                
                 <ItemsControl Name="BladeTraces" ItemsSource="{Binding Process.Traces}" Panel.ZIndex="4">
                     
                     <ItemsControl.RenderTransform>
@@ -992,7 +993,7 @@
                                     <MultiBinding Converter="{StaticResource GetRatioConverter}">
                                         <Binding Path="ActualWidth"
                                                  RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                                        <Binding Path="1" FallbackValue="100"></Binding>
+                                        <Binding Path="" FallbackValue="100"></Binding>
                                     </MultiBinding>
                                 </ScaleTransform.ScaleX>
                                 <ScaleTransform.ScaleY>

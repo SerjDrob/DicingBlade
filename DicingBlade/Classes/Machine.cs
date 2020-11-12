@@ -86,6 +86,9 @@ namespace DicingBlade.Classes
                 VelocityRegime = Velocity.Fast;
                 RefreshSettings();
             }
+            SwitchOnBlowing = false;
+            SwitchOnChuckVacuum = false;
+            SwitchOnCoolantWater = false;
             var threadCurrentState = new Thread(MachineState);
             threadCurrentState.Start();
         }
@@ -142,7 +145,7 @@ namespace DicingBlade.Classes
         public bool CoolantWater { get; set; }
         public double SpindleFreq { get; set; }
         public double SpindleCurrent { get; set; }
-
+        
         public bool SwitchOnCoolantWater
         {
             get
@@ -152,7 +155,7 @@ namespace DicingBlade.Classes
             }
             set
             {
-                if (!testRegime) U.SetDo(DO.OUT4, (byte) (value ? 1 : 0));
+                if (!testRegime) U.SetDo(DO.OUT4, (byte) (value ? 1 : 0));                
             }
         }
 
@@ -161,7 +164,7 @@ namespace DicingBlade.Classes
         public bool SwitchOnChuckVacuum
         {
             get
-            {
+            {                
                 if (!testRegime) return Z.GetDO(DO.OUT5);
                 return false;
             }
@@ -176,7 +179,7 @@ namespace DicingBlade.Classes
         public bool SwitchOnBlowing
         {
             get
-            {
+            {                
                 if (!testRegime) return Z.GetDO(DO.OUT6);
                 return false;
             }
@@ -981,8 +984,8 @@ namespace DicingBlade.Classes
             while (true)
             {
                 CheckSensors();                
-                SpindleFreq = _spindleModbus.ReadHoldingRegisters(0xD000, 1)[0]/10;
-                SpindleCurrent = _spindleModbus.ReadHoldingRegisters(0xD001, 1)[0]/10;
+                //SpindleFreq = _spindleModbus.ReadHoldingRegisters(0xD000, 1)[0]/10;
+                //SpindleCurrent = _spindleModbus.ReadHoldingRegisters(0xD001, 1)[0]/10;
                 if (!testRegime)
                 {
                     res = Motion.mAcm_CheckMotionEvent(m_DeviceHandle, AxEvtStatusArray, GpEvtStatusArray, m_ulAxisCount, 0, 10);                
@@ -1244,13 +1247,15 @@ namespace DicingBlade.Classes
         public bool GetDO(DO dout)
         {
             byte bit = 0;
-            Motion.mAcm_AxDoGetBit(Handle, (ushort) dout, ref bit);
+            var result = Motion.mAcm_AxDoGetBit(Handle, (ushort) dout, ref bit);            
             return bit != 0 ? true : false;
         }
 
         public bool SetDo(DO dout, byte val)
-        {
-            return Motion.mAcm_AxDoSetBit(Handle, (ushort) dout, val) == (uint) ErrorCode.SUCCESS ? true : false;
+        {            
+            var result = Motion.mAcm_AxDoSetBit(Handle, (ushort)dout, val);
+            Thread.Sleep(100);
+            return  result == (uint) ErrorCode.SUCCESS;
         }
 
         /// <summary>
