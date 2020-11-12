@@ -47,8 +47,8 @@ namespace DicingBlade.ViewModels
         private int[] cols;
         private int[] rows;
         private bool test;        
-        public Map Condition { get; set; }        
-        public double Thickness { get; set; }        
+        public Map Condition { get; set; }
+        public double Thickness { get; set; } = 1;        
         public bool Test { get; set; }      
         public int[] Rows
         {

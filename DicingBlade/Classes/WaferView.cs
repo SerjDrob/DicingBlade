@@ -21,6 +21,10 @@ namespace DicingBlade.Classes
             ShapeSize = GetSize();
             this.Angle = 0;
         }
+        public WaferView() 
+        {
+            RawLines = new ObservableCollection<Line>();
+        }
         public bool IsRound { get; set; }        
         public double Angle { get; set; }
         public ObservableCollection<Line> RawLines { get; set; }

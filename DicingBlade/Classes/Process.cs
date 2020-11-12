@@ -82,6 +82,7 @@ namespace DicingBlade.Classes
         public Visibility CutWidthMarkerVisibility { get; set; } = Visibility.Hidden;
         public Status ProcessStatus { get; set; }
         public TracePath TracingLine { get; set; }
+        public WaferView TracesView { get; set; }
         public ObservableCollection<TracePath> Traces { get; set; }
         public double CutWidth { get; set; } = 0.05;
         public double CutOffset { get; set; } = 0;
@@ -89,7 +90,7 @@ namespace DicingBlade.Classes
         private double BladeTransferGapZ /*{ get; set; }*/ = 1;
         private bool IsCutting { get; set; } = false;
         private bool InProcess { get; set; } = false;
-        public bool CutsRotate { get; set; } = false;
+        public bool CutsRotate { get; set; } = true;
         //private bool procToken = true;
         private bool _pauseProcess;
         public bool PauseProcess 
@@ -152,6 +153,7 @@ namespace DicingBlade.Classes
             Wafer = wafer;
             Blade = blade;
             Traces = new ObservableCollection<TracePath>();
+            TracesView = new WaferView();
             BaseProcess = proc;
             CancelProcess = false;
             FeedSpeed = PropContainer.Technology.FeedSpeed;            
@@ -332,15 +334,23 @@ namespace DicingBlade.Classes
                     //traces.Add(TracingLine);
 
                     RotateTransform rotateTransform = new RotateTransform(
-                        30,
+                        -Wafer.GetCurrentDiretionAngle,
                         Machine.BladeChuckCenter.X,
                         Machine.BladeChuckCenter.Y
                         );
                     
                     var point1 = rotateTransform.Transform(new System.Windows.Point(traceX, traceY));
                     var point2 = rotateTransform.Transform(new System.Windows.Point(Machine.X.ActualPosition, traceY));
-                    Traces.Add(new TracePath(point1.Y, point1.X, point2.X, angle)); /*new ObservableCollection<TracePath>(traces);*/
+                    point1 = new TranslateTransform(-Machine.BladeChuckCenter.X, -Machine.BladeChuckCenter.Y).Transform(point1);
+                    point2 = new TranslateTransform(-Machine.BladeChuckCenter.X, -Machine.BladeChuckCenter.Y).Transform(point2);
+
                     
+                    TracesView.RawLines.Add(new Line(
+                        new Vector2(point1.X, point1.Y),
+                        new Vector2(point2.X, point2.Y)
+                        ));
+                    TracesView.RawLines = new ObservableCollection<Line>(TracesView.RawLines);
+                    TracingLine = null;
                     Machine.SwitchOnCoolantWater = false;
                     if (!Wafer.CurrentCutIncrement(CurrentLine))
                     {
@@ -396,9 +406,9 @@ namespace DicingBlade.Classes
                     if (InProcess & SideDone /*| ProcessStatus == Status.Learning*/) //if the blade isn't in the wafer
                     {
                         Machine.SetVelocity(Velocity.Service);
-                       
+                        //CutsRotate = true;
                         await MoveNextDirAsync();
-                        
+                        //CutsRotate = false;
                         SideDone = false;
                         CurrentLine = 0;
                         SideCounter++;

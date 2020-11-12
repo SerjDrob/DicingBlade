@@ -265,7 +265,7 @@ namespace DicingBlade.Classes
             LocalWebCamsCollection = new FilterInfoCollection(FilterCategory.VideoInputDevice);
             try
             {
-                LocalWebCam = new VideoCaptureDevice(LocalWebCamsCollection[1].MonikerString);
+                LocalWebCam = new VideoCaptureDevice(LocalWebCamsCollection[0].MonikerString);
             } //1
             catch
             {
