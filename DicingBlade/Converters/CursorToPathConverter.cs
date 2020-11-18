@@ -23,6 +23,7 @@ namespace DicingBlade.Classes
             double yOffset = 0;
             double shapeX = 0;
             double shapeY = 0;
+            double shift = 0;
             int selector = System.Convert.ToInt32(parameter);
             TranslateTransform translateTransform1x;
             TranslateTransform translateTransform2x;
@@ -47,6 +48,7 @@ namespace DicingBlade.Classes
                 yOffset = System.Convert.ToDouble(values[5]);
                 shapeX = System.Convert.ToDouble(values[6]);
                 shapeY = System.Convert.ToDouble(values[7]);
+                
                 if (shapeX > shapeY)
                 {
                     res = shapeX;
@@ -56,6 +58,10 @@ namespace DicingBlade.Classes
                 {
                     res = shapeY;
                     wh = actualHeight;
+                }
+                if (values.Count() == 9)
+                {
+                    shift = System.Convert.ToDouble(values[8]);
                 }
             }
             catch { }
@@ -69,9 +75,9 @@ namespace DicingBlade.Classes
             scaleTransformY = new ScaleTransform(1, wh / (1.4 * res));
 
             Point StartPointX = new Point(x, 0);
-            Point EndPointX = new Point(x,actualHeight);
-            Point StartPointY = new Point(0, y);
-            Point EndPointY = new Point(actualWidth,y);
+            Point EndPointX = new Point(x, actualHeight);
+            Point StartPointY = new Point(0, y + shift);
+            Point EndPointY = new Point(actualWidth, y + shift);
 
 
             StartPointX = translateTransform2x.Transform(scaleTransformX.Transform(translateTransform1x.Transform(StartPointX)));

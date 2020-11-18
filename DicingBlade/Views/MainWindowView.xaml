@@ -37,7 +37,9 @@
         <SolidColorBrush Color="MediumSpringGreen" x:Key="SignalGreen"/>
         <SolidColorBrush Color="IndianRed" x:Key="SignalRed"/>
         <System:Double x:Key="Zero">0</System:Double>
+        <System:Double x:Key="Hundred">100</System:Double>
         <System:Double x:Key="Ycoor">69.515</System:Double>
+        <System:Double x:Key="CutStrokeThickness">0.002</System:Double>
         <Storyboard x:Key="PathAnimation">
             <DoubleAnimation 
                 Storyboard.Target="{Binding ElementName=CutsView}"
@@ -122,6 +124,7 @@
                         <Button Grid.Row="2" Margin="3"/>
                         <Button Grid.Column="1" Grid.Row="2" Margin="3"/>
                         <Button Grid.Column="2" Grid.Row="2" Margin="3"/>
+                        
                         <Menu Grid.Row="1" BorderThickness="1" Margin="3" BorderBrush="DimGray"
                               Width="{Binding Path=ActualWidth,RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Menu}}"
                               Height="{Binding Path=ActualHeight,RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Menu}}"
@@ -130,7 +133,7 @@
                                 <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlLightColorKey}}"/>
                             </Menu.Background>
                             
-                            <MenuItem HorizontalAlignment="Center">
+                            <MenuItem HorizontalAlignment="Center" >
                                 <MenuItem.HeaderTemplate>
                                     <DataTemplate>
                                         <Grid
@@ -142,7 +145,7 @@
                                         </Grid>
                                     </DataTemplate>
                                 </MenuItem.HeaderTemplate>
-                                <MenuItem Header="_Масштаб видео"/>
+                                <MenuItem Header="_Масштаб видео" Command="{Binding ToTeachVideoScaleCmd}"/>
                                 <MenuItem Header="_Масштаб видео" Command="{Binding ToTeachChipSizeCmd}"/>
                                 <MenuItem Header="_Масштаб видео"/>
                                 <MenuItem Header="_Масштаб видео"/>
@@ -444,6 +447,7 @@
                             <Binding Path="Machine.BladeChuckCenter.Y"/>
                             <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
                             <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                            <Binding Path="DataContext.Wafer.GetCurrentDirectionIndexShift" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
                         </MultiBinding>
                     </Path.Data>
                     <Path.Style>
@@ -454,7 +458,7 @@
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
-                    </Path.Style>
+                    </Path.Style>                    
                 </Path>
                 <Path x:Name="CameraCursor" Stroke="OrangeRed" StrokeThickness="1" Panel.ZIndex="3">
                     <Path.Data>
@@ -467,6 +471,7 @@
                             <Binding Path="Machine.CameraChuckCenter.Y"/>
                             <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
                             <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                            <Binding Path="DataContext.Wafer.GetCurrentDirectionIndexShift" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
                         </MultiBinding>
                     </Path.Data>
                     <Path.Style>
@@ -491,10 +496,10 @@
                             <Binding Path="DataContext.Machine.BladeChuckCenter.Y" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
                             <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
                             <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                            <Binding Path="DataContext.Wafer.GetCurrentDirectionIndexShift" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
                         </MultiBinding>
-                    </Path.Data>
+                    </Path.Data>                    
                 </Path>
-
                 <Path   Name="TracesView"
                         Stroke="Black" Panel.ZIndex="2"                     
                         Data="{Binding Process.TracesView.RawLines, Converter={StaticResource WaferViewToPathConverter}}"
@@ -505,12 +510,12 @@
                             <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType=Canvas}"/>
                             <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
                             <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
-                            <Binding Path="DataContext.Thickness" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
+                            <Binding Path="DataContext.Thickness" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>                          
                         </MultiBinding>
                     </Path.StrokeThickness>
                     <Path.RenderTransform>
                         <TransformGroup>
-                            <RotateTransform></RotateTransform>
+                            <RotateTransform></RotateTransform>                         
                             <ScaleTransform>
                                 <ScaleTransform.ScaleX>
                                     <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
@@ -545,66 +550,6 @@
                         </TransformGroup>
                     </Path.RenderTransform>
                 </Path>
-
-                <!--<ItemsControl Name="BladeTraces" ItemsSource="{Binding Process.Traces}" Panel.ZIndex="4">
-                    
-                    <ItemsControl.RenderTransform>
-                        <TransformGroup>
-                            <RotateTransform>
-                                <RotateTransform.CenterX>
-                                    <MultiBinding Converter="{StaticResource CrossConverter}">
-                                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType=Canvas}"/>
-                                    </MultiBinding>
-                                </RotateTransform.CenterX>
-                                <RotateTransform.CenterY>
-                                    <MultiBinding Converter="{StaticResource CrossConverter}">
-                                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType=Canvas}"/>
-                                    </MultiBinding>
-                                </RotateTransform.CenterY>
-                            </RotateTransform>
-                        </TransformGroup>
-                    </ItemsControl.RenderTransform>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Canvas>                                
-                                <Path Stroke="Navy" StrokeThickness="2" StrokeDashArray="4 4">
-                                    <Path.Data>
-                                        <MultiBinding Converter="{StaticResource TraceConverter}">
-                                            <Binding Path="X"/>
-                                            <Binding Path="Y"/>
-                                            <Binding Path="Xend"/>
-                                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=2,AncestorType=Canvas}"/>
-                                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=2,AncestorType=Canvas}"/>
-                                            <Binding Path="DataContext.Machine.BladeChuckCenter.X" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
-                                            <Binding Path="DataContext.Machine.BladeChuckCenter.Y" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
-                                            <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
-                                            <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
-                                        </MultiBinding>
-                                    </Path.Data>
-                                   
-                                    --><!--<Path.RenderTransform>
-                                        <TransformGroup>
-                                            <RotateTransform>
-                                                <RotateTransform.CenterX>
-                                                    <MultiBinding Converter="{StaticResource CrossConverter}">
-                                                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=2,AncestorType=Canvas}"/>
-                                                    </MultiBinding>
-                                                </RotateTransform.CenterX>
-                                                <RotateTransform.CenterY>
-                                                    <MultiBinding Converter="{StaticResource CrossConverter}">
-                                                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorLevel=2,AncestorType=Canvas}"/>
-                                                    </MultiBinding>
-                                                </RotateTransform.CenterY>
-                                            </RotateTransform>
-                                            
-                                        </TransformGroup>
-                                    </Path.RenderTransform>--><!--
-                                </Path>
-                            </Canvas>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>-->
-                
                 <Line Name="AnglePosition" Stroke="YellowGreen" StrokeThickness="2"
                       X1="0"
                       X2="{Binding Path=ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}"
@@ -1003,14 +948,14 @@
                                     <MultiBinding Converter="{StaticResource GetRatioConverter}">
                                         <Binding Path="ActualWidth"
                                                  RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                                        <Binding Path="" FallbackValue="100"></Binding>
+                                        <Binding Source="{StaticResource Hundred}"/>
                                     </MultiBinding>
                                 </ScaleTransform.ScaleX>
                                 <ScaleTransform.ScaleY>
                                     <MultiBinding Converter="{StaticResource GetRatioConverter}">
                                         <Binding Path="ActualWidth"
                                                  RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                                        <Binding Path="" FallbackValue="100"></Binding>
+                                        <Binding Source="{StaticResource Hundred}"/>
                                     </MultiBinding>
                                 </ScaleTransform.ScaleY>
                             </ScaleTransform>                           
@@ -1044,14 +989,14 @@
                                     <MultiBinding Converter="{StaticResource GetRatioConverter}">
                                         <Binding Path="ActualWidth"
                                                  RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                                        <Binding Path="" FallbackValue="100"></Binding>
+                                        <Binding Source="{StaticResource Hundred}"></Binding>
                                     </MultiBinding>
                                 </ScaleTransform.ScaleX>
                                 <ScaleTransform.ScaleY>
                                     <MultiBinding Converter="{StaticResource GetRatioConverter}">
                                         <Binding Path="ActualWidth"
                                                  RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                                        <Binding Path="" FallbackValue="100"></Binding>
+                                        <Binding Source="{StaticResource Hundred}"></Binding>
                                     </MultiBinding>
                                 </ScaleTransform.ScaleY>
                             </ScaleTransform>
@@ -1067,7 +1012,7 @@
             >
                 <Rectangle.StrokeThickness>
                     <MultiBinding Converter="{StaticResource GetRatioConverter}">
-                        <Binding Path="" FallbackValue="0.002"></Binding>
+                        <Binding Source="{StaticResource CutStrokeThickness}"/>
                         <Binding Path="Machine.CameraScale"/>
                     </MultiBinding>
                 </Rectangle.StrokeThickness>

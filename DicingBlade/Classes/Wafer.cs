@@ -86,7 +86,14 @@ namespace DicingBlade.Classes
             {
                 var shift = Directions[CurrentAngleNum].indexShift;
                 Directions[CurrentAngleNum] = (Directions[CurrentAngleNum].angle, Directions[CurrentAngleNum].actualAngle, shift + value);
+                GetCurrentDirectionIndexShift = Directions[CurrentAngleNum].indexShift;
             }
+        }
+        double _currentShift;
+        public double GetCurrentDirectionIndexShift //{ get; set; }
+        {
+            set { _currentShift = value; }
+            get => - Directions[CurrentAngleNum].indexShift;
         }
         public Wafer() { }
         public void ResetWafer()

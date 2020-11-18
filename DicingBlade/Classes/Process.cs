@@ -24,6 +24,7 @@ using System.Windows.Media;
 namespace DicingBlade.Classes
 {
     public delegate void GetRotation(double angle, double time);
+    public delegate void ChangeScreens(bool regime);
     enum Diagram 
     {
         goWaferStartX,
@@ -78,6 +79,7 @@ namespace DicingBlade.Classes
         private readonly Wafer Wafer;
         private readonly Machine Machine;
         private readonly Blade Blade;
+        public ChangeScreens ChangeScreensEvent;
         public Visibility TeachVScaleMarkersVisibility { get; set; } = Visibility.Hidden;
         public Visibility CutWidthMarkerVisibility { get; set; } = Visibility.Hidden;
         public Status ProcessStatus { get; set; }
@@ -145,7 +147,7 @@ namespace DicingBlade.Classes
         private double FeedSpeed { get; set; }        
         //private bool Aligned { get; set; }
         //private double OffsetAngle { get; set; }
-        public GetRotation GetRotation;
+        public GetRotation GetRotationEvent;
         public bool Rotation { get; set; } = false;
         public Process(Machine machine, Wafer wafer, Blade blade,ITechnology technology, Diagram[] proc) // В конструкторе происходит загрузка технологических параметров
         {
@@ -225,7 +227,7 @@ namespace DicingBlade.Classes
                     time = Math.Abs(Wafer.GetCurrentDiretionActualAngle - Machine.U.ActualPosition) / Machine.U.GetVelocity();                    
                 }
                 Rotation = true;
-                GetRotation(deltaAngle, time);
+                GetRotationEvent(deltaAngle, time);
                 await Machine.U.MoveAxisInPosAsync(angle);                
                 Rotation = false;
             }
@@ -339,8 +341,8 @@ namespace DicingBlade.Classes
                         Machine.BladeChuckCenter.Y
                         );
                     
-                    var point1 = rotateTransform.Transform(new System.Windows.Point(traceX, traceY));
-                    var point2 = rotateTransform.Transform(new System.Windows.Point(Machine.X.ActualPosition, traceY));
+                    var point1 = rotateTransform.Transform(new System.Windows.Point(traceX, traceY+Wafer.GetCurrentDirectionIndexShift));
+                    var point2 = rotateTransform.Transform(new System.Windows.Point(Machine.X.ActualPosition, traceY+Wafer.GetCurrentDirectionIndexShift));
                     point1 = new TranslateTransform(-Machine.BladeChuckCenter.X, -Machine.BladeChuckCenter.Y).Transform(point1);
                     point2 = new TranslateTransform(-Machine.BladeChuckCenter.X, -Machine.BladeChuckCenter.Y).Transform(point2);
 
@@ -462,11 +464,13 @@ namespace DicingBlade.Classes
                     PauseProcess = true;
                     if (PauseProcess) await PauseScenarioAsync();
                     CutWidthMarkerVisibility = Visibility.Visible;
+                    ChangeScreensEvent(true);
                     ProcessStatus = Status.Correcting;
                     break;
                 case Status.Correcting:
                     var result  = MessageBox.Show($"Сместить следующие резы на {CutOffset} мм?","",MessageBoxButtons.OKCancel);
                     if(result == DialogResult.OK) Wafer.AddToCurrentDirectionIndexShift = CutOffset;
+                    ChangeScreensEvent(false);
                     ProcessStatus = Status.Working;
                     CutWidthMarkerVisibility = Visibility.Hidden;
                     CutOffset = 0;

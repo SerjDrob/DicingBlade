@@ -17,10 +17,12 @@ namespace DicingBlade.Classes
             double actualWidth = System.Convert.ToDouble(values[1]);
             double wh = 0;
             double res = 1;
+            double t = 0;
             try
             {
                 double shapeX = System.Convert.ToDouble(values[2]);
-                double shapeY = System.Convert.ToDouble(values[3]);                
+                double shapeY = System.Convert.ToDouble(values[3]); 
+                
                 if (shapeX > shapeY) 
                 {
                     res = shapeX;
@@ -35,7 +37,7 @@ namespace DicingBlade.Classes
             catch { }
             if (values.Length == 5)
             {
-                double t = System.Convert.ToDouble(values[4]);
+                t = System.Convert.ToDouble(values[4]);
                 return t /( wh / (1.4 * res));
             }
             else

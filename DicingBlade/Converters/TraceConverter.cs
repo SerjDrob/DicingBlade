@@ -24,6 +24,7 @@ namespace DicingBlade.Converters
             double yOffset = 0;
             double shapeX = 0;
             double shapeY = 0;
+            double shift = 0;
             int selector = System.Convert.ToInt32(parameter);
             TranslateTransform translateTransform1;
             TranslateTransform translateTransform2;
@@ -55,6 +56,7 @@ namespace DicingBlade.Converters
                     res = shapeY;
                     wh = actualHeight;
                 }
+                shift = System.Convert.ToDouble(values[9]);
             }
             catch
             {
@@ -64,8 +66,8 @@ namespace DicingBlade.Converters
             translateTransform2 = new TranslateTransform(ActualWidth / 2, actualHeight / 2);
             scaleTransform = new ScaleTransform(wh / (1.4 * res), wh / (1.4 * res));
 
-            Point StartPoint = new Point(x, y);
-            Point EndPoint = new Point(x1, y);
+            Point StartPoint = new Point(x, y + shift);
+            Point EndPoint = new Point(x1, y + shift);
 
             StartPoint = translateTransform2.Transform(scaleTransform.Transform(translateTransform1.Transform(StartPoint)));
             EndPoint = translateTransform2.Transform(scaleTransform.Transform(translateTransform1.Transform(EndPoint)));

@@ -29,7 +29,7 @@ namespace DicingBlade.ViewModels
         waterValve,
         vacuumValve
     }
-   
+    
     [AddINotifyPropertyChangedInterface]
     class MainViewModel
     {
@@ -76,6 +76,7 @@ namespace DicingBlade.ViewModels
         public ICommand MachineSettingsCmd { get; set; }
         public ICommand TechnologySettingsCmd { get; set; }
         public ICommand ToTeachChipSizeCmd { get; set; }
+        public ICommand ToTeachVideoScaleCmd { get; set; }
         public ICommand TestCmd { get; set; }
         public MainViewModel()
         {
@@ -92,7 +93,8 @@ namespace DicingBlade.ViewModels
             WaferSettingsCmd = new Command(args => WaferSettings());
             MachineSettingsCmd = new Command(args => MachineSettings());
             TechnologySettingsCmd = new Command(args => TechnologySettings());
-            ToTeachChipSizeCmd = new Command(args => ToTeachChipSize());
+            ToTeachChipSizeCmd = new Command(args => ToTeachChipSizeAsync());
+            ToTeachVideoScaleCmd = new Command(args => ToTeachVideoScaleAsync());
             TestCmd = new Command(args => Func(args));
             Machine = new Machine(Test);           
             BaseProcess = new Diagram[] {
@@ -127,11 +129,15 @@ namespace DicingBlade.ViewModels
         {
 
         }
-        private async Task ToTeachChipSize() 
+        private async Task ToTeachChipSizeAsync() 
         {
             await Process.ToTeachChipSizeAsync();
             new TempWafer(PropContainer.WaferTemp).SerializeObjectJson(Settings.Default.WaferLastFile);
             AjustWaferTechnology();
+        }
+        private async Task ToTeachVideoScaleAsync()
+        {
+            await Process.ToTeachVideoScale();
         }
         private async Task KeyDownAsync(object args) 
         {
@@ -179,7 +185,8 @@ namespace DicingBlade.ViewModels
                             await Machine.GoThereAsync(Place.CameraChuckCenter);
 
                             Process = new Process(Machine, Wafer, new Blade(), new Technology(), BaseProcess);
-                            Process.GetRotation += SetRotation;
+                            Process.GetRotationEvent += SetRotation;
+                            Process.ChangeScreensEvent += ChangeScreensRegime;
                             Process.ProcessStatus = Status.StartLearning;                        
                         }
                     
@@ -247,9 +254,7 @@ namespace DicingBlade.ViewModels
                 }
             }
             if (key.Key == Key.Home) 
-            {
-                Machine.ResetErrors();
-                Machine.VelocityRegime = Velocity.Fast;
+            {   
                 await Machine.GoThereAsync(Place.Home);
             }
             if (key.Key == Key.OemMinus) 
@@ -383,10 +388,23 @@ namespace DicingBlade.ViewModels
                 Wafer.SetPassCount(PropContainer.Technology.PassCount);
             }
         }
-        private void Change() 
+        private void Change()
         {
             Cols = new int[] { Cols[1], Cols[0] };
-            Rows = new int[] { Rows[1], Rows[0] };            
+            Rows = new int[] { Rows[1], Rows[0] };
+        }
+
+        private void ChangeScreensRegime(bool regime)
+        {
+            switch (regime)
+            {
+                case true:
+                    if (Cols[0] == 0) Change();
+                    break;
+                case false:
+                    if (Cols[0] == 1) Change();
+                    break;
+            }
         }
         private void OpenFile() 
         {
