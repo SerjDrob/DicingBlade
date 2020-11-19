@@ -1,13 +1,13 @@
 ﻿namespace DicingBlade.Classes
 {
-    class TracePath
+    internal class TracePath
     {
-        public TracePath(double Y, double X, double Xend, double InitAngle)
+        public TracePath(double y, double x, double xend, double initAngle)
         {
-            this.Y = Y;
-            this.X = X;
-            this.Xend = Xend;
-            this.InitAngle = InitAngle;
+            Y = y;
+            X = x;
+            Xend = xend;
+            InitAngle = initAngle;
         }
         public double Y { get; set; }
         public double X { get; set; }

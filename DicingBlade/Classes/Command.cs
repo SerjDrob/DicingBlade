@@ -1,21 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace DicingBlade.Classes
 {
-    class Command : ICommand
+    internal class Command : ICommand
     {
-        public event EventHandler CanExecuteChanged 
+        public event EventHandler CanExecuteChanged
         {
-            add { CommandManager.RequerySuggested += value; }
-            remove { CommandManager.RequerySuggested -= value; }
+            add => CommandManager.RequerySuggested += value;
+            remove => CommandManager.RequerySuggested -= value;
         }
 
-        public Command(Action<object> action, Func<object,bool> func = null) 
+        public Command(Action<object> action, Func<object, bool> func = null)
         {
             ExecuteDelegate = action;
         }
@@ -23,7 +19,7 @@ namespace DicingBlade.Classes
         public Action<object> ExecuteDelegate { get; set; }
         public bool CanExecute(object parameter)
         {
-            if (CanExecuteDelegate != null) 
+            if (CanExecuteDelegate != null)
             {
                 return CanExecuteDelegate(parameter);
             }
