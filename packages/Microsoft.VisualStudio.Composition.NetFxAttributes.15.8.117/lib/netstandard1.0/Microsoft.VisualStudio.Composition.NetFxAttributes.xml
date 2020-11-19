@@ -1,0 +1,631 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Microsoft.VisualStudio.Composition.NetFxAttributes</name>
+    </assembly>
+    <members>
+        <member name="T:System.ComponentModel.Composition.CompositionException">
+            <summary>
+            Represents the exception that is thrown when one or more errors occur during
+            composition in a System.ComponentModel.Composition.Hosting.CompositionContainer
+            object.
+            </summary>
+        </member>
+        <member name="T:System.ComponentModel.Composition.CreationPolicy">
+            <summary>
+            Specifies when and how a part will be instantiated.
+            </summary>
+        </member>
+        <member name="F:System.ComponentModel.Composition.CreationPolicy.Any">
+            <summary>
+            Specifies that the System.ComponentModel.Composition.Hosting.CompositionContainer
+            will use the most appropriate System.ComponentModel.Composition.CreationPolicy
+            for the part given the current context. This is the default System.ComponentModel.Composition.CreationPolicy.
+            By default, System.ComponentModel.Composition.Hosting.CompositionContainer will
+            use System.ComponentModel.Composition.CreationPolicy.Shared, unless the System.ComponentModel.Composition.Primitives.ComposablePart
+            or importer requests System.ComponentModel.Composition.CreationPolicy.NonShared.
+            </summary>
+        </member>
+        <member name="F:System.ComponentModel.Composition.CreationPolicy.Shared">
+            <summary>
+            Specifies that a single shared instance of the associated System.ComponentModel.Composition.Primitives.ComposablePart
+            will be created by the System.ComponentModel.Composition.Hosting.CompositionContainer
+            and shared by all requestors.
+            </summary>
+        </member>
+        <member name="F:System.ComponentModel.Composition.CreationPolicy.NonShared">
+            <summary>
+            Specifies that a new non-shared instance of the associated System.ComponentModel.Composition.Primitives.ComposablePart
+            will be created by the System.ComponentModel.Composition.Hosting.CompositionContainer
+            for every requestor.
+            </summary>
+        </member>
+        <member name="T:System.ComponentModel.Composition.ExportAttribute">
+            <summary>
+                Specifies that a type, property, field, or method provides a particular export.
+            </summary>
+        </member>
+        <member name="M:System.ComponentModel.Composition.ExportAttribute.#ctor">
+            <summary>
+                Initializes a new instance of the <see cref="T:System.ComponentModel.Composition.ExportAttribute"/> class, exporting the
+                type or member marked with this attribute under the default contract name.
+            </summary>
+        </member>
+        <member name="M:System.ComponentModel.Composition.ExportAttribute.#ctor(System.Type)">
+            <summary>
+                Initializes a new instance of the <see cref="T:System.ComponentModel.Composition.ExportAttribute"/> class, exporting the
+                type or member marked with this attribute under a contract name derived from the
+                specified type.
+            </summary>
+            <param name="contractType">
+                A <see cref="T:System.Type"/> of which to derive the contract name to export the type or
+                member marked with this attribute, under; or <see langword="null"/> to use the
+                default contract name.
+            </param>
+        </member>
+        <member name="M:System.ComponentModel.Composition.ExportAttribute.#ctor(System.String)">
+            <summary>
+                Initializes a new instance of the <see cref="T:System.ComponentModel.Composition.ExportAttribute"/> class, exporting the
+                type or member marked with this attribute under the specified contract name.
+            </summary>
+            <param name="contractName">
+                 A <see cref="T:System.String"/> containing the contract name to export the type or member
+                 marked with this attribute, under; or <see langword="null"/> or an empty string
+                 ("") to use the default contract name.
+            </param>
+        </member>
+        <member name="M:System.ComponentModel.Composition.ExportAttribute.#ctor(System.String,System.Type)">
+            <summary>
+                Initializes a new instance of the <see cref="T:System.ComponentModel.Composition.ExportAttribute"/> class, exporting the
+                type or member marked with this attribute under the specified contract name.
+            </summary>
+            <param name="contractName">
+                 A <see cref="T:System.String"/> containing the contract name to export the type or member
+                 marked with this attribute, under; or <see langword="null"/> or an empty string
+                 ("") to use the default contract name.
+            </param>
+            <param name="contractType">
+                A <see cref="T:System.Type"/> of which to derive the contract name to export the type or
+                member marked with this attribute, under; or <see langword="null"/> to use the
+                default contract name.
+            </param>
+        </member>
+        <member name="P:System.ComponentModel.Composition.ExportAttribute.ContractName">
+            <summary>
+                Gets the contract name to export the type or member under.
+            </summary>
+            <value>
+                 A <see cref="T:System.String"/> containing the contract name to export the type or member
+                 marked with this attribute, under. The default value is an empty string ("").
+            </value>
+        </member>
+        <member name="P:System.ComponentModel.Composition.ExportAttribute.ContractType">
+            <summary>
+                Gets the contract type that is exported by the member that this attribute is attached to.
+            </summary>
+            <value>
+                A <see cref="T:System.Type"/> of the export that is be provided. The default value is
+                <see langword="null"/> which means that the type will be obtained by looking at the type on
+                the member that this export is attached to.
+            </value>
+        </member>
+        <member name="T:System.ComponentModel.Composition.ExportFactory`1">
+            <summary>
+            A factory that creates new instances of a part that provides the specified export.
+            </summary>
+            <typeparam name="T">The type of the export.</typeparam>
+        </member>
+        <member name="F:System.ComponentModel.Composition.ExportFactory`1.exportLifetimeContextCreator">
+            <summary>
+            A function that returns the exported value and an System.Action that releases it.
+            </summary>
+        </member>
+        <member name="M:System.ComponentModel.Composition.ExportFactory`1.#ctor(System.Func{System.Tuple{`0,System.Action}})">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.ComponentModel.Composition.ExportFactory`1"/> class.
+            </summary>
+            <param name="exportLifetimeContextCreator">
+            A function that returns the exported value and an System.Action that releases it.
+            </param>
+        </member>
+        <member name="M:System.ComponentModel.Composition.ExportFactory`1.CreateExport">
+            <summary>
+            Creates an instance of the factory's export type.
+            </summary>
+            <returns>A valid instance of the factory's exported type.</returns>
+        </member>
+        <member name="T:System.ComponentModel.Composition.ExportFactory`2">
+            <summary>
+            A factory that creates new instances of a part that provides the specified export, with attached metadata.
+            </summary>
+            <typeparam name="T">The type of the created part.</typeparam>
+            <typeparam name="TMetadata">The type of the created part's metadata.</typeparam>
+        </member>
+        <member name="M:System.ComponentModel.Composition.ExportFactory`2.#ctor(System.Func{System.Tuple{`0,System.Action}},`1)">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.ComponentModel.Composition.ExportFactory`2"/> class.
+            </summary>
+            <param name="exportLifetimeContextCreator">
+            A function that returns the exported value and an System.Action that releases it.
+            </param>
+            <param name="metadata">The metadata to attach to the created parts.</param>
+        </member>
+        <member name="P:System.ComponentModel.Composition.ExportFactory`2.Metadata">
+            <summary>
+            Gets the metadata to be attached to the created parts.
+            </summary>
+            <value>
+            A metadata object that will be attached to the created parts.
+            </value>
+        </member>
+        <member name="T:System.ComponentModel.Composition.ExportLifetimeContext`1">
+            <summary>
+            Holds an exported value created by an <see cref="T:System.ComponentModel.Composition.ExportFactory`1"/>
+            object and a reference to a method to release that object.
+            </summary>
+            <typeparam name="T">The type of the exported value.</typeparam>
+        </member>
+        <member name="F:System.ComponentModel.Composition.ExportLifetimeContext`1.disposeAction">
+            <summary>
+            A reference to a method to release the object.
+            </summary>
+        </member>
+        <member name="M:System.ComponentModel.Composition.ExportLifetimeContext`1.#ctor(`0,System.Action)">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.ComponentModel.Composition.ExportLifetimeContext`1"/> class.
+            </summary>
+            <param name="value">The exported value.</param>
+            <param name="disposeAction">A reference to a method to release the object.</param>
+        </member>
+        <member name="P:System.ComponentModel.Composition.ExportLifetimeContext`1.Value">
+            <summary>
+            Gets the exported value of a <see cref="T:System.ComponentModel.Composition.ExportFactory`1"/> object.
+            </summary>
+            <value>The exported value.</value>
+        </member>
+        <member name="M:System.ComponentModel.Composition.ExportLifetimeContext`1.Dispose">
+            <summary>
+            Releases all resources used by the current instance of the <see cref="T:System.ComponentModel.Composition.ExportLifetimeContext`1"/>
+            class, including its associated export.
+            </summary>
+        </member>
+        <member name="T:System.ComponentModel.Composition.ExportMetadataAttribute">
+            <summary>
+                Specifies metadata for a type, property, field, or method marked with the
+                <see cref="T:System.ComponentModel.Composition.ExportAttribute"/>.
+            </summary>
+        </member>
+        <member name="M:System.ComponentModel.Composition.ExportMetadataAttribute.#ctor(System.String,System.Object)">
+            <summary>
+                Initializes a new instance of the <see cref="T:System.ComponentModel.Composition.ExportMetadataAttribute"/> class with the
+                specified name and metadata value.
+            </summary>
+            <param name="name">
+                A <see cref="T:System.String"/> containing the name of the metadata value; or
+                <see langword="null"/> to set the <see cref="P:System.ComponentModel.Composition.ExportMetadataAttribute.Name"/> property to an empty
+                string ("").
+            </param>
+            <param name="value">
+                An <see cref="T:System.Object"/> containing the metadata value. This can be
+                <see langword="null"/>.
+            </param>
+        </member>
+        <member name="P:System.ComponentModel.Composition.ExportMetadataAttribute.Name">
+            <summary>
+                Gets the name of the metadata value.
+            </summary>
+            <value>
+                A <see cref="T:System.String"/> containing the name of the metadata value.
+            </value>
+        </member>
+        <member name="P:System.ComponentModel.Composition.ExportMetadataAttribute.Value">
+            <summary>
+                Gets the metadata value.
+            </summary>
+            <value>
+                An <see cref="T:System.Object"/> containing the metadata value.
+            </value>
+        </member>
+        <member name="P:System.ComponentModel.Composition.ExportMetadataAttribute.IsMultiple">
+            <summary>
+            Gets or sets a value indicating whether this item is marked with this attribute
+            more than once.
+            </summary>
+            <value>true if the item is marked more than once; otherwise, false.</value>
+        </member>
+        <member name="T:System.ComponentModel.Composition.ImportAttribute">
+            <summary>
+                Specifies that a property, field, or parameter imports a particular export.
+            </summary>
+        </member>
+        <member name="M:System.ComponentModel.Composition.ImportAttribute.#ctor">
+            <summary>
+                Initializes a new instance of the <see cref="T:System.ComponentModel.Composition.ImportAttribute"/> class, importing the
+                export with the default contract name.
+            </summary>
+        </member>
+        <member name="M:System.ComponentModel.Composition.ImportAttribute.#ctor(System.Type)">
+            <summary>
+                Initializes a new instance of the <see cref="T:System.ComponentModel.Composition.ImportAttribute"/> class, importing the
+                export with the contract name derived from the specified type.
+            </summary>
+            <param name="contractType">
+                A <see cref="T:System.Type"/> of which to derive the contract name of the export to import, or
+                <see langword="null"/> to use the default contract name.
+            </param>
+        </member>
+        <member name="M:System.ComponentModel.Composition.ImportAttribute.#ctor(System.String)">
+            <summary>
+                Initializes a new instance of the <see cref="T:System.ComponentModel.Composition.ImportAttribute"/> class, importing the
+                export with the specified contract name.
+            </summary>
+            <param name="contractName">
+                 A <see cref="T:System.String"/> containing the contract name of the export to import, or
+                 <see langword="null"/> or an empty string ("") to use the default contract name.
+            </param>
+        </member>
+        <member name="M:System.ComponentModel.Composition.ImportAttribute.#ctor(System.String,System.Type)">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.ComponentModel.Composition.ImportAttribute"/> class,
+            importing the export with the specified contract name and type.
+            </summary>
+            <param name="contractName">
+                 A <see cref="T:System.String"/> containing the contract name of the export to import, or
+                 <see langword="null"/> or an empty string ("") to use the default contract name.
+            </param>
+            <param name="contractType">The type of the export to import.</param>
+        </member>
+        <member name="P:System.ComponentModel.Composition.ImportAttribute.ContractName">
+            <summary>
+                Gets the contract name of the export to import.
+            </summary>
+            <value>
+                 A <see cref="T:System.String"/> containing the contract name of the export to import. The
+                 default value is an empty string ("").
+            </value>
+        </member>
+        <member name="P:System.ComponentModel.Composition.ImportAttribute.ContractType">
+            <summary>
+                Gets the contract type of the export to import.
+            </summary>
+            <value>
+                A <see cref="T:System.Type"/> of the export that this import is expecting. The default value is
+                <see langword="null"/> which means that the type will be obtained by looking at the type on
+                the member that this import is attached to. If the type is <see cref="T:System.Object"/> then the
+                importer is delaring they can accept any exported type.
+            </value>
+        </member>
+        <member name="P:System.ComponentModel.Composition.ImportAttribute.AllowDefault">
+            <summary>
+                Gets or sets a value indicating whether the property, field or parameter will be set
+                to its type's default value when an export with the contract name is not present in
+                the container.
+            </summary>
+            <remarks>
+                <para>
+                    The default value of a property's, field's or parameter's type is
+                    <see langword="null"/> for reference types and 0 for numeric value types. For
+                    other value types, the default value will be each field of the value type
+                    initialized to zero, if the field is a value type or <see langword="null"/> if
+                    the field is a reference type.
+                </para>
+            </remarks>
+        </member>
+        <member name="P:System.ComponentModel.Composition.ImportAttribute.AllowRecomposition">
+            <summary>
+                Gets or sets a value indicating whether the property or field will be recomposed
+                when exports that provide the same contract that this import expects, have changed
+                in the container.
+            </summary>
+        </member>
+        <member name="P:System.ComponentModel.Composition.ImportAttribute.RequiredCreationPolicy">
+             <summary>
+                 Gets or sets a value indicating that the importer requires a specific
+                 <see cref="T:System.ComponentModel.Composition.CreationPolicy"/> for the exports used to satisfy this import. T
+             </summary>
+             <value>
+                 <see cref="F:System.ComponentModel.Composition.CreationPolicy.Any"/> - default value, used if the importer doesn't
+                     require a specific <see cref="T:System.ComponentModel.Composition.CreationPolicy"/>.
+            
+                 <see cref="F:System.ComponentModel.Composition.CreationPolicy.Shared"/> - Requires that all exports used should be shared
+                     by everyone in the container.
+            
+                 <see cref="F:System.ComponentModel.Composition.CreationPolicy.NonShared"/> - Requires that all exports used should be
+                     non-shared in a container and thus everyone gets their own instance.
+             </value>
+        </member>
+        <member name="P:System.ComponentModel.Composition.ImportAttribute.Source">
+             <summary>
+                 Gets or sets a value indicating that the importer indicating that the composition engine
+                 either should satisfy exports from the local or no local scope.
+             </summary>
+             <value>
+                 <see cref="F:System.ComponentModel.Composition.ImportSource.Any"/> - indicates that importer does not
+                     require a specific satisfaction scope"/>.
+            
+                 <see cref="F:System.ComponentModel.Composition.ImportSource.Local"/> - indicates the importer requires satisfaction to be
+                     from the current container.
+            
+                 <see cref="F:System.ComponentModel.Composition.ImportSource.NonLocal"/> - indicates the importer requires satisfaction to be
+                     from one of the ancestor containers.
+             </value>
+        </member>
+        <member name="T:System.ComponentModel.Composition.ImportCardinalityMismatchException">
+            <summary>
+            The exception that is thrown when the cardinality of an import is not compatible
+            with the cardinality of the matching exports.
+            </summary>
+        </member>
+        <member name="M:System.ComponentModel.Composition.ImportCardinalityMismatchException.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.ComponentModel.Composition.ImportCardinalityMismatchException"/> class
+            with a system-supplied message that describes the error.
+            </summary>
+        </member>
+        <member name="M:System.ComponentModel.Composition.ImportCardinalityMismatchException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.ComponentModel.Composition.ImportCardinalityMismatchException"/> class
+            with a specified message that describes the error.
+            </summary>
+            <param name="message">
+            A message that describes the <see cref="T:System.ComponentModel.Composition.ImportCardinalityMismatchException"/>,
+            or null to set the System.Exception.Message property to its default value.
+            </param>
+        </member>
+        <member name="M:System.ComponentModel.Composition.ImportCardinalityMismatchException.#ctor(System.String,System.Exception)">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.ComponentModel.Composition.ImportCardinalityMismatchException"/> class
+            with a specified error message and a reference to the inner exception that
+            is the cause of this exception.
+            </summary>
+            <param name="message">
+            The message that describes the exception. The caller of this constructor is required
+            to ensure that this string has been localized for the current system culture.
+            </param>
+            <param name="innerException">
+            The exception that is the cause of the current exception. If the innerException
+            parameter is not null, the current exception is raised in a catch block that
+            handles the inner exception.
+            </param>
+        </member>
+        <member name="T:System.ComponentModel.Composition.ImportingConstructorAttribute">
+            <summary>
+                Specifies that a constructor should be used when constructing an attributed part.
+            </summary>
+            <remarks>
+                By default, only a default parameter-less constructor, if available, is used to
+                construct an attributed part. Use this attribute to indicate that a specific constructor
+                should be used.
+            </remarks>
+        </member>
+        <member name="M:System.ComponentModel.Composition.ImportingConstructorAttribute.#ctor">
+            <summary>
+                Initializes a new instance of the <see cref="T:System.ComponentModel.Composition.ImportingConstructorAttribute"/> class.
+            </summary>
+        </member>
+        <member name="T:System.ComponentModel.Composition.ImportManyAttribute">
+            <summary>
+                Specifies that a property, field, or parameter imports a particular set of exports.
+            </summary>
+        </member>
+        <member name="M:System.ComponentModel.Composition.ImportManyAttribute.#ctor">
+            <summary>
+                Initializes a new instance of the <see cref="T:System.ComponentModel.Composition.ImportManyAttribute"/> class, importing the
+                set of exports with the default contract name.
+            </summary>
+        </member>
+        <member name="M:System.ComponentModel.Composition.ImportManyAttribute.#ctor(System.Type)">
+            <summary>
+                Initializes a new instance of the <see cref="T:System.ComponentModel.Composition.ImportManyAttribute"/> class, importing the
+                set of exports with the contract name derived from the specified type.
+            </summary>
+            <param name="contractType">
+                A <see cref="T:System.Type"/> of which to derive the contract name of the exports to import, or
+                <see langword="null"/> to use the default contract name.
+            </param>
+        </member>
+        <member name="M:System.ComponentModel.Composition.ImportManyAttribute.#ctor(System.String)">
+            <summary>
+                Initializes a new instance of the <see cref="T:System.ComponentModel.Composition.ImportManyAttribute"/> class, importing the
+                set of exports with the specified contract name.
+            </summary>
+            <param name="contractName">
+                 A <see cref="T:System.String"/> containing the contract name of the exports to import, or
+                 <see langword="null"/> or an empty string ("") to use the default contract name.
+            </param>
+        </member>
+        <member name="M:System.ComponentModel.Composition.ImportManyAttribute.#ctor(System.String,System.Type)">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.ComponentModel.Composition.ImportManyAttribute"/> class,
+            importing the set of exports with the specified contract name and contract
+            type.
+            </summary>
+            <param name="contractName">
+                The contract name of the exports to import, or null or an empty string ("") to
+                use the default contract name.
+            </param>
+            <param name="contractType">
+                The type of the export to import.
+            </param>
+        </member>
+        <member name="P:System.ComponentModel.Composition.ImportManyAttribute.ContractName">
+            <summary>
+                Gets the contract name of the exports to import.
+            </summary>
+        </member>
+        <member name="P:System.ComponentModel.Composition.ImportManyAttribute.ContractType">
+            <summary>
+                Gets the contract type of the export to import.
+            </summary>
+        </member>
+        <member name="P:System.ComponentModel.Composition.ImportManyAttribute.AllowRecomposition">
+            <summary>
+                Gets or sets a value indicating whether the property or field will be recomposed
+                when exports that provide the same contract that this import expects, have changed
+                in the container.
+            </summary>
+        </member>
+        <member name="P:System.ComponentModel.Composition.ImportManyAttribute.RequiredCreationPolicy">
+            <summary>
+                Gets or sets a value indicating that the importer requires a specific
+                <see cref="T:System.ComponentModel.Composition.CreationPolicy"/> for the exports used to satisfy this import. T
+            </summary>
+        </member>
+        <member name="P:System.ComponentModel.Composition.ImportManyAttribute.Source">
+            <summary>
+                Gets or sets a value indicating that the importer indicating that the composition engine
+                either should satisfy exports from the local or no local scope.
+            </summary>
+        </member>
+        <member name="T:System.ComponentModel.Composition.ImportSource">
+            <summary>
+            Option placed on an import to determine how composition searches for exports.
+            </summary>
+        </member>
+        <member name="F:System.ComponentModel.Composition.ImportSource.Any">
+            <summary>
+            The import can be satisfied with values from the current or parent (or other ancestor) containers  (scopes)
+            </summary>
+        </member>
+        <member name="F:System.ComponentModel.Composition.ImportSource.Local">
+            <summary>
+            The import can be satisfied with values from the current container (scope)
+            </summary>
+        </member>
+        <member name="F:System.ComponentModel.Composition.ImportSource.NonLocal">
+            <summary>
+            The import can only be satisfied with values from the parent container (or other ancestor containers) (scopes)
+            </summary>
+        </member>
+        <member name="T:System.ComponentModel.Composition.InheritedExportAttribute">
+            <summary>Specifies that a type provides a particular export, and that subclasses of that type will also provide that export.</summary>
+        </member>
+        <member name="M:System.ComponentModel.Composition.InheritedExportAttribute.#ctor">
+            <summary>Initializes a new instance of the <see cref="T:System.ComponentModel.Composition.InheritedExportAttribute" /> class. </summary>
+        </member>
+        <member name="M:System.ComponentModel.Composition.InheritedExportAttribute.#ctor(System.Type)">
+            <summary>Initializes a new instance of the <see cref="T:System.ComponentModel.Composition.InheritedExportAttribute" /> class with the specified contract type.</summary>
+            <param name="contractType">The type of the contract.</param>
+        </member>
+        <member name="M:System.ComponentModel.Composition.InheritedExportAttribute.#ctor(System.String)">
+            <summary>Initializes a new instance of the <see cref="T:System.ComponentModel.Composition.InheritedExportAttribute" /> class with the specified contract name.</summary>
+            <param name="contractName">The name of the contract.</param>
+        </member>
+        <member name="M:System.ComponentModel.Composition.InheritedExportAttribute.#ctor(System.String,System.Type)">
+            <summary>Initializes a new instance of the <see cref="T:System.ComponentModel.Composition.InheritedExportAttribute" /> class with the specified contract name and type.</summary>
+            <param name="contractName">The name of the contract.</param>
+            <param name="contractType">The type of the contract.</param>
+        </member>
+        <member name="T:System.ComponentModel.Composition.IPartImportsSatisfiedNotification">
+            <summary>
+            Notifies a part when its imports have been satisfied.
+            </summary>
+        </member>
+        <member name="M:System.ComponentModel.Composition.IPartImportsSatisfiedNotification.OnImportsSatisfied">
+            <summary>
+            Called when a part's imports have been satisfied and it is safe to use.
+            </summary>
+        </member>
+        <member name="T:System.ComponentModel.Composition.MetadataAttributeAttribute">
+            <summary>
+            Specifies that a custom attribute's properties provide metadata for exports applied
+            to the same type, property, field, or method.
+            </summary>
+        </member>
+        <member name="M:System.ComponentModel.Composition.MetadataAttributeAttribute.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.ComponentModel.Composition.MetadataAttributeAttribute"/> class.
+            </summary>
+        </member>
+        <member name="T:System.ComponentModel.Composition.MetadataViewImplementationAttribute">
+            <summary>
+                Specifies the type used to implement a metadata view.
+            </summary>
+        </member>
+        <member name="M:System.ComponentModel.Composition.MetadataViewImplementationAttribute.#ctor(System.Type)">
+            <summary>
+                Initializes a new instance of the <see cref="T:System.ComponentModel.Composition.MetadataViewImplementationAttribute"/> class, declaring the
+                type that holds the implementation for the view.
+            </summary>
+            <param name="implementationType">
+                A <see cref="T:System.Type"/> for the implementation of the MetadataView.
+            </param>
+            <remarks>
+                <para>
+                    By default MetadataViews are generated using reflection emit.  This attribute
+                    allows the developer to specify the type that implements the view rather than
+                    using a generated type.
+                </para>
+            </remarks>
+        </member>
+        <member name="P:System.ComponentModel.Composition.MetadataViewImplementationAttribute.ImplementationType">
+            <summary>
+                Gets the type that is used to implement the view to which this attribute is attached.
+            </summary>
+            <value>
+                A <see cref="T:System.Type"/> of the export that is be provided. The default value is
+                <see langword="null"/> which means that the type will be obtained by looking at the type on
+                the member that this export is attached to.
+            </value>
+        </member>
+        <member name="T:System.ComponentModel.Composition.PartCreationPolicyAttribute">
+            <summary>
+            Specifies the System.ComponentModel.Composition.PartCreationPolicyAttribute.CreationPolicy
+            for a part.
+            </summary>
+        </member>
+        <member name="M:System.ComponentModel.Composition.PartCreationPolicyAttribute.#ctor(System.ComponentModel.Composition.CreationPolicy)">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.ComponentModel.Composition.PartCreationPolicyAttribute"/> class
+            with the specified creation policy.
+            </summary>
+            <param name="creationPolicy">The creation policy to use.</param>
+        </member>
+        <member name="P:System.ComponentModel.Composition.PartCreationPolicyAttribute.CreationPolicy">
+            <summary>
+            Gets a value that indicates the creation policy of the attributed part.
+            </summary>
+        </member>
+        <member name="T:System.ComponentModel.Composition.PartMetadataAttribute">
+            <summary>
+            Specifies metadata for a type to be used as a ComposablePartDefinition and
+            ComposablePart.
+            </summary>
+        </member>
+        <member name="M:System.ComponentModel.Composition.PartMetadataAttribute.#ctor(System.String,System.Object)">
+            <summary>
+                Initializes a new instance of the <see cref="T:System.ComponentModel.Composition.PartMetadataAttribute"/> class with the
+                specified name and metadata value.
+            </summary>
+            <param name="name">
+                A <see cref="T:System.String"/> containing the name of the metadata value; or
+                <see langword="null"/> to use an empty string ("").
+            </param>
+            <param name="value">
+                An <see cref="T:System.Object"/> containing the metadata value. This can be
+                <see langword="null"/>.
+            </param>
+        </member>
+        <member name="P:System.ComponentModel.Composition.PartMetadataAttribute.Name">
+            <summary>
+            Gets the name of the metadata value.
+            </summary>
+        </member>
+        <member name="P:System.ComponentModel.Composition.PartMetadataAttribute.Value">
+            <summary>
+            Gets the metadata value.
+            </summary>
+        </member>
+        <member name="T:System.ComponentModel.Composition.PartNotDiscoverableAttribute">
+            <summary>
+            Place on a type that should not be discovered as a ComposablePart in
+            a ComposablePartCatalog.
+            </summary>
+        </member>
+        <member name="M:System.ComponentModel.Composition.PartNotDiscoverableAttribute.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.ComponentModel.Composition.PartNotDiscoverableAttribute"/> class.
+            </summary>
+        </member>
+    </members>
+</doc>

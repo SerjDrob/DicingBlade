@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Microsoft.VisualStudio.Composition.NetFxAttributes</name>
+    </assembly>
+    <members>
+        <member name="T:System.ComponentModel.Composition.MetadataViewImplementationAttribute">
+            <summary>
+                Specifies the type used to implement a metadata view.
+            </summary>
+        </member>
+        <member name="M:System.ComponentModel.Composition.MetadataViewImplementationAttribute.#ctor(System.Type)">
+            <summary>
+                Initializes a new instance of the <see cref="T:System.ComponentModel.Composition.MetadataViewImplementationAttribute"/> class, declaring the
+                type that holds the implementation for the view.
+            </summary>
+            <param name="implementationType">
+                A <see cref="T:System.Type"/> for the implementation of the MetadataView.
+            </param>
+            <remarks>
+                <para>
+                    By default MetadataViews are generated using reflection emit.  This attribute
+                    allows the developer to specify the type that implements the view rather than
+                    using a generated type.
+                </para>
+            </remarks>
+        </member>
+        <member name="P:System.ComponentModel.Composition.MetadataViewImplementationAttribute.ImplementationType">
+            <summary>
+                Gets the type that is used to implement the view to which this attribute is attached.
+            </summary>
+            <value>
+                A <see cref="T:System.Type"/> of the export that is be provided. The default value is
+                <see langword="null"/> which means that the type will be obtained by looking at the type on
+                the member that this export is attached to.
+            </value>
+        </member>
+    </members>
+</doc>
