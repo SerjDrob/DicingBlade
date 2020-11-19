@@ -276,7 +276,7 @@ namespace DicingBlade.Classes
             {
                 LocalWebCam.VideoResolution = LocalWebCam.VideoCapabilities[1]; //8                
                 LocalWebCam.NewFrame += Cam_NewFrame;
-                LocalWebCam.Start();
+                LocalWebCam.Start();                
             }
         }
 
@@ -308,6 +308,22 @@ namespace DicingBlade.Classes
         public void StopCamera()
         {
             LocalWebCam.Stop();
+        }
+
+        private bool _stopCamera;
+        public bool GetSnapShot
+        {
+            get => _stopCamera;
+            set
+            {
+                if (value)
+                {                    
+                    LocalWebCam.SignalToStop();
+                }
+                else LocalWebCam.Start();
+                _stopCamera = value;
+            }
+                        
         }
 
         private bool DevicesConnection()

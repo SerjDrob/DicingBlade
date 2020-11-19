@@ -71,6 +71,34 @@ namespace DicingBlade.Classes
         }
     }
 
+    struct CheckCutControl
+    {
+        int startCut;
+        int checkInterval;
+        int currentCut;
+        public bool addToCurrentCut()
+        {
+            int res = 0;
+            currentCut++;
+            if (currentCut >= startCut)
+            {
+                Math.DivRem(currentCut - startCut, checkInterval, out res);
+                if (res == 0) return true;
+                else return false;
+            }
+            else return false;
+        }
+        public void Reset()
+        {
+            currentCut = 0;
+        }
+        public void Set(int start, int interval)
+        {
+            currentCut = 0;
+            checkInterval = interval;
+            startCut = start;
+        }
+    }
     //public delegate void SetPause(bool pause);
     [AddINotifyPropertyChangedInterface]
     class Process
@@ -80,6 +108,7 @@ namespace DicingBlade.Classes
         private readonly Wafer Wafer;
         private readonly Machine Machine;
         private readonly Blade Blade;
+        private CheckCutControl checkCut;
         public ChangeScreens ChangeScreensEvent;
         public Visibility TeachVScaleMarkersVisibility { get; set; } = Visibility.Hidden;
         public Visibility CutWidthMarkerVisibility { get; set; } = Visibility.Hidden;
@@ -163,7 +192,8 @@ namespace DicingBlade.Classes
             Machine.OnAirWanished += Machine_OnAirWanished;
             Machine.OnCoolWaterWanished += Machine_OnCoolWaterWanished;
             Machine.OnSpinWaterWanished += Machine_OnSpinWaterWanished;
-            Machine.OnVacuumWanished += Machine_OnVacuumWanished;            
+            Machine.OnVacuumWanished += Machine_OnVacuumWanished;
+            checkCut.Set(1, 2);
         }
         public async Task PauseScenarioAsync() 
         {
@@ -355,6 +385,8 @@ namespace DicingBlade.Classes
                     TracesView.RawLines = new ObservableCollection<Line>(TracesView.RawLines);
                     TracingLine = null;
                     Machine.SwitchOnCoolantWater = false;
+                    if (checkCut.addToCurrentCut()) await TakeThePhotoAsync();
+
                     if (!Wafer.CurrentCutIncrement(CurrentLine))
                     {
                         NextLine();
@@ -435,6 +467,18 @@ namespace DicingBlade.Classes
                     break;
             }
         }
+
+        private async Task TakeThePhotoAsync()
+        {
+            Machine.GetSnapShot = false;
+            await ProcElementDispatcherAsync(Diagram.goTransferingHeightZ);            
+            await ProcElementDispatcherAsync(Diagram.goCameraPointXYZ);
+            Machine.SwitchOnBlowing = true;            
+            Thread.Sleep(100);
+            Machine.GetSnapShot = true;
+            Machine.SwitchOnBlowing = false;
+        }
+
         public async Task StartPauseProc()
         {
             switch (ProcessStatus)
@@ -467,6 +511,7 @@ namespace DicingBlade.Classes
                     CutWidthMarkerVisibility = Visibility.Visible;
                     ChangeScreensEvent(true);
                     ProcessStatus = Status.Correcting;
+                    Machine.GetSnapShot = false;
                     break;
                 case Status.Correcting:
                     var result  = MessageBox.Show($"Сместить следующие резы на {CutOffset} мм?","",MessageBoxButtons.OKCancel);
@@ -476,6 +521,7 @@ namespace DicingBlade.Classes
                     CutWidthMarkerVisibility = Visibility.Hidden;
                     CutOffset = 0;
                     PauseProcess = false;
+                    Machine.GetSnapShot = true;
                     break;
                 default:
                     break;

@@ -145,9 +145,11 @@ namespace DicingBlade.ViewModels
             KeyEventArgs key = (KeyEventArgs)args;
             
             //test key
-            if(key.Key==Key.Tab)
+            if(key.Key==Key.U)
             {
-                Machine.SpindleModbus();
+                Machine.GetSnapShot ^= true;                
+                
+                //Machine.SpindleModbus();
                 //WVRotate ^= true;
                 //Machine.GoTest();
                 //if(process==null) process = new Process(Machine, Wafer, new Blade());
@@ -187,7 +189,7 @@ namespace DicingBlade.ViewModels
 
                             Process = new Process(Machine, Wafer, new Blade(), new Technology(), BaseProcess);
                             Process.GetRotationEvent += SetRotation;
-                            Process.ChangeScreensEvent += ChangeScreensRegime;
+                            Process.ChangeScreensEvent += ChangeScreensRegime;                            
                             Process.ProcessStatus = Status.StartLearning;                        
                         }
                     
