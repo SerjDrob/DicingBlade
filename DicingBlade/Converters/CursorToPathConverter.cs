@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Data;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Media;
-using System.Windows.Shapes;
 
-namespace DicingBlade.Classes
+namespace DicingBlade.Converters
 {
-    class CursorToPathConverter : IMultiValueConverter
+    internal class CursorToPathConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
@@ -25,16 +21,16 @@ namespace DicingBlade.Classes
             double shapeY = 0;
             double shift = 0;
             int selector = System.Convert.ToInt32(parameter);
-            TranslateTransform translateTransform1x;
-            TranslateTransform translateTransform2x;
-            TranslateTransform translateTransform1y;
-            TranslateTransform translateTransform2y;
+            TranslateTransform translateTransform1X;
+            TranslateTransform translateTransform2X;
+            TranslateTransform translateTransform1Y;
+            TranslateTransform translateTransform2Y;
             ScaleTransform scaleTransformX;
             ScaleTransform scaleTransformY;
             LineGeometry lineGeometryX;
             LineGeometry lineGeometryY;
             GeometryGroup geometryGroup = new GeometryGroup();
-          
+
 
             double wh = 0;
             double res = 1;
@@ -48,7 +44,7 @@ namespace DicingBlade.Classes
                 yOffset = System.Convert.ToDouble(values[5]);
                 shapeX = System.Convert.ToDouble(values[6]);
                 shapeY = System.Convert.ToDouble(values[7]);
-                
+
                 if (shapeX > shapeY)
                 {
                     res = shapeX;
@@ -66,30 +62,30 @@ namespace DicingBlade.Classes
             }
             catch { }
 
-            translateTransform1x = new TranslateTransform(-xOffset, 0);
-            translateTransform2x = new TranslateTransform(actualWidth / 2, 0);
+            translateTransform1X = new TranslateTransform(-xOffset, 0);
+            translateTransform2X = new TranslateTransform(actualWidth / 2, 0);
             scaleTransformX = new ScaleTransform(wh / (1.4 * res), 1);
 
-            translateTransform1y = new TranslateTransform(0, -yOffset);
-            translateTransform2y = new TranslateTransform(0, actualHeight / 2);
+            translateTransform1Y = new TranslateTransform(0, -yOffset);
+            translateTransform2Y = new TranslateTransform(0, actualHeight / 2);
             scaleTransformY = new ScaleTransform(1, wh / (1.4 * res));
 
-            Point StartPointX = new Point(x, 0);
-            Point EndPointX = new Point(x, actualHeight);
-            Point StartPointY = new Point(0, y + shift);
-            Point EndPointY = new Point(actualWidth, y + shift);
+            Point startPointX = new Point(x, 0);
+            Point endPointX = new Point(x, actualHeight);
+            Point startPointY = new Point(0, y + shift);
+            Point endPointY = new Point(actualWidth, y + shift);
 
 
-            StartPointX = translateTransform2x.Transform(scaleTransformX.Transform(translateTransform1x.Transform(StartPointX)));
-            StartPointY = translateTransform2y.Transform(scaleTransformY.Transform(translateTransform1y.Transform(StartPointY)));
-            EndPointX = translateTransform2x.Transform(scaleTransformX.Transform(translateTransform1x.Transform(EndPointX)));
-            EndPointY = translateTransform2y.Transform(scaleTransformY.Transform(translateTransform1y.Transform(EndPointY)));
+            startPointX = translateTransform2X.Transform(scaleTransformX.Transform(translateTransform1X.Transform(startPointX)));
+            startPointY = translateTransform2Y.Transform(scaleTransformY.Transform(translateTransform1Y.Transform(startPointY)));
+            endPointX = translateTransform2X.Transform(scaleTransformX.Transform(translateTransform1X.Transform(endPointX)));
+            endPointY = translateTransform2Y.Transform(scaleTransformY.Transform(translateTransform1Y.Transform(endPointY)));
 
-            lineGeometryX = new LineGeometry(StartPointX, EndPointX);
-            lineGeometryY = new LineGeometry(StartPointY, EndPointY);
+            lineGeometryX = new LineGeometry(startPointX, endPointX);
+            lineGeometryY = new LineGeometry(startPointY, endPointY);
             geometryGroup.Children.Add(lineGeometryX);
             geometryGroup.Children.Add(lineGeometryY);
-            
+
 
             return geometryGroup;
         }

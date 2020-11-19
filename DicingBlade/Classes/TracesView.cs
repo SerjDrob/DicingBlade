@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PropertyChanged;
+﻿using PropertyChanged;
 using System.Collections.ObjectModel;
 using netDxf.Entities;
-using netDxf;
 
 namespace DicingBlade.Classes
 {
     [AddINotifyPropertyChangedInterface]
-    class TracesView
+    internal class TracesView
     {
-        public TracesView() 
+        public TracesView()
         {
             Traces = new ObservableCollection<Line>();
         }

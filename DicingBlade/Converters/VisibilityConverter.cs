@@ -1,34 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Data;
 using System.Windows;
+using System.Windows.Data;
 
-namespace DicingBlade.Classes
+namespace DicingBlade.Converters
 {
-    class VisibilityConverter : IValueConverter
+    internal class VisibilityConverter : IValueConverter
     {
         object IValueConverter.Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            switch ((string)parameter )
+            return (string) parameter switch
             {
-                case "round": 
-                    {
-                        return (bool)value ? Visibility.Visible : Visibility.Collapsed;
-                        break;
-                    }
-                case "square": 
-                    {
-                        return (bool)value ? Visibility.Collapsed : Visibility.Visible;
-                        break;
-                    }
-                default:
-                    return (bool)value ? Visibility.Visible : Visibility.Collapsed;
-                    break;
-            }            
+                "round" => (bool) value ? Visibility.Visible : Visibility.Collapsed,
+                "square" => (bool) value ? Visibility.Collapsed : Visibility.Visible,
+                _ => (bool) value ? Visibility.Visible : Visibility.Collapsed,
+            };
         }
 
         object IValueConverter.ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

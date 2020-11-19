@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 using DicingBlade.Classes;
 using DicingBlade.Properties;
 using PropertyChanged;
@@ -12,31 +7,31 @@ namespace DicingBlade.ViewModels
     [AddINotifyPropertyChangedInterface]
     public class MachineSettingsViewModel
     {
-        public ICommand XYObjectiveTeachCmd { get; set; }
+        public ICommand XyObjectiveTeachCmd { get; set; }
         public ICommand XDiskTeachCmd { get; set; }
-        public ICommand XYLoadTeachCmd { get; set; }
-        private Machine machine;
-        internal MachineSettingsViewModel(Machine machine) 
+        public ICommand XyLoadTeachCmd { get; set; }
+        private Machine _machine;
+        internal MachineSettingsViewModel(Machine machine)
         {
             //this.machine = new Machine(true);
-            this.machine = machine;
-            XYObjectiveTeachCmd = new Command(args => XYObjectiveTeach());
-            XYLoadTeachCmd = new Command(args => XYLoadTeach());
+            _machine = machine;
+            XyObjectiveTeachCmd = new Command(args => XyObjectiveTeach());
+            XyLoadTeachCmd = new Command(args => XyLoadTeach());
             XDiskTeachCmd = new Command(args => XDiskTeach());
         }
-        private void XYObjectiveTeach() 
+        private void XyObjectiveTeach()
         {
-            Settings.Default.XObjective = machine.X.ActualPosition;
-            Settings.Default.YObjective = machine.Y.ActualPosition;
+            Settings.Default.XObjective = _machine.X.ActualPosition;
+            Settings.Default.YObjective = _machine.Y.ActualPosition;
         }
-        private void XYLoadTeach()
+        private void XyLoadTeach()
         {
-            Settings.Default.XLoad = machine.X.ActualPosition;
-            Settings.Default.YLoad = machine.Y.ActualPosition;
+            Settings.Default.XLoad = _machine.X.ActualPosition;
+            Settings.Default.YLoad = _machine.Y.ActualPosition;
         }
-        private void XDiskTeach() 
+        private void XDiskTeach()
         {
-            Settings.Default.XDisk = machine.X.ActualPosition;            
+            Settings.Default.XDisk = _machine.X.ActualPosition;
         }
     }
 }

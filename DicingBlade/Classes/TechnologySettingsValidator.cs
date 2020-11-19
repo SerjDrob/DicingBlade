@@ -1,11 +1,10 @@
-﻿using DicingBlade.Classes;
-using FluentValidation;
+﻿using FluentValidation;
 
-namespace DicingBlade.ViewModels
+namespace DicingBlade.Classes
 {
-    class TechnologySettingsValidator :AbstractValidator<ITechnology>
+    internal class TechnologySettingsValidator : AbstractValidator<ITechnology>
     {
-        public TechnologySettingsValidator() 
+        public TechnologySettingsValidator()
         {
             RuleFor(technology => technology.SpindleFreq).NotEmpty().LessThan(60000).GreaterThan(10000);
             RuleFor(technology => technology.FeedSpeed).NotEmpty().LessThan(20).GreaterThan(0.1);
