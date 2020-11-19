@@ -105,6 +105,7 @@ namespace DicingBlade.ViewModels
                 Diagram.goNextDirection
             };
             Traces = new ObservableCollection<TracePath>();
+            tempWafer2.firstPointSet = false;
             // machine = new Machine();
             //  machine.OnAirWanished += Machine_OnAirWanished;
             
@@ -261,14 +262,16 @@ namespace DicingBlade.ViewModels
             {
                 if (Process.ProcessStatus == Status.Learning)
                 {
-                    if (tempWafer2.point1 == null)
+                    if (!tempWafer2.firstPointSet)
                     {
                         tempWafer2.point1 = new Vector2(Machine.X.ActualPosition, Machine.Y.ActualPosition);
+                        tempWafer2.firstPointSet = true;
                     }
                     else
                     {
                         tempWafer2.point2 = new Vector2(Machine.X.ActualPosition, Machine.Y.ActualPosition);
                         await Machine.U.MoveAxisInPosAsync(Machine.U.ActualPosition - tempWafer2.GetAngle());
+                        tempWafer2.firstPointSet = false;
                     }
                 }
             }
@@ -406,6 +409,7 @@ namespace DicingBlade.ViewModels
                     break;
             }
         }
+        
         private void OpenFile() 
         {
             //var openFileDialog = new OpenFileDialog();

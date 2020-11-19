@@ -54,14 +54,15 @@ namespace DicingBlade.Classes
     /// Структура параметров процесса
     /// </summary>
     struct TempWafer2D
-    {
-        public bool Round;
-        public double XIndex;
-        public double XShift;
-        public double YIndex;
-        public double YShift;
-        public double XAngle;
-        public double YAngle;
+    {        
+        //public bool Round;
+        //public double XIndex;
+        //public double XShift;
+        //public double YIndex;
+        //public double YShift;
+        //public double XAngle;
+        //public double YAngle;
+        public bool firstPointSet;
         public Vector2 point1;
         public Vector2 point2;
         public double GetAngle()
