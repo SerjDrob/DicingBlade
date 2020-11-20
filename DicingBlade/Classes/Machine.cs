@@ -40,7 +40,7 @@ namespace DicingBlade.Classes
     }
 
     public delegate void DIEventHandler( /*DIEventArgs eventArgs*/);
-
+    public delegate void CoordinatesEventHandler(params double[] xyzu);
     internal struct Bridge
     {
         public bool SpindleWater;
@@ -232,7 +232,7 @@ namespace DicingBlade.Classes
         public event DIEventHandler OnCoolWaterWanished;
         public event DIEventHandler OnSpinWaterWanished;
         public event DIEventHandler OnAirWanished;
-
+        public event CoordinatesEventHandler OnCoordinatesChanged;
         private void EMGScenario( /*DIEventArgs eventArgs*/)
         {
         }
@@ -1093,6 +1093,7 @@ namespace DicingBlade.Classes
                             }
                         }
                     }
+                    OnCoordinatesChanged(X.ActualPosition, Y.ActualPosition, Z.ActualPosition, U.ActualPosition);
                 }
                 Thread.Sleep(1);
             }
