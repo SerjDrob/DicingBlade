@@ -1,31 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using PropertyChanged;
 using System.Collections.ObjectModel;
 using netDxf.Entities;
 using netDxf;
-using static System.Math;
 
 namespace DicingBlade.Classes
 {
     [AddINotifyPropertyChangedInterface]
     public class WaferView
     {
-        public WaferView(ICollection<Line> RawLines, Vector2 center)
+        public WaferView(ICollection<Line> rawLines, Vector2 center)
         {
-            this.RawLines = new ObservableCollection<Line>(RawLines);
-            GridCenter = new Vector2(center.X,center.Y);
+            RawLines = new ObservableCollection<Line>(rawLines);
+            GridCenter = new Vector2(center.X, center.Y);
             ShapeSize = GetSize();
-            this.Angle = 0;
+            Angle = 0;
         }
-        public WaferView() 
+        public WaferView()
         {
             RawLines = new ObservableCollection<Line>();
         }
-        public bool IsRound { get; set; }        
+        public bool IsRound { get; set; }
         public double Angle { get; set; }
         public ObservableCollection<Line> RawLines { get; set; }
         private double[] GetSize()
@@ -37,6 +33,6 @@ namespace DicingBlade.Classes
             };
         }
         public double[] ShapeSize { get; private set; }
-        private Vector2 GridCenter { get; set; }        
+        private Vector2 GridCenter { get; set; }
     }
 }

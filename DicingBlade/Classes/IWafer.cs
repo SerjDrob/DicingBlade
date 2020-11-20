@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DicingBlade.Classes
+﻿namespace DicingBlade.Classes
 {
     public interface IWafer
     {
@@ -32,6 +26,6 @@ namespace DicingBlade.Classes
         {
             wafer.CopyPropertiesTo(this);
         }
-        public TempWafer(){}
+        public TempWafer() { }
     }
 }

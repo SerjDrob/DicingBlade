@@ -1,17 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows;
 using System.Windows.Media;
-using System.Windows.Shapes;
 
 namespace DicingBlade.Converters
 {
-    class TraceConverter : IMultiValueConverter
+    internal class TraceConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
@@ -19,7 +14,7 @@ namespace DicingBlade.Converters
             double y = 0;
             double x1 = 0;
             double actualHeight = 0;
-            double ActualWidth = 0;
+            double actualWidth = 0;
             double xOffset = 0;
             double yOffset = 0;
             double shapeX = 0;
@@ -40,7 +35,7 @@ namespace DicingBlade.Converters
                 x = System.Convert.ToDouble(values[0]);
                 y = System.Convert.ToDouble(values[1]);
                 x1 = System.Convert.ToDouble(values[2]);
-                ActualWidth = System.Convert.ToDouble(values[3]);
+                actualWidth = System.Convert.ToDouble(values[3]);
                 actualHeight = System.Convert.ToDouble(values[4]);
                 xOffset = System.Convert.ToDouble(values[5]);
                 yOffset = System.Convert.ToDouble(values[6]);
@@ -49,7 +44,7 @@ namespace DicingBlade.Converters
                 if (shapeX > shapeY)
                 {
                     res = shapeX;
-                    wh = ActualWidth;
+                    wh = actualWidth;
                 }
                 else
                 {
@@ -63,17 +58,17 @@ namespace DicingBlade.Converters
             }
 
             translateTransform1 = new TranslateTransform(-xOffset, -yOffset);
-            translateTransform2 = new TranslateTransform(ActualWidth / 2, actualHeight / 2);
+            translateTransform2 = new TranslateTransform(actualWidth / 2, actualHeight / 2);
             scaleTransform = new ScaleTransform(wh / (1.4 * res), wh / (1.4 * res));
 
-            Point StartPoint = new Point(x, y + shift);
-            Point EndPoint = new Point(x1, y + shift);
+            Point startPoint = new Point(x, y + shift);
+            Point endPoint = new Point(x1, y + shift);
 
-            StartPoint = translateTransform2.Transform(scaleTransform.Transform(translateTransform1.Transform(StartPoint)));
-            EndPoint = translateTransform2.Transform(scaleTransform.Transform(translateTransform1.Transform(EndPoint)));
+            startPoint = translateTransform2.Transform(scaleTransform.Transform(translateTransform1.Transform(startPoint)));
+            endPoint = translateTransform2.Transform(scaleTransform.Transform(translateTransform1.Transform(endPoint)));
 
 
-            lineGeometry = new LineGeometry(StartPoint, EndPoint);
+            lineGeometry = new LineGeometry(startPoint, endPoint);
             geometryGroup.Children.Add(lineGeometry);
 
             return geometryGroup;

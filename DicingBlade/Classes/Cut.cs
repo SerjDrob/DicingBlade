@@ -1,29 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using netDxf.Entities;
+﻿using netDxf.Entities;
 using netDxf;
 
 namespace DicingBlade.Classes
 {
-    public class Cut:Line
+    public class Cut : Line
     {
-        public Cut(Cut cut) 
+        public Cut(Cut cut)
         {
             //this.Clone = cut;
         }
-        public Cut(Vector3 startpoint, Vector3 endpoint) 
+        public Cut(Vector3 startpoint, Vector3 endpoint)
         {
             StartPoint = startpoint;
             EndPoint = endpoint;
             Status = true;
             CutCount = 1;
             Offset = 0;
-            CutDirection = Directions.direct;
+            CutDirection = Directions.Direct;
         }
-        
+
         /// <summary>
         /// направление резки - встречная, попутная, встречно-попутная        
         /// </summary>
@@ -31,31 +26,25 @@ namespace DicingBlade.Classes
         /// <summary>
         /// true - действует, false - отключен или выполнен
         /// </summary>
-        public bool Status 
+        public bool Status
         {
-            get { return CurrentCut / CutCount==1 ? false : true; }
+            get => CurrentCut / CutCount == 1 ? false : true;
             private set { }
         }
-        public bool NextCut() 
+        public bool NextCut()
         {
             if (Status)
             {
-                CurrentCut++;              
+                CurrentCut++;
             }
             return Status;
         }
         public int CutCount { get; set; }
-        public double CutRatio
-        {
-            get
-            {
-                return (double)(CurrentCut + 1) / CutCount;
-            }
-        }
+        public double CutRatio => (double)(CurrentCut + 1) / CutCount;
         private int CurrentCut { get; set; } = 0;
-        public double Offset { get; set; }     
-        
-        public void ResetCut() 
+        public double Offset { get; set; }
+
+        public void ResetCut()
         {
             CurrentCut = 0;
             Offset = 0;
@@ -64,8 +53,8 @@ namespace DicingBlade.Classes
     }
     public enum Directions
     {
-        direct,
-        reverse,
-        both
+        Direct,
+        Reverse,
+        Both
     }
 }

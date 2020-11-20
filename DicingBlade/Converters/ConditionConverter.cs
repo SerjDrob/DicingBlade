@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Data;
 
-namespace DicingBlade.Classes
+namespace DicingBlade.Converters
 {
-    class ConditionConverter : IMultiValueConverter
+    internal class ConditionConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
@@ -20,7 +16,7 @@ namespace DicingBlade.Classes
                 bit = System.Convert.ToInt32(values[1]);
             }
             catch { }
-            return (mask & (1 << bit)) != 0 ? true : false;
+            return (mask & (1 << bit)) != 0;
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

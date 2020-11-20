@@ -1,32 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PropertyChanged;
-using System.ComponentModel;
+﻿using PropertyChanged;
 using DicingBlade.Classes;
 using System.Windows.Input;
 using System.Windows;
-using netDxf;
-using System.Windows.Forms;
 using DicingBlade.Properties;
 using System.IO;
+using Microsoft.Win32;
 
 namespace DicingBlade.ViewModels
 {
     [AddINotifyPropertyChangedInterface]
-    class WaferSettingsViewModel:IWafer
+    internal class WaferSettingsViewModel : IWafer
     {
         private bool _isRound;
-        public bool IsRound 
+        public bool IsRound
         {
-            get { return _isRound; }
-            set 
+            get => _isRound;
+            set
             {
                 _isRound = value;
-                if (value) SquareVisibility = Visibility.Collapsed;
-                else SquareVisibility = Visibility.Visible;
+                SquareVisibility = value ? Visibility.Collapsed : Visibility.Visible;
             }
         }
         public double Width { get; set; }
@@ -35,10 +27,10 @@ namespace DicingBlade.ViewModels
         public double IndexW { get; set; }
         public double IndexH { get; set; }
         public double Diameter { get; set; }
-        public string FileName { get; set; }        
-        public Visibility SquareVisibility { get; set; }       
-        public Wafer wafer { get; set; }
-        public WaferSettingsViewModel() 
+        public string FileName { get; set; }
+        public Visibility SquareVisibility { get; set; }
+        public Wafer Wafer { get; set; }
+        public WaferSettingsViewModel()
         {
             CloseCmd = new Command(args => ClosingWnd());
             OpenFileCmd = new Command(args => OpenFile());
@@ -57,7 +49,7 @@ namespace DicingBlade.ViewModels
             }
             else
             {
-                ((IWafer)(new TempWafer().DeSerializeObjectJson(FileName))).CopyPropertiesTo(this);                
+                ((IWafer)new TempWafer().DeSerializeObjectJson(FileName)).CopyPropertiesTo(this);
             }
         }
         public ICommand CloseCmd { get; set; }
@@ -66,38 +58,42 @@ namespace DicingBlade.ViewModels
         public ICommand ChangeShapeCmd { get; set; }
         private void ClosingWnd()
         {
-            PropContainer.WaferTemp = this;            
+            PropContainer.WaferTemp = this;
             new TempWafer(PropContainer.WaferTemp).SerializeObjectJson(FileName);
             Settings.Default.WaferLastFile = FileName;
             Settings.Default.Save();
         }
 
-        private void ChangeShape() 
+        private void ChangeShape()
         {
             IsRound ^= true;
         }
         private void OpenFile()
         {
-            using (var dialog = new OpenFileDialog())
+            var dialog = new OpenFileDialog
             {
-                dialog.Filter = "Файлы пластины (*.json)|*.json";
-                if (dialog.ShowDialog() == DialogResult.OK)
-                {
-                    FileName = dialog.FileName;
-                    ((IWafer)(new TempWafer().DeSerializeObjectJson(FileName))).CopyPropertiesTo(this);
-                }
+                Filter = "Файлы пластины (*.json)|*.json",
+            };
+
+            var result = dialog.ShowDialog();
+            if (result.HasValue && result.Value)
+            {
+                FileName = dialog.FileName;
+                ((IWafer)new TempWafer().DeSerializeObjectJson(FileName)).CopyPropertiesTo(this);
             }
         }
         private void SaveFileAs()
         {
-            using (var dialog = new SaveFileDialog())
+            var dialog = new SaveFileDialog
             {
-                dialog.Filter = "Файлы пластины (*.json)|*.json";
-                if (dialog.ShowDialog() == DialogResult.OK)
-                {
-                    FileName = dialog.FileName;
-                    ClosingWnd();
-                }
+                Filter = "Файлы пластины (*.json)|*.json",
+            };
+
+            var result = dialog.ShowDialog();
+            if (result.HasValue && result.Value)
+            {
+                FileName = dialog.FileName;
+                ClosingWnd();
             }
         }
 
