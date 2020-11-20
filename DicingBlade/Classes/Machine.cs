@@ -31,7 +31,7 @@ namespace DicingBlade.Classes
         public IntPtr[] MAxishand = new IntPtr[32];
         private bool _mBInit;
         private IntPtr _mDeviceHandle = IntPtr.Zero;
-        private uint _mUlAxisCount;
+        private int _mUlAxisCount;
         public bool Pci1240IsConnected;
         private double _position;
         private uint _result;
@@ -277,7 +277,7 @@ namespace DicingBlade.Classes
             _localWebCam.Stop();
         }
 
-        private bool _stopCamera;
+		private bool _stopCamera;
         public bool GetSnapShot
         {
             get => _stopCamera;
@@ -293,50 +293,28 @@ namespace DicingBlade.Classes
                         
         }
 
+
         private bool DevicesConnection()
         {
+            MotionDevice motionDevice = default;
+            try
+            {
+                motionDevice = new MotionDevice();
+                _mUlAxisCount = motionDevice.GetAxisCount();
+            }
+            catch (MotionException e)
+            {
+                MessageBox.Show(e.Message);
+                return false;
+            }
+
             string strTemp;
-            uint i = 0;
-            var axesPerDev = new uint();
-            uint deviceCount = 0;
-            uint deviceNum = 0;
-            var curAvailableDevs = new DEV_LIST[Motion.MAX_DEVICES];
 
-
-            var resAvlb = Motion.mAcm_GetAvailableDevs(curAvailableDevs, Motion.MAX_DEVICES, ref deviceCount);
-
-            if (resAvlb != (int)ErrorCode.SUCCESS)
-            {
-                strTemp = "Get Device Numbers Failed With Error Code: [0x" + Convert.ToString(resAvlb, 16) + "]";
-                MessageBox.Show(strTemp + " " + resAvlb);
-                return false;
-            }
-
-            if (deviceCount > 0) deviceNum = curAvailableDevs[0].DeviceNum;
-
-            //deviceNum = curAvailableDevs[0].DeviceNum;
-
-            var result = Motion.mAcm_DevOpen(deviceNum, ref _mDeviceHandle);
-            if (result != (uint)ErrorCode.SUCCESS)
-            {
-                strTemp = "Open Device Failed With Error Code: [0x" + Convert.ToString(result, 16) + "]";
-                MessageBox.Show(strTemp + result);
-                return false;
-            }
-
-            result = Motion.mAcm_GetU32Property(_mDeviceHandle, (uint)PropertyID.FT_DevAxesCount, ref axesPerDev);
-            if (result != (uint)ErrorCode.SUCCESS)
-            {
-                strTemp = "Get Axis Number Failed With Error Code: [0x" + Convert.ToString(result, 16) + "]";
-                MessageBox.Show(strTemp + " " + result);
-                return false;
-            }
-
-            _mUlAxisCount = axesPerDev;
             var axisEnableEvent = new uint[_mUlAxisCount];
             var gpEnableEvent = new uint[1];
 
-            for (i = 0; i < _mUlAxisCount; i++)
+            uint result;
+            for (var i = 0; i < axisEnableEvent.Length; i++)
             {
                 result = Motion.mAcm_AxOpen(_mDeviceHandle, (ushort)i, ref MAxishand[i]);
                 if (result != (uint)ErrorCode.SUCCESS)
@@ -346,8 +324,7 @@ namespace DicingBlade.Classes
                     return false;
                 }
 
-                var cmdPosition = new double();
-                cmdPosition = 0;
+                double cmdPosition = 0;
                 //Set command position for the specified axis
                 result = Motion.mAcm_AxSetCmdPosition(MAxishand[i], cmdPosition);
                 //Set actual position for the specified axis
@@ -360,7 +337,7 @@ namespace DicingBlade.Classes
                 // axisEnableEvent[i] |= (uint)EventType.EVT_AX_COMPARED;
             }
 
-            Motion.mAcm_EnableMotionEvent(_mDeviceHandle, axisEnableEvent, gpEnableEvent, _mUlAxisCount, 1);
+            Motion.mAcm_EnableMotionEvent(_mDeviceHandle, axisEnableEvent, gpEnableEvent, (uint) _mUlAxisCount, 1);
             _mBInit = true;
 
             X = new Axis(0, MAxishand[0], 0);
@@ -391,7 +368,10 @@ namespace DicingBlade.Classes
 
             // _spindleModbus.Connect();
 
-            if (_mBInit) MachineInit = true;
+            if (_mBInit)
+            {
+                MachineInit = true;
+            }
 
             return true;
         }
@@ -1004,7 +984,7 @@ namespace DicingBlade.Classes
                 //SpindleCurrent = _spindleModbus.ReadHoldingRegisters(0xD001, 1)[0]/10;
                 if (!_testRegime)
                 {
-                    res = Motion.mAcm_CheckMotionEvent(_mDeviceHandle, axEvtStatusArray, gpEvtStatusArray, _mUlAxisCount, 0, 10);
+                    res = Motion.mAcm_CheckMotionEvent(_mDeviceHandle, axEvtStatusArray, gpEvtStatusArray, (uint) _mUlAxisCount, 0, 10);
                     foreach (var ax in _axes)
                     {
                         _result = Motion.mAcm_AxGetMotionIO(ax.Handle, ref _ioStatus);
@@ -1061,7 +1041,7 @@ namespace DicingBlade.Classes
 
             while ( /*m_bInit*/ true)
             {
-                _result = Motion.mAcm_CheckMotionEvent(_mDeviceHandle, axEvtStatusArray, gpEvtStatusArray, _mUlAxisCount,
+                _result = Motion.mAcm_CheckMotionEvent(_mDeviceHandle, axEvtStatusArray, gpEvtStatusArray, (uint) _mUlAxisCount,
                     0, 10);
                 if (_result == (uint)ErrorCode.SUCCESS)
                 {
