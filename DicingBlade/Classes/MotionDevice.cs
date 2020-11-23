@@ -13,7 +13,7 @@ namespace DicingBlade.Classes
             DeviceHandle = OpenDevice(device);
         }
 
-        public IntPtr DeviceHandle { get; }
+        public static IntPtr DeviceHandle { get; private set; }
 
         private static IntPtr OpenDevice(in DEV_LIST device)
         {
@@ -47,7 +47,7 @@ namespace DicingBlade.Classes
             uint axesPerDev = default;
             var result = Motion.mAcm_GetU32Property(DeviceHandle, (uint)PropertyID.FT_DevAxesCount, ref axesPerDev);
 
-            if (Success(result))
+            if (!Success(result))
             {
                 throw new MotionException($"Get Axis Number Failed With Error Code: [0x{result:X}]");
             }
@@ -67,12 +67,12 @@ namespace DicingBlade.Classes
 
         private void ReleaseUnmanagedResources()
         {
-            var copy = DeviceHandle;
+            //var copy = DeviceHandle;
 
-            if (copy != IntPtr.Zero)
-            {
-                Motion.mAcm_DevClose(ref copy);
-            }
+            //if (copy != IntPtr.Zero)
+            //{
+            //    Motion.mAcm_DevClose(ref copy);
+            //}
         }
 
         public void Dispose()

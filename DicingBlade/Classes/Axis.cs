@@ -104,7 +104,7 @@ namespace DicingBlade.Classes
 
             Motion.mAcm_AxResetError(Handle);
             MotionDone = false;
-            Motion.mAcm_AxMoveVel(Handle, dir);
+            var res = Motion.mAcm_AxMoveVel(Handle, dir);
         }
 
         public async Task MoveAxisInPos1Async(double position)

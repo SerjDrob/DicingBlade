@@ -64,7 +64,34 @@ namespace DicingBlade.Classes
             return Math.Atan2(Point2.Y - Point1.Y, Point2.X - Point1.X);
         }
     }
-
+    struct CheckCutControl
+    {
+        int startCut;
+        int checkInterval;
+        int currentCut;
+        public bool addToCurrentCut()
+        {
+            int res = 0;
+            currentCut++;
+            if (currentCut >= startCut)
+            {
+                Math.DivRem(currentCut - startCut, checkInterval, out res);
+                if (res == 0) return true;
+                else return false;
+            }
+            else return false;
+        }
+        public void Reset()
+        {
+            currentCut = 0;
+        }
+        public void Set(int start, int interval)
+        {
+            currentCut = 0;
+            checkInterval = interval;
+            startCut = start;
+        }
+    }
     //public delegate void SetPause(bool pause);
     [AddINotifyPropertyChangedInterface]
     internal class Process
@@ -74,6 +101,7 @@ namespace DicingBlade.Classes
         private readonly Wafer _wafer;
         private readonly Machine _machine;
         private readonly Blade _blade;
+        private CheckCutControl _checkCut;
         public ChangeScreens ChangeScreensEvent;
         public Visibility TeachVScaleMarkersVisibility { get; set; } = Visibility.Hidden;
         public Visibility CutWidthMarkerVisibility { get; set; } = Visibility.Hidden;
@@ -152,6 +180,7 @@ namespace DicingBlade.Classes
             _machine.OnCoolWaterWanished += Machine_OnCoolWaterWanished;
             _machine.OnSpinWaterWanished += Machine_OnSpinWaterWanished;
             _machine.OnVacuumWanished += Machine_OnVacuumWanished;
+            _checkCut.Set(1, 2);
         }
         public async Task PauseScenarioAsync()
         {
@@ -320,7 +349,8 @@ namespace DicingBlade.Classes
                     tracingThread.Start();
                     await _machine.X.MoveAxisInPosAsync(target.X);
                     IsCutting = false;
-                    tracingThread.Abort();
+                   
+                   
                     //traces.Add(TracingLine);
 
                     RotateTransform rotateTransform = new RotateTransform(
@@ -342,10 +372,12 @@ namespace DicingBlade.Classes
                     TracesView.RawLines = new ObservableCollection<Line>(TracesView.RawLines);
                     TracingLine = null;
                     _machine.SwitchOnCoolantWater = false;
+                    
                     if (!_wafer.CurrentCutIncrement(CurrentLine))
                     {
                         NextLine();
                     }
+                    if (_checkCut.addToCurrentCut()) await TakeThePhotoAsync();
                     break;
                 case Diagram.GoCameraPointXyz:
                     _machine.SetVelocity(Velocity.Service);
@@ -422,6 +454,16 @@ namespace DicingBlade.Classes
                     break;
             }
         }
+        private async Task TakeThePhotoAsync()
+        {
+            _machine.GetSnapShot = false;
+            await ProcElementDispatcherAsync(Diagram.GoTransferingHeightZ);
+            await ProcElementDispatcherAsync(Diagram.GoCameraPointXyz);
+            _machine.SwitchOnBlowing = true;
+            Thread.Sleep(100);
+            _machine.GetSnapShot = true;
+            _machine.SwitchOnBlowing = false;
+        }
         public async Task StartPauseProc()
         {
             switch (ProcessStatus)
@@ -454,6 +496,7 @@ namespace DicingBlade.Classes
                     CutWidthMarkerVisibility = Visibility.Visible;
                     ChangeScreensEvent(true);
                     ProcessStatus = Status.Correcting;
+                    _machine.GetSnapShot = false;
                     break;
                 case Status.Correcting:
                     var result = MessageBox.Show($"Сместить следующие резы на {CutOffset} мм?", "", MessageBoxButton.OKCancel);
@@ -463,6 +506,7 @@ namespace DicingBlade.Classes
                     CutWidthMarkerVisibility = Visibility.Hidden;
                     CutOffset = 0;
                     PauseProcess = false;
+                    _machine.GetSnapShot = true;
                     break;
                 default:
                     break;

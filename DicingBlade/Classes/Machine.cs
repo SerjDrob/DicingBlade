@@ -16,6 +16,7 @@ using DicingBlade.Properties;
 using netDxf;
 using PropertyChanged;
 using EasyModbus;
+using System.Collections.Generic;
 
 namespace DicingBlade.Classes
 {
@@ -30,7 +31,7 @@ namespace DicingBlade.Classes
         private VideoCaptureDevice _localWebCam;
         public IntPtr[] MAxishand = new IntPtr[32];
         private bool _mBInit;
-        private IntPtr _mDeviceHandle = IntPtr.Zero;
+        //private IntPtr _mDeviceHandle = IntPtr.Zero;
         private int _mUlAxisCount;
         public bool Pci1240IsConnected;
         private double _position;
@@ -70,7 +71,7 @@ namespace DicingBlade.Classes
                 SetVelocity(value);
             }
         }
-
+        
         public BitmapImage Bi { get; set; }
         public bool MachineInit { get; set; }
         public Vector2 BladeChuckCenter { get; set; }
@@ -276,8 +277,21 @@ namespace DicingBlade.Classes
             _localWebCam.Stop();
         }
 
+        private bool _stopCamera;
+        public bool GetSnapShot
+        {
+            get => _stopCamera;
+            set
+            {
+                if (value)
+                {
+                    _localWebCam.SignalToStop();
+                }
+                else _localWebCam.Start();
+                _stopCamera = value;
+            }
 
-
+        }
 
         private bool DevicesConnection()
         {
@@ -301,7 +315,7 @@ namespace DicingBlade.Classes
             uint result;
             for (var i = 0; i < axisEnableEvent.Length; i++)
             {
-                result = Motion.mAcm_AxOpen(_mDeviceHandle, (ushort)i, ref MAxishand[i]);
+                result = Motion.mAcm_AxOpen(MotionDevice.DeviceHandle, (ushort)i, ref MAxishand[i]);
                 if (result != (uint)ErrorCode.SUCCESS)
                 {
                     strTemp = "Open Axis Failed With Error Code: [0x" + Convert.ToString(result, 16) + "]";
@@ -322,7 +336,7 @@ namespace DicingBlade.Classes
                 // axisEnableEvent[i] |= (uint)EventType.EVT_AX_COMPARED;
             }
 
-            Motion.mAcm_EnableMotionEvent(_mDeviceHandle, axisEnableEvent, gpEnableEvent, (uint) _mUlAxisCount, 1);
+            Motion.mAcm_EnableMotionEvent(MotionDevice.DeviceHandle, axisEnableEvent, gpEnableEvent, (uint) _mUlAxisCount, 1);
             _mBInit = true;
 
             X = new Axis(0, MAxishand[0], 0);
@@ -360,7 +374,6 @@ namespace DicingBlade.Classes
 
             return true;
         }
-
         public void SpindleModbus()
         {
             //ModbusClient modbusClient = new ModbusClient("COM1");
@@ -527,7 +540,6 @@ namespace DicingBlade.Classes
             buf = (uint)SwLmtEnable.SLMT_DIS;
             res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwPelEnable, ref buf, 4);
         }
-
         public void SetVelocity(Velocity velocity)
         {
             double xVel = 0;
@@ -612,14 +624,12 @@ namespace DicingBlade.Classes
 
             //ErrorCode
         }
-
         private void SaveParams()
         {
             //-------------Сохранение параметров в файле онфигурации----
             Settings.Default.Save();
             //----------------------------------------------------------
         }
-
         private void SetGpVel(Vector2 position, Velocity velocity)
         {
             var x = Math.Abs(position.X - X.ActualPosition);
@@ -700,9 +710,9 @@ namespace DicingBlade.Classes
                 case Place.Home:
                     ResetErrors();
                     SetVelocity(Velocity.Service);
-                    Motion.mAcm_AxHome(X.Handle, (uint)HomeMode.MODE2_Lmt, (uint)HomeDir.NegDir);
-                    Motion.mAcm_AxHome(Y.Handle, (uint)HomeMode.MODE6_Lmt_Ref, (uint)HomeDir.NegDir);
-                    Motion.mAcm_AxHome(Z.Handle, (uint)HomeMode.MODE2_Lmt, (uint)HomeDir.NegDir);
+                    _result = Motion.mAcm_AxHome(X.Handle, (uint)HomeMode.MODE2_Lmt, (uint)HomeDir.NegDir);
+                    _result = Motion.mAcm_AxHome(Y.Handle, (uint)HomeMode.MODE6_Lmt_Ref, (uint)HomeDir.NegDir);
+                    _result = Motion.mAcm_AxHome(Z.Handle, (uint)HomeMode.MODE2_Lmt, (uint)HomeDir.NegDir);
                     var done = 0;
                     var zlmt = true;
                     var xlmt = true;
@@ -960,8 +970,7 @@ namespace DicingBlade.Classes
         private void MachineState() // Производит опрос всех датчиков, линеек, координат
         {
             var axEvtStatusArray = new uint[4];//axes.Length
-            var gpEvtStatusArray = new uint[1];
-            uint res = 0;
+            var gpEvtStatusArray = new uint[1];            
             while (true)
             {
                 CheckSensors();
@@ -969,7 +978,7 @@ namespace DicingBlade.Classes
                 //SpindleCurrent = _spindleModbus.ReadHoldingRegisters(0xD001, 1)[0]/10;
                 if (!_testRegime)
                 {
-                    res = Motion.mAcm_CheckMotionEvent(_mDeviceHandle, axEvtStatusArray, gpEvtStatusArray, (uint) _mUlAxisCount, 0, 10);
+                    _result = Motion.mAcm_CheckMotionEvent(MotionDevice.DeviceHandle, axEvtStatusArray, gpEvtStatusArray, (uint) _mUlAxisCount, 0, 10);
                     foreach (var ax in _axes)
                     {
                         _result = Motion.mAcm_AxGetMotionIO(ax.Handle, ref _ioStatus);
@@ -1002,7 +1011,7 @@ namespace DicingBlade.Classes
                         ////trig.trigger(Air, (dI)=>OnAirWanished);
                         ///
 
-                        if (res == (uint)ErrorCode.SUCCESS)
+                        if (_result == (uint)ErrorCode.SUCCESS)
                         {
                             for (var i = 0; i < _axes.Length; i++)
                             {
@@ -1025,7 +1034,7 @@ namespace DicingBlade.Classes
 
             while ( /*m_bInit*/ true)
             {
-                _result = Motion.mAcm_CheckMotionEvent(_mDeviceHandle, axEvtStatusArray, gpEvtStatusArray, (uint) _mUlAxisCount,
+                _result = Motion.mAcm_CheckMotionEvent(MotionDevice.DeviceHandle, axEvtStatusArray, gpEvtStatusArray, (uint) _mUlAxisCount,
                     0, 10);
                 if (_result == (uint)ErrorCode.SUCCESS)
                 {
