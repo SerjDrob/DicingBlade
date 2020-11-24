@@ -204,7 +204,7 @@
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal">
                                     <Label Content="CurrentLine" />
-                                    <Label Content="{Binding Process.CurrentLine}" />
+                                    <Label Content="{Binding Process.CurrentLine}" />                                    
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal">
                                     <Label Content="SpindleFreq" />
@@ -1100,7 +1100,7 @@
             Grid.Column="{Binding Cols[1]}"
             Margin="3"
             Panel.ZIndex="0"
-            Source="{Binding Machine.Bi, Mode=OneWay}" />
+            Source="{Binding Bi, Mode=OneWay}" />
 
         <Canvas
             Grid.RowSpan="{Binding Rows[1]}"

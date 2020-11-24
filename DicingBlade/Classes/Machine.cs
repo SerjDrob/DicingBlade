@@ -23,17 +23,18 @@ namespace DicingBlade.Classes
     [AddINotifyPropertyChangedInterface]
     internal class Machine
     {
+        public IVideoCapture VideoCamera { get; set; }
         private readonly bool _testRegime;
         private Axis[] _axes;
         private byte _bitData;
         private Bridge _bridge;
         private uint _ioStatus;
-        private VideoCaptureDevice _localWebCam;
+        
         public IntPtr[] MAxishand = new IntPtr[32];
         private bool _mBInit;
         //private IntPtr _mDeviceHandle = IntPtr.Zero;
         private int _mUlAxisCount;
-        public bool Pci1240IsConnected;
+        
         private double _position;
         private uint _result;
         private bool _tokenXy = true;
@@ -47,7 +48,9 @@ namespace DicingBlade.Classes
             if (!_testRegime)
             {
                 _spindleModbus = new ModbusClient("COM1");
-                StartCamera();
+                //StartCamera();
+                VideoCamera = new USBCamera();
+                VideoCamera.StartCamera(0);
                 DevicesConnection();
                 SetConfigs();
                 VelocityRegime = Velocity.Slow;
@@ -72,7 +75,7 @@ namespace DicingBlade.Classes
             }
         }
         
-        public BitmapImage Bi { get; set; }
+       
         public bool MachineInit { get; set; }
         public Vector2 BladeChuckCenter { get; set; }
         public double CameraScale { get; set; } = 1;
@@ -217,65 +220,7 @@ namespace DicingBlade.Classes
             }
         }
 
-        public void StartCamera()
-        {
-            _localWebCam = GetCamera();
-
-            while (_localWebCam is null)
-            {
-                MessageBox.Show("Включите питание видеокамеры !");
-                _localWebCam = GetCamera();
-            }
-
-            _localWebCam.VideoResolution = _localWebCam.VideoCapabilities[1]; //8
-            _localWebCam.NewFrame += HandleNewFrame;
-            _localWebCam.Start();
-        }
-
-        private static VideoCaptureDevice GetCamera()
-        {
-            var webCams = new FilterInfoCollection(FilterCategory.VideoInputDevice);
-
-            return webCams.Count != 0 ? new VideoCaptureDevice(webCams[0].MonikerString) : default;
-        }
-
-        public async void HandleNewFrame(object sender, NewFrameEventArgs eventArgs)
-        {
-            try
-            {
-                var filter = new Mirror(false, true);
-                using var img = (Bitmap)eventArgs.Frame.Clone();
-                filter.ApplyInPlace(img);
-
-                var ms = new MemoryStream();
-                img.Save(ms, ImageFormat.Bmp);
-
-                ms.Seek(0, SeekOrigin.Begin);
-
-                var bitmap = new BitmapImage();
-                bitmap.BeginInit();
-                bitmap.StreamSource = ms;
-                bitmap.EndInit();
-                bitmap.Freeze();
-
-                var tmp = Bi;
-                Bi = bitmap;
-                if (tmp?.StreamSource != null)
-                {
-                    await tmp.StreamSource.DisposeAsync().ConfigureAwait(false);
-                }
-            }
-            catch (Exception ex)
-            {
-            }
-
-            await Task.Delay(1).ConfigureAwait(false);
-        }
-
-        public void StopCamera()
-        {
-            _localWebCam.Stop();
-        }
+        
 
         private bool _stopCamera;
         public bool GetSnapShot
@@ -285,9 +230,9 @@ namespace DicingBlade.Classes
             {
                 if (value)
                 {
-                    _localWebCam.SignalToStop();
+                    VideoCamera.FreezeCameraImage();
                 }
-                else _localWebCam.Start();
+                else VideoCamera.StartCamera(0);
                 _stopCamera = value;
             }
 
@@ -698,11 +643,6 @@ namespace DicingBlade.Classes
             ResetErrors();
         }
 
-        public async Task GoTest()
-        {
-            Motion.mAcm_AxMoveAbs(Z.Handle, 5);
-        }
-
         public async Task GoThereAsync(Place place)
         {
             switch (place)
@@ -891,76 +831,76 @@ namespace DicingBlade.Classes
 
         #region Методы
 
-        public async Task YGoToSwLmt(double position)
-        {
-            uint buf = 0;
-            uint res = 0;
-            const double tolerance = 0.003;
-            var pos = (int)(position * Y.Ppu);
-            ushort direction = 0;
+        //public async Task YGoToSwLmt(double position)
+        //{
+        //    uint buf = 0;
+        //    uint res = 0;
+        //    const double tolerance = 0.003;
+        //    var pos = (int)(position * Y.Ppu);
+        //    ushort direction = 0;
 
-            buf = (uint)SwLmtEnable.SLMT_DIS;
-            res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwPelEnable, ref buf, 4);
-            res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwMelEnable, ref buf, 4);
-            ResetErrors();
+        //    buf = (uint)SwLmtEnable.SLMT_DIS;
+        //    res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwPelEnable, ref buf, 4);
+        //    res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwMelEnable, ref buf, 4);
+        //    ResetErrors();
 
-            var diff = position - Y.ActualPosition;
-            if (Math.Abs(diff) > tolerance)
-            {
-                buf = (uint)SwLmtReact.SLMT_IMMED_STOP;
-                res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwPelReact, ref buf, 4);
-                res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwMelReact, ref buf, 4);
-                var tol = 0;
-                switch (Math.Sign(diff))
-                {
-                    case 1:
-                        res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwPelValue, ref pos, 4);
-                        buf = (uint)SwLmtEnable.SLMT_EN;
-                        res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwPelEnable, ref buf, 4);
-                        buf = (uint)SwLmtToleranceEnable.TOLERANCE_ENABLE;
-                        res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwPelToleranceEnable, ref buf,
-                            4);
-                        res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwPelToleranceValue, ref tol,
-                            4);
-                        direction = (ushort)VelMoveDir.DIR_POSITIVE;
-                        break;
-                    case -1:
-                        res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwMelValue, ref pos, 4);
-                        buf = (uint)SwLmtEnable.SLMT_EN;
-                        res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwMelEnable, ref buf, 4);
-                        buf = (uint)SwLmtToleranceEnable.TOLERANCE_ENABLE;
-                        res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwMelToleranceEnable, ref buf,
-                            4);
-                        res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwMelToleranceValue, ref tol,
-                            4);
-                        direction = (ushort)VelMoveDir.DIR_NEGATIVE;
-                        break;
-                }
+        //    var diff = position - Y.ActualPosition;
+        //    if (Math.Abs(diff) > tolerance)
+        //    {
+        //        buf = (uint)SwLmtReact.SLMT_IMMED_STOP;
+        //        res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwPelReact, ref buf, 4);
+        //        res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwMelReact, ref buf, 4);
+        //        var tol = 0;
+        //        switch (Math.Sign(diff))
+        //        {
+        //            case 1:
+        //                res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwPelValue, ref pos, 4);
+        //                buf = (uint)SwLmtEnable.SLMT_EN;
+        //                res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwPelEnable, ref buf, 4);
+        //                buf = (uint)SwLmtToleranceEnable.TOLERANCE_ENABLE;
+        //                res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwPelToleranceEnable, ref buf,
+        //                    4);
+        //                res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwPelToleranceValue, ref tol,
+        //                    4);
+        //                direction = (ushort)VelMoveDir.DIR_POSITIVE;
+        //                break;
+        //            case -1:
+        //                res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwMelValue, ref pos, 4);
+        //                buf = (uint)SwLmtEnable.SLMT_EN;
+        //                res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwMelEnable, ref buf, 4);
+        //                buf = (uint)SwLmtToleranceEnable.TOLERANCE_ENABLE;
+        //                res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwMelToleranceEnable, ref buf,
+        //                    4);
+        //                res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwMelToleranceValue, ref tol,
+        //                    4);
+        //                direction = (ushort)VelMoveDir.DIR_NEGATIVE;
+        //                break;
+        //        }
 
-                Motion.mAcm_AxMoveVel(Y.Handle, direction);
-                uint status = 0;
-                uint slmtp = 0;
-                uint slmtn = 0;
-                await Task.Run(() =>
-                    {
-                        do
-                        {
-                            Thread.Sleep(1);
-                            Motion.mAcm_AxGetMotionIO(Y.Handle, ref status);
-                            slmtp = status & (uint)Ax_Motion_IO.AX_MOTION_IO_SLMTP;
-                            slmtn = status & (uint)Ax_Motion_IO.AX_MOTION_IO_SLMTN;
-                        } while ((slmtp == 0) & (slmtn == 0));
-                    }
-                );
-                Y.SetVelocity(1);
-                Motion.mAcm_AxSetCmdPosition(Y.Handle, Y.ActualPosition);
-                await YGoToSwLmt(position);
-                buf = (uint)SwLmtEnable.SLMT_DIS;
-                //res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwPelEnable, ref buf, 4);
-                //res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwMelEnable, ref buf, 4);
-                ResetErrors();
-            }
-        }
+        //        Motion.mAcm_AxMoveVel(Y.Handle, direction);
+        //        uint status = 0;
+        //        uint slmtp = 0;
+        //        uint slmtn = 0;
+        //        await Task.Run(() =>
+        //            {
+        //                do
+        //                {
+        //                    Thread.Sleep(1);
+        //                    Motion.mAcm_AxGetMotionIO(Y.Handle, ref status);
+        //                    slmtp = status & (uint)Ax_Motion_IO.AX_MOTION_IO_SLMTP;
+        //                    slmtn = status & (uint)Ax_Motion_IO.AX_MOTION_IO_SLMTN;
+        //                } while ((slmtp == 0) & (slmtn == 0));
+        //            }
+        //        );
+        //        Y.SetVelocity(1);
+        //        Motion.mAcm_AxSetCmdPosition(Y.Handle, Y.ActualPosition);
+        //        await YGoToSwLmt(position);
+        //        buf = (uint)SwLmtEnable.SLMT_DIS;
+        //        //res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwPelEnable, ref buf, 4);
+        //        //res = Motion.mAcm_SetProperty(Y.Handle, (uint)PropertyID.CFG_AxSwMelEnable, ref buf, 4);
+        //        ResetErrors();
+        //    }
+        //}
 
         public void ResetErrors()
         {
@@ -1077,72 +1017,6 @@ namespace DicingBlade.Classes
 
         #endregion
 
-        //private void CheckDevEvents()
-        //{
-        //    uint Result;
-        //    UInt32[] AxEvtStatusArray = new UInt32[32];
-        //    UInt32[] GpEvtStatusArray = new UInt32[32];
-        //    UInt32 i;
-        //    while (MachineInit)
-        //    {
-        //        Result = Motion.mAcm_CheckMotionEvent(m_DeviceHandle, AxEvtStatusArray, GpEvtStatusArray, m_ulAxisCount, 2, 1);
-        //        if (Result == (uint)ErrorCode.SUCCESS)
-        //        {
-        //            for (i = 0; i < m_ulAxisCount; i++)
-        //            {
-
-        //                if ((AxEvtStatusArray[i] & (uint)EventType.EVT_AX_MOTION_DONE) > 0)
-        //                {
-        //                    AxMotionDone |= i + 1;
-        //                }
-        //                else
-        //                {
-        //                    //  globalProperties.AxMotionDone &= i + 1;
-        //                }
-        //                if ((AxEvtStatusArray[i] & (uint)EventType.EVT_AX_COMPARED) > 0)
-        //                {
-
-        //                }
-
-        //            }
-        //            if (m_GpHand != IntPtr.Zero)
-        //            {
-
-        //                if ((GpEvtStatusArray[0] & (uint)EventType.EVT_GP1_MOTION_DONE) > 0)
-        //                {
-        //                    GpMotionDone = true;
-        //                }
-        //                else
-        //                {
-        //                    GpMotionDone = false;
-        //                }
-
-        //            }
-        //        }
-        //    }
-        //}
-
-        //private void EnableDevEvents()
-        //{
-        //    UInt32 Result;
-        //    uint[] AxEnableEvtArray = new uint[m_ulAxisCount];
-        //    uint[] GpEnableEvt = new uint[1];
-        //    if (MachineInit)
-        //    {
-        //        for (int i = 0; i < m_ulAxisCount; i++)
-        //        {
-        //            AxEnableEvtArray[i] |= (uint)EventType.EVT_AX_MOTION_DONE;
-        //            AxEnableEvtArray[i] |= (uint)EventType.EVT_AX_COMPARED;
-        //            AxEnableEvtArray[i] |= (uint)EventType.EVT_AX_HOME_DONE;
-        //        }
-        //        GpEnableEvt[0] |= (uint)EventType.EVT_GP1_MOTION_DONE;
-        //        Result = Motion.mAcm_EnableMotionEvent(m_DeviceHandle, AxEnableEvtArray, GpEnableEvt, m_ulAxisCount, 1);
-        //        if (Result != (uint)ErrorCode.SUCCESS)
-        //        {
-        //            MessageBox.Show(Result.ToString());
-        //            return;
-        //        }
-        //    }
-        //}
+       
     }
 }

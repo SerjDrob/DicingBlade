@@ -8,6 +8,7 @@ using System.IO;
 using PropertyChanged;
 using System.Windows;
 using DicingBlade.Properties;
+using System.Windows.Media.Imaging;
 
 
 namespace DicingBlade.ViewModels
@@ -15,6 +16,10 @@ namespace DicingBlade.ViewModels
     [AddINotifyPropertyChangedInterface]
     internal class MainViewModel
     {
+
+        public BitmapImage Bi { get; set; }
+
+
         //private Parameters parameters;
         public Machine Machine { get; set; }
         public Process Process { get; set; }
@@ -73,6 +78,7 @@ namespace DicingBlade.ViewModels
             ToTeachVideoScaleCmd = new Command(args => ToTeachVideoScaleAsync());
             TestCmd = new Command(args => Func(args));
             Machine = new Machine(Test);
+            Machine.VideoCamera.OnBitmapChanged += GetCameraImage;
             BaseProcess = new Diagram[] {
                 Diagram.GoNextCutXy,
                 Diagram.GoNextDepthZ,
@@ -92,6 +98,17 @@ namespace DicingBlade.ViewModels
             WvAngle = angle;
             RotatingTime = time;
             WvRotate ^= true;
+        }
+
+        private async void GetCameraImage(BitmapImage bi) 
+        {
+            var tmp = Bi;            
+            if (tmp?.StreamSource != null)
+            {
+                await tmp.StreamSource.DisposeAsync().ConfigureAwait(false);
+            }
+            Bi = new BitmapImage();
+            Bi = bi;
         }
 
         private void Machine_OnAirWanished(DiEventArgs eventArgs)
