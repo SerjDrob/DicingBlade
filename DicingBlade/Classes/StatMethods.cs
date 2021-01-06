@@ -65,5 +65,20 @@ namespace DicingBlade.Classes
         {
             return new Vector2(vector.X, vector.Y);
         }
+        public static int SetBit(this int variable, int pos)
+        {
+           var res = variable | 1 << pos;
+            return res;
+        }
+        public static int ResetBit(this int variable, int pos)
+        {
+            var res = variable & ~(1 << pos);
+            return res;
+        }
+
+        public static double GetVal(this (Ax num, double val)[] arr, Ax @enum)
+        {
+            return arr.Where(n => n.num == @enum).Select(v => v.val).First();
+        }
     }
 }

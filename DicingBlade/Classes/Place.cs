@@ -5,6 +5,7 @@
         Home,
         Loading,
         CameraChuckCenter,
-        BladeChuckCenter
+        BladeChuckCenter,
+        ZBladeTouch        
     }
 }

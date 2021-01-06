@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30413.136
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DicingBlade", "DicingBlade\DicingBlade.csproj", "{ADB02AFF-239E-4B37-B9F3-282D1503104E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DicingBlade", "DicingBlade\DicingBlade.csproj", "{ADB02AFF-239E-4B37-B9F3-282D1503104E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DicingBladeTests", "DicingBladeTests\DicingBladeTests.csproj", "{D5A0B6F2-F1BF-4C85-B7CD-9105A8198057}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,14 @@ Global
 		{ADB02AFF-239E-4B37-B9F3-282D1503104E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{ADB02AFF-239E-4B37-B9F3-282D1503104E}.Release|x86.ActiveCfg = Release|x86
 		{ADB02AFF-239E-4B37-B9F3-282D1503104E}.Release|x86.Build.0 = Release|x86
+		{D5A0B6F2-F1BF-4C85-B7CD-9105A8198057}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5A0B6F2-F1BF-4C85-B7CD-9105A8198057}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5A0B6F2-F1BF-4C85-B7CD-9105A8198057}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D5A0B6F2-F1BF-4C85-B7CD-9105A8198057}.Debug|x86.Build.0 = Debug|Any CPU
+		{D5A0B6F2-F1BF-4C85-B7CD-9105A8198057}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5A0B6F2-F1BF-4C85-B7CD-9105A8198057}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5A0B6F2-F1BF-4C85-B7CD-9105A8198057}.Release|x86.ActiveCfg = Release|Any CPU
+		{D5A0B6F2-F1BF-4C85-B7CD-9105A8198057}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

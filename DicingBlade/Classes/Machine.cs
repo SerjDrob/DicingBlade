@@ -244,7 +244,7 @@ namespace DicingBlade.Classes
             try
             {
                 motionDevice = new MotionDevice();
-                _mUlAxisCount = motionDevice.GetAxisCount();
+              //  _mUlAxisCount = motionDevice.GetAxisCount();
             }
             catch (MotionException e)
             {
@@ -285,9 +285,10 @@ namespace DicingBlade.Classes
             _mBInit = true;
 
             X = new Axis(0, MAxishand[0], 0);
-            Y = new Axis(12.8, MAxishand[3], 3);
-            Z = new Axis(0, MAxishand[2], 2);
             U = new Axis(0, MAxishand[1], 1);
+            Z = new Axis(0, MAxishand[2], 2);
+            Y = new Axis(12.8, MAxishand[3], 3);
+           
             _axes = new Axis[4];
             _axes[X.AxisNum] = X;
             _axes[Y.AxisNum] = Y;

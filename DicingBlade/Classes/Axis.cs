@@ -41,14 +41,14 @@ namespace DicingBlade.Classes
 
         public bool GetDi(Di din)
         {
-            return (DIs & (1 << (int)din)) != 0 ? true : false;
+            return (DIs & (1 << (int)din)) != 0;
         }
 
         public bool GetDo(Do dout)
         {
             byte bit = 0;
             var result = Motion.mAcm_AxDoGetBit(Handle, (ushort)dout, ref bit);
-            return bit != 0 ? true : false;
+            return bit != 0;
         }
 
         public bool SetDo(Do dout, byte val)

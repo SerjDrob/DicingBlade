@@ -9,20 +9,82 @@ using PropertyChanged;
 using System.Windows;
 using DicingBlade.Properties;
 using System.Windows.Media.Imaging;
+using System.Collections.Generic;
+using DicingBlade;
+using DicingBlade.ViewModels;
+using System.Windows.Media;
 
+namespace DicingBlade.Classes
+{
+    public class TraceLine
+    {
+        public double XStart;
+        public double XEnd;
+        public double YStart;
+        public double YEnd;
+    }
+}
 
 namespace DicingBlade.ViewModels
 {
     [AddINotifyPropertyChangedInterface]
-    internal class MainViewModel
+    internal class MainViewModel : IDisposable
     {
+        private IMachine _machine;
 
+
+
+
+
+        public Velocity VelocityRegime { get; set; } = Velocity.Fast;
+        private ExceptionsAgregator _exceptionsAgregator;
+
+        public ObservableCollection<TraceLine> TracesCollectionView { get; set; } = new ObservableCollection<TraceLine>();
+
+        private Task _tracingTask;
+
+        public double XTrace { get; set; }
+        public double YTrace { get; set; }
+        public double XTraceEnd { get; set; }
+
+        private System.Threading.CancellationTokenSource _tracingTaskCancellationTokenSource;
+        private System.Threading.CancellationToken _tracingTaskCancellationToken;
         public BitmapImage Bi { get; set; }
+        public double XView { get; set; }
+        public double YView { get; set; }
+        public double ZView { get; set; }
+        public double UView { get; set; }
+        public bool XpLmtView { get; set; }
+        public bool YpLmtView { get; set; }
+        public bool ZpLmtView { get; set; }
+        public bool UpLmtView { get; set; }
+        public bool XnLmtView { get; set; }
+        public bool YnLmtView { get; set; }
+        public bool ZnLmtView { get; set; }
+        public bool UnLmtView { get; set; }
+        public bool XMotDoneView { get; set; }
+        public bool YMotDoneView { get; set; }
+        public bool ZMotDoneView { get; set; }
+        public bool UMotDoneView { get; set; }
+        public bool ChuckVacuumValveView { get; set; }
+        public bool CoolantValveView { get; set; }
+        public bool BlowingValveView { get; set; }
+        public bool ChuckVacuumSensorView { get; set; }
+        public bool CoolantSensorView { get; set; }
+        public bool AirSensorView { get; set; }
+        public bool SpindleCoolantSensorView { get; set; }
+        public double BCCenterXView { get; set; }
+        public double BCCenterYView { get; set; }
+        public double CCCenterXView { get; set; }
+        public double CCCenterYView { get; set; }
+        public double ZBladeTouchView { get; set; }
+        public int SpindleFreqView { get; set; }
+        public double SpindleCurrentView { get; set; }
 
 
         //private Parameters parameters;
         public Machine Machine { get; set; }
-        public Process Process { get; set; }
+        public Process2 Process { get; set; }
         public Wafer Wafer { get; set; }
         public WaferView WaferView { get; set; }
         public ObservableCollection<TracePath> Traces { get; set; }
@@ -62,12 +124,10 @@ namespace DicingBlade.ViewModels
         public MainViewModel()
         {
             Test = false;
-
             Cols = new int[] { 0, 1 };
             Rows = new int[] { 2, 1 };
             Condition = new Map();
             OpenFileCmd = new Command(args => OpenFile());
-            //RotateCmd = new Command(args => Rotate());
             ChangeCmd = new Command(args => Change());
             KeyDownCmd = new Command(args => KeyDownAsync(args));
             KeyUpCmd = new Command(args => KeyUp(args));
@@ -77,8 +137,65 @@ namespace DicingBlade.ViewModels
             ToTeachChipSizeCmd = new Command(args => ToTeachChipSizeAsync());
             ToTeachVideoScaleCmd = new Command(args => ToTeachVideoScaleAsync());
             TestCmd = new Command(args => Func(args));
-            Machine = new Machine(Test);
-            Machine.VideoCamera.OnBitmapChanged += GetCameraImage;
+
+            Bi = new BitmapImage();
+
+            _exceptionsAgregator = ExceptionsAgregator.GetExceptionsAgregator();
+            _exceptionsAgregator.SetShowMethod(s => { MessageBox.Show(s); });
+
+            //Machine = new Machine(Test);
+            //Machine.VideoCamera.OnBitmapChanged += GetCameraImage;
+            try
+            {
+                _machine = new Machine4X();
+                _machine.ConfigureAxes(new (Ax, double)[]
+                {
+                    (Ax.X,0),
+                    (Ax.U,0),
+                    (Ax.Z,0),
+                    (Ax.Y,12.8)
+                });
+
+                _machine.ConfigureAxesGroups(new Dictionary<Groups, Ax[]> {
+                { Groups.XY, new Ax[]{Ax.X,Ax.Y}}
+                });
+
+                _machine.ConfigureValves(new Dictionary<Valves, (Ax, Do)>
+                {
+                    {Valves.Blowing,(Ax.Z,Do.Out6) },
+                    {Valves.ChuckVacuum,(Ax.Z,Do.Out4) },
+                    {Valves.Coolant,(Ax.U,Do.Out4) }
+                });
+
+                _machine.SwitchOffValve(Valves.Blowing);
+                _machine.SwitchOffValve(Valves.ChuckVacuum);
+                _machine.SwitchOffValve(Valves.Coolant);
+
+                _machine.ConfigureSensors(new Dictionary<Sensors, (Ax, Di)>
+                {
+                    {Sensors.Air,(Ax.Z,Di.In1)},
+                    {Sensors.ChuckVacuum,(Ax.X,Di.In3)},
+                    {Sensors.Coolant,(Ax.X,Di.In2)},
+                    {Sensors.SpindleCoolant,(Ax.X,Di.In1) }
+                });
+
+                ImplementMachineSettings();
+                _machine.StartVideoCapture(0);
+                _machine.OnVideoSourceBmpChanged += _machine_OnVideoSourceBmpChanged;
+                _machine.OnAxisMotionStateChanged += _machine_OnAxisMotionStateChanged;
+                _machine.OnSensorStateChanged += _machine_OnAxisSensorStateChanged;
+                _machine.OnValveStateChanged += _machine_OnAxisValveStateChanged;
+                _machine.OnSpindleStateChanging += _machine_OnSpindleStateChanging;
+            }
+            catch (MotionException ex)
+            {
+                MessageBox.Show(ex.Message, ex.StackTrace);
+            }
+
+
+
+
+
             BaseProcess = new Diagram[] {
                 Diagram.GoNextCutXy,
                 Diagram.GoNextDepthZ,
@@ -86,29 +203,106 @@ namespace DicingBlade.ViewModels
                 Diagram.GoTransferingHeightZ,
                 Diagram.GoNextDirection
             };
-            Traces = new ObservableCollection<TracePath>();
-            _tempWafer2.FirstPointSet = false;
-            // machine = new Machine();
-            //  machine.OnAirWanished += Machine_OnAirWanished;
+            //Traces = new ObservableCollection<TracePath>();
+            //_tempWafer2.FirstPointSet = false;
 
             AjustWaferTechnology();
         }
+
+        private void _machine_OnSpindleStateChanging(int rpm, double current, bool spinningState)
+        {
+            SpindleFreqView = rpm;
+            SpindleCurrentView = current;
+        }
+
+        private void _machine_OnVideoSourceBmpChanged(BitmapImage bitmapImage)
+        {
+            Bi = bitmapImage;
+            //var tmp = Bi;
+            //if (tmp?.StreamSource != null)
+            //{
+            //    await tmp.StreamSource.DisposeAsync().ConfigureAwait(false);
+            //}            
+        }
+
+        private void _machine_OnAxisValveStateChanged(Valves valve, bool state)
+        {
+            switch (valve)
+            {
+                case Valves.Blowing:
+                    BlowingValveView = state;
+                    break;
+                case Valves.Coolant:
+                    CoolantValveView = state;
+                    break;
+                case Valves.ChuckVacuum:
+                    ChuckVacuumValveView = state;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void _machine_OnAxisSensorStateChanged(Sensors sensor, bool state)
+        {
+            switch (sensor)
+            {
+                case Sensors.ChuckVacuum:
+                    ChuckVacuumSensorView = state;
+                    break;
+                case Sensors.Air:
+                    AirSensorView = state;
+                    break;
+                case Sensors.Coolant:
+                    CoolantSensorView = state;
+                    break;
+                case Sensors.SpindleCoolant:
+                    SpindleCoolantSensorView = state;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void _machine_OnAxisMotionStateChanged(Ax axis, double position, bool nLmt, bool pLmt, bool motionDone)
+        {
+            position = Math.Round(position, 3);
+            switch (axis)
+            {
+                case Ax.X:
+                    XView = position;
+                    XpLmtView = pLmt;
+                    XnLmtView = nLmt;
+                    XMotDoneView = motionDone;
+                    break;
+                case Ax.Y:
+                    YView = position;
+                    YpLmtView = pLmt;
+                    YnLmtView = nLmt;
+                    YMotDoneView = motionDone;
+                    break;
+                case Ax.Z:
+                    ZView = position;
+                    ZpLmtView = pLmt;
+                    ZnLmtView = nLmt;
+                    ZMotDoneView = motionDone;
+                    break;
+                case Ax.U:
+                    UView = position;
+                    UpLmtView = pLmt;
+                    UnLmtView = nLmt;
+                    UMotDoneView = motionDone;
+                    break;
+                default:
+                    break;
+            }
+        }
+
         private void SetRotation(double angle, double time)
         {
             WvAngle = angle;
             RotatingTime = time;
             WvRotate ^= true;
-        }
-
-        private async void GetCameraImage(BitmapImage bi) 
-        {
-            var tmp = Bi;            
-            if (tmp?.StreamSource != null)
-            {
-                await tmp.StreamSource.DisposeAsync().ConfigureAwait(false);
-            }
-            Bi = new BitmapImage();
-            Bi = bi;
         }
 
         private void Machine_OnAirWanished(DiEventArgs eventArgs)
@@ -140,10 +334,10 @@ namespace DicingBlade.ViewModels
             //test key
             if (key.Key == Key.Tab)
             {
-                Machine.SpindleModbus();
+                //Machine.SpindleModbus();
                 //WVRotate ^= true;
                 //Machine.GoTest();
-                //if(process==null) process = new Process(Machine, Wafer, new Blade());
+                //if (process == null) process = new Process(Machine, Wafer, new Blade());
                 //await process.ProcElementDispatcherAsync(Diagram.goCameraPointLearningXYZ);
             }
 
@@ -153,84 +347,134 @@ namespace DicingBlade.ViewModels
             }
             if (key.Key == Key.Q)
             {
-                Machine.SwitchOnChuckVacuum ^= true;
-            }
-            if (key.Key == Key.W)
-            {
-                Machine.SwitchOnCoolantWater ^= true;
-            }
-            if (key.Key == Key.R)
-            {
-                Machine.SwitchOnBlowing ^= true;
-            }
-            if (key.Key == Key.D) WaferView.Angle += 0.2;
-            if (key.Key == Key.S) WaferView.Angle -= 0.2;
-            if (key.Key == Key.F2) OpenFile();
-            if (key.Key == Key.T) Change();
-            if (key.Key == Key.Divide)
-            {
-                if (!Test)
+                if (_machine.GetValveState(Valves.ChuckVacuum))
                 {
-                    if (Process == null)
-                    {
-                        if (Machine.SetOnChuck())
-                        {
-                            Machine.SetVelocity(Velocity.Service);
-                            await Machine.GoThereAsync(Place.CameraChuckCenter);
-
-                            Process = new Process(Machine, Wafer, new Blade(), new Technology(), BaseProcess);
-                            Process.GetRotationEvent += SetRotation;
-                            Process.ChangeScreensEvent += ChangeScreensRegime;
-                            Process.ProcessStatus = Status.StartLearning;
-                        }
-
-                    }
-                    else
-                    {
-                        if (Process.ProcessStatus == Status.Done)
-                        {
-                            Process = null;
-                        }
-                        else await Process.StartPauseProc();
-                    }
+                    _machine.SwitchOffValve(Valves.ChuckVacuum);
                 }
                 else
                 {
-                    Process = new Process(Machine, Wafer, new Blade(), new Technology(), BaseProcess);
+                    _machine.SwitchOnValve(Valves.ChuckVacuum);
                 }
-                //StartWorkAsync();
+
             }
-            if (key.Key == Key.A)
+            if (key.Key == Key.W)
             {
-                Machine.Y.GoWhile(AxDir.Pos);
+                if (_machine.GetValveState(Valves.Coolant))
+                {
+                    _machine.SwitchOffValve(Valves.Coolant);
+                }
+                else
+                {
+                    _machine.SwitchOnValve(Valves.Coolant);
+                }
             }
-            if (key.Key == Key.Z)
+            if (key.Key == Key.R)
             {
-                Machine.Y.GoWhile(AxDir.Neg);
-            }
-            if (key.Key == Key.X)
-            {
-                Machine.X.GoWhile(AxDir.Neg);
-            }
-            if (key.Key == Key.C)
-            {
-                Machine.X.GoWhile(AxDir.Pos);
-            }
-            if (key.Key == Key.S)
-            {
-                Machine.GoWhile(AxisDirections.Up);
+                if (_machine.GetValveState(Valves.Blowing))
+                {
+                    _machine.SwitchOffValve(Valves.Blowing);
+                }
+                else
+                {
+                    _machine.SwitchOnValve(Valves.Blowing);
+                }
             }
             if (key.Key == Key.D)
             {
-                Machine.GoWhile(AxisDirections.Un);
+                _machine.GoWhile(Ax.U, AxDir.Pos);
+            }
+
+            if (key.Key == Key.S)
+            {
+                _machine.GoWhile(Ax.U, AxDir.Neg);
+            }
+            if (key.Key == Key.F2)
+            {
+                _machine.StartSpindle();
+            }
+            if (key.Key == Key.F3)
+            {
+                _machine.StopSpindle();
+            }
+            if (key.Key == Key.T) Change();
+            if (key.Key == Key.Divide)
+            {
+
+                if (Process == null)
+                {
+
+                    try
+                    {
+                        Process = new Process2(_machine, Wafer, new Blade(), new Technology(), BaseProcess);
+                        _exceptionsAgregator.RegisterMessager(Process);
+                        //Machine.SetVelocity(Velocity.Service);
+                        //await Machine.GoThereAsync(Place.CameraChuckCenter);
+                        Process.GetRotationEvent += SetRotation;
+                        Process.ChangeScreensEvent += ChangeScreensRegime;
+                        Process.BladeTracingEvent += Process_BladeTracingEvent;
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message);
+                    }
+
+
+                }
+                else
+                {
+                    if (Process.ProcessStatus == Status.Done)
+                    {
+                        Process = null;
+                    }
+                    else
+                    {
+                        try
+                        {
+                            await Process.StartPauseProc();
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"{ex.Message}\n{ex.StackTrace}");
+                        }
+
+                    }
+
+                }
+
+
+            }
+            if (key.Key == Key.A)
+            {
+                _machine.GoWhile(Ax.Y, AxDir.Pos);
+                //Machine.Y.GoWhile(AxDir.Pos);
+            }
+            if (key.Key == Key.Z)
+            {
+                _machine.GoWhile(Ax.Y, AxDir.Neg);
+            }
+            if (key.Key == Key.X)
+            {
+                _machine.GoWhile(Ax.X, AxDir.Neg);
+            }
+            if (key.Key == Key.C)
+            {
+                _machine.GoWhile(Ax.X, AxDir.Pos);
+            }
+            if (key.Key == Key.S)
+            {
+                _machine.GoWhile(Ax.U, AxDir.Pos);
+            }
+            if (key.Key == Key.D)
+            {
+                _machine.GoWhile(Ax.U, AxDir.Neg);
             }
             if (key.Key == Key.V)
             {
-                Machine.Z.GoWhile(AxDir.Pos);
+                _machine.GoWhile(Ax.Z, AxDir.Pos);
             }
             if (key.Key == Key.B)
             {
-                Machine.Z.GoWhile(AxDir.Neg);
+                _machine.GoWhile(Ax.Z, AxDir.Neg);
             }
             if (key.Key == Key.J)
             {
@@ -249,7 +493,18 @@ namespace DicingBlade.ViewModels
             }
             if (key.Key == Key.Home)
             {
-                await Machine.GoThereAsync(Place.Home);
+                try
+                {
+                    var task = Task.Factory.StartNew(() => _machine.GoThereAsync(Place.Home));
+                    await task;
+                    if (Process != null) Process = null;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, ex.StackTrace);
+                }
+
+                // await Machine.GoThereAsync(Place.Home);
             }
             if (key.Key == Key.OemMinus)
             {
@@ -274,19 +529,21 @@ namespace DicingBlade.ViewModels
             }
             if (key.Key == Key.Add)
             {
-                if (Machine.VelocityRegime == Velocity.Slow)
+                if (VelocityRegime == Velocity.Slow)
                 {
-                    Machine.VelocityRegime = Velocity.Fast;
+                    VelocityRegime = Velocity.Fast;
+                    _machine.SetVelocity(Velocity.Fast);
                 }
                 else
                 {
-                    Machine.VelocityRegime = Velocity.Slow;
+                    VelocityRegime = Velocity.Slow;
+                    _machine.SetVelocity(Velocity.Slow);
                 }
             }
 
             if (Keyboard.IsKeyDown(Key.RightCtrl) && Keyboard.IsKeyDown(Key.Oem6))//}
             {
-                throw new NotImplementedException();
+                await _machine?.GoThereAsync(Place.CameraChuckCenter);
             }
             if (Keyboard.IsKeyDown(Key.RightCtrl) && Keyboard.IsKeyDown(Key.Oem4))//{
             {
@@ -304,24 +561,90 @@ namespace DicingBlade.ViewModels
             }
             //key.Handled = true;
         }
+
+        private async void Process_BladeTracingEvent(bool trace)
+        {
+            if (trace)
+            {
+                _tracingTaskCancellationTokenSource = new System.Threading.CancellationTokenSource();
+                _tracingTaskCancellationToken = _tracingTaskCancellationTokenSource.Token;
+                _tracingTask = new Task(() => BladeTracingTaskAsync(), _tracingTaskCancellationToken);
+
+                _tracingTask.Start();
+            }
+            else
+            {
+                _tracingTaskCancellationTokenSource.Cancel();
+                try
+                {
+                    await _tracingTask;
+                }
+                catch (OperationCanceledException)
+                {
+
+                }
+                finally
+                {
+                    _tracingTaskCancellationTokenSource.Dispose();
+                    _tracingTask?.Dispose();
+
+                    RotateTransform rotateTransform = new RotateTransform(
+                       -Wafer.GetCurrentDiretionAngle,
+                       BCCenterXView,
+                       BCCenterYView
+                       );
+
+                    var point1 = rotateTransform.Transform(new System.Windows.Point(XTrace, YTrace + Wafer.GetCurrentDirectionIndexShift));
+                    var point2 = rotateTransform.Transform(new System.Windows.Point(XTraceEnd, YTrace + Wafer.GetCurrentDirectionIndexShift));
+                    point1 = new TranslateTransform(-BCCenterXView, -BCCenterYView).Transform(point1);
+                    point2 = new TranslateTransform(-BCCenterXView, -BCCenterYView).Transform(point2);
+
+                    TracesCollectionView.Add(new TraceLine()
+                    {
+                        XStart = point1.X,
+                        XEnd = point2.X,
+                        YStart = point1.Y,
+                        YEnd = point2.Y
+                    });
+
+                    TracesCollectionView = new ObservableCollection<TraceLine>(TracesCollectionView);
+                    XTrace = new double();
+                    YTrace = new double();
+                    XTraceEnd = new double();
+                }
+            }
+        }
+        private async Task BladeTracingTaskAsync()
+        {
+            XTrace = XView;
+            YTrace = YView;
+
+            while (!_tracingTaskCancellationToken.IsCancellationRequested)
+            {
+                XTraceEnd = XView;
+                Task.Delay(100).Wait();
+            }
+
+            _tracingTaskCancellationToken.ThrowIfCancellationRequested();
+        }
         private void KeyUp(object args)
         {
             KeyEventArgs key = (KeyEventArgs)args;
             if (key.Key == Key.A | key.Key == Key.Z)
             {
-                Machine.Stop(Ax.Y);
+                _machine.Stop(Ax.Y);
             }
             if (key.Key == Key.X | key.Key == Key.C)
             {
-                Machine.Stop(Ax.X);
+                _machine.Stop(Ax.X);
             }
             if (key.Key == Key.S | key.Key == Key.D)
             {
-                Machine.Stop(Ax.U);
+                _machine.Stop(Ax.U);
             }
             if (key.Key == Key.V | key.Key == Key.B)
             {
-                Machine.Stop(Ax.Z);
+                _machine.Stop(Ax.Z);
             }
         }
         private void WaferSettings()
@@ -337,13 +660,159 @@ namespace DicingBlade.ViewModels
         }
         private void MachineSettings()
         {
-            var machineSettingsView = new Views.MachineSettingsView
+            new Views.MachineSettingsView()
             {
-                DataContext = new MachineSettingsViewModel(Machine)
-            };
-            machineSettingsView.ShowDialog();
+                DataContext = new MachineSettingsViewModel(XView, YView)
+            }.ShowDialog();
+
             Settings.Default.Save();
-            Machine.RefreshSettings();
+
+            //Machine.RefreshSettings();
+            try
+            {
+                ImplementMachineSettings();
+            }
+            catch (MotionException ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void ImplementMachineSettings()
+        {
+            var xpar = new MotionDeviceConfigs()
+            {
+                maxAcc = 180,
+                maxDec = 180,
+                maxVel = 50,
+                axDirLogic = (int)Advantech.Motion.DirLogic.DIR_ACT_HIGH,
+                plsOutMde = (int)Advantech.Motion.PulseOutMode.OUT_DIR,
+                reset = (int)Advantech.Motion.HomeReset.HOME_RESET_EN,
+                acc = Settings.Default.XAcc,
+                dec = Settings.Default.XDec,
+                ppu = Settings.Default.XPPU,
+                homeVelLow = Settings.Default.XVelLow,
+                homeVelHigh = Settings.Default.XVelService
+            };
+            var ypar = new MotionDeviceConfigs()
+            {
+                maxAcc = 180,
+                maxDec = 180,
+                maxVel = 50,
+                plsOutMde = (int)Advantech.Motion.PulseOutMode.OUT_DIR_ALL_NEG,
+                axDirLogic = (int)Advantech.Motion.DirLogic.DIR_ACT_HIGH,
+                reset = (int)Advantech.Motion.HomeReset.HOME_RESET_EN,
+                acc = Settings.Default.YAcc,
+                dec = Settings.Default.YDec,
+                ppu = Settings.Default.YPPU,
+                plsInMde = (int)Advantech.Motion.PulseInMode.AB_4X,
+                homeVelLow = Settings.Default.YVelLow,
+                homeVelHigh = Settings.Default.YVelService
+            };
+            var zpar = new MotionDeviceConfigs()
+            {
+                maxAcc = 180,
+                maxDec = 180,
+                maxVel = 50,
+                axDirLogic = (int)Advantech.Motion.DirLogic.DIR_ACT_HIGH,
+                plsOutMde = (int)Advantech.Motion.PulseOutMode.OUT_DIR,
+                reset = (int)Advantech.Motion.HomeReset.HOME_RESET_EN,
+                acc = Settings.Default.ZAcc,
+                dec = Settings.Default.ZDec,
+                ppu = Settings.Default.ZPPU,
+                homeVelLow = Settings.Default.ZVelLow,
+                homeVelHigh = Settings.Default.ZVelService
+            };
+            Settings.Default.UPPU = 1000;
+            var upar = new MotionDeviceConfigs()
+            {
+                maxAcc = 180,
+                maxDec = 180,
+                maxVel = 50,
+                axDirLogic = (int)Advantech.Motion.DirLogic.DIR_ACT_HIGH,
+                plsOutMde = (int)Advantech.Motion.PulseOutMode.OUT_DIR,
+                reset = (int)Advantech.Motion.HomeReset.HOME_RESET_EN,
+                acc = Settings.Default.UAcc,
+                dec = Settings.Default.UDec,
+                ppu = Settings.Default.UPPU,
+                homeVelLow = Settings.Default.UVelLow,
+                homeVelHigh = Settings.Default.UVelService
+            };
+            var XVelRegimes = new Dictionary<Velocity, double>
+            {
+                {Velocity.Fast,Settings.Default.XVelHigh },
+                {Velocity.Slow,Settings.Default.XVelLow },
+                {Velocity.Service,Settings.Default.XVelService }
+            };
+
+            var YVelRegimes = new Dictionary<Velocity, double>
+            {
+                {Velocity.Fast,Settings.Default.YVelHigh },
+                {Velocity.Slow,Settings.Default.YVelLow },
+                {Velocity.Service,Settings.Default.YVelService }
+            };
+
+            var ZVelRegimes = new Dictionary<Velocity, double>
+            {
+                {Velocity.Fast,Settings.Default.ZVelHigh },
+                {Velocity.Slow,Settings.Default.ZVelLow },
+                {Velocity.Service,Settings.Default.ZVelService }
+            };
+
+            var UVelRegimes = new Dictionary<Velocity, double>
+            {
+                {Velocity.Fast,Settings.Default.UVelHigh },
+                {Velocity.Slow,Settings.Default.UVelLow },
+                {Velocity.Service,Settings.Default.UVelService }
+            };
+
+            _machine.ConfigureVelRegimes(new Dictionary<Ax, Dictionary<Velocity, double>>
+                {
+                {Ax.X, XVelRegimes},
+                {Ax.Y, YVelRegimes},
+                {Ax.Z, ZVelRegimes},
+                {Ax.U, UVelRegimes}
+                });
+
+
+            _machine.SetConfigs(new (Ax axis, MotionDeviceConfigs configs)[]
+            {
+                (Ax.X,xpar),
+                (Ax.Y,ypar),
+                (Ax.Z,zpar),
+                (Ax.U,upar)
+            });
+
+            _machine.SetVelocity(VelocityRegime);
+
+            BCCenterXView = Settings.Default.XDisk;
+            BCCenterYView = Settings.Default.YObjective + Settings.Default.DiskShift;
+            CCCenterXView = Settings.Default.XObjective;
+            CCCenterYView = Settings.Default.YObjective;
+            ZBladeTouchView = Settings.Default.ZTouch;
+
+            _machine.ConfigureGeometry(new Dictionary<Place, (Ax, double)[]>
+                {
+                    {Place.BladeChuckCenter, new (Ax,double)[]{ (Ax.X, Settings.Default.XDisk), (Ax.Y, Settings.Default.YObjective + Settings.Default.DiskShift)} },
+                    {Place.CameraChuckCenter, new (Ax,double)[]{(Ax.X, Settings.Default.XObjective),(Ax.Y,Settings.Default.YObjective)} },
+                    {Place.Loading, new (Ax,double)[]{(Ax.X,Settings.Default.XLoad),(Ax.Y, Settings.Default.YLoad)} },
+                    {Place.ZBladeTouch, new (Ax,double)[]{(Ax.Z, Settings.Default.ZTouch) } }
+                });
+
+            _machine.ConfigureGeometry(new Dictionary<Place, double>
+                { { Place.ZBladeTouch, Settings.Default.ZTouch} }
+                );
+
+            _machine.ConfigureDoubleFeatures(new Dictionary<MFeatures, double>
+                {
+                    {MFeatures.CameraBladeOffset, Settings.Default.DiskShift},
+                    {MFeatures.ZBladeTouch, Settings.Default.ZTouch },
+                    {MFeatures.CameraFocus, 3 }
+                });
+
+            _machine.SetBridgeOnSensors(Sensors.ChuckVacuum, Settings.Default.VacuumSensorDsbl);
+            _machine.SetBridgeOnSensors(Sensors.Coolant, Settings.Default.CoolantSensorDsbl);
+            _machine.SetBridgeOnSensors(Sensors.Air, Settings.Default.AirSensorDsbl);
+            _machine.SetBridgeOnSensors(Sensors.SpindleCoolant, Settings.Default.SpindleCoolantSensorDsbl);
         }
         private void AjustWaferTechnology()
         {
@@ -396,7 +865,7 @@ namespace DicingBlade.ViewModels
             {
                 Change();
             }
-            else if(Cols[0] == 1)
+            else if (Cols[0] == 1)
             {
                 Change();
             }
@@ -417,6 +886,11 @@ namespace DicingBlade.ViewModels
             //Wafer = new Wafer(new Vector2(0, 0), 1, 5000, (0, 500), (60, 300));
 
             //Thickness = 1;
+        }
+
+        public void Dispose()
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -277,7 +277,7 @@ namespace DicingBlade.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("6400")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1280")]
         public int UPPU {
             get {
                 return ((int)(this["UPPU"]));

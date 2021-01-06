@@ -11,7 +11,7 @@
     Title="Настройки"
     Width="auto"
     Height="auto"
-    d:DataContext="{d:DesignInstance model:MachineSettingsViewModel,
+    d:DataContext="{d:DesignInstance model:DicingBlade.Classes.MachineSettingsViewModel,
                                      IsDesignTimeCreatable=False}"
     ResizeMode="NoResize"
     SizeToContent="WidthAndHeight"

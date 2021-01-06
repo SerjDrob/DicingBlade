@@ -12,8 +12,7 @@
     Title="MainWindowView"
     Width="1280"
     Height="1024"
-    d:DataContext="{d:DesignInstance model:MainViewModel,
-                                     IsDesignTimeCreatable=False}"
+    d:DataContext="{d:DesignInstance model:MainViewModel, IsDesignTimeCreatable=False}"
     Background="Beige"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
@@ -35,6 +34,7 @@
         <converters:GetRatioConverter x:Key="GetRatioConverter" />
         <converters:DoubleToDurationConverter x:Key="DoubleToDurationConverter" />
         <converters:WaferViewToPathConverter x:Key="WaferViewToPathConverter" />
+        <converters:TraceViewToPathConverter x:Key="TraceViewToPathConverter"/>
         <converters:DisableBindingConverter x:Key="DisableBindingConverter" />
         <converters:MulZeroConverter x:Key="MulZeroConverter" />
         <SolidColorBrush x:Key="SignalGreen" Color="MediumSpringGreen" />
@@ -244,8 +244,8 @@
                                             <MultiBinding Converter="{StaticResource ZIndConverter}">
                                                 <Binding Path="ActualHeight" RelativeSource="{RelativeSource AncestorType={x:Type Canvas}, Mode=FindAncestor}" />
                                                 <Binding FallbackValue="1" Path="Wafer.Thickness" />
-                                                <Binding Path="Machine.Z.ActualPosition" />
-                                                <Binding Path="Machine.ZBladeTouch" />
+                                                <Binding Path="ZView" />
+                                                <Binding Path="ZBladeTouchView" />
                                             </MultiBinding>
                                         </Line.Y1>
                                         <Line.RenderTransform>
@@ -532,12 +532,12 @@
                     StrokeThickness="1">
                     <Path.Data>
                         <MultiBinding Converter="{StaticResource GetCursor}">
-                            <Binding Path="Machine.X.ActualPosition" />
-                            <Binding Path="Machine.Y.ActualPosition" />
+                            <Binding Path="XView" />
+                            <Binding Path="YView" />
                             <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Canvas}" />
                             <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Canvas}" />
-                            <Binding Path="Machine.BladeChuckCenter.X" />
-                            <Binding Path="Machine.BladeChuckCenter.Y" />
+                            <Binding Path="BCCenterXView" />
+                            <Binding Path="BCCenterYView" />
                             <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
                             <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
                             <Binding Path="DataContext.Wafer.GetCurrentDirectionIndexShift" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
@@ -560,12 +560,12 @@
                     StrokeThickness="1">
                     <Path.Data>
                         <MultiBinding Converter="{StaticResource GetCursor}">
-                            <Binding Path="Machine.X.ActualPosition" />
-                            <Binding Path="Machine.Y.ActualPosition" />
+                            <Binding Path="XView" />
+                            <Binding Path="YView" />
                             <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Canvas}" />
                             <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Canvas}" />
-                            <Binding Path="Machine.CameraChuckCenter.X" />
-                            <Binding Path="Machine.CameraChuckCenter.Y" />
+                            <Binding Path="CCCenterXView" />
+                            <Binding Path="CCCenterYView" />
                             <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
                             <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
                             <Binding Path="DataContext.Wafer.GetCurrentDirectionIndexShift" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
@@ -589,13 +589,13 @@
                     StrokeThickness="2">
                     <Path.Data>
                         <MultiBinding Converter="{StaticResource TraceConverter}">
-                            <Binding Path="Process.TracingLine.X" />
-                            <Binding Path="Process.TracingLine.Y" />
-                            <Binding Path="Process.TracingLine.Xend" />
+                            <Binding Path="XTrace" />
+                            <Binding Path="YTrace" />
+                            <Binding Path="XTraceEnd" />
                             <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Canvas}" />
                             <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Canvas}" />
-                            <Binding Path="DataContext.Machine.BladeChuckCenter.X" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                            <Binding Path="DataContext.Machine.BladeChuckCenter.Y" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                            <Binding Path="DataContext.BCCenterXView" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                            <Binding Path="DataContext.BCCenterYView" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
                             <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
                             <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
                             <Binding Path="DataContext.Wafer.GetCurrentDirectionIndexShift" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
@@ -605,7 +605,7 @@
                 <Path
                     Name="TracesView"
                     Panel.ZIndex="2"
-                    Data="{Binding Process.TracesView.RawLines, Converter={StaticResource WaferViewToPathConverter}}"
+                    Data="{Binding TracesCollectionView, Converter={StaticResource TraceViewToPathConverter}}"
                     Stroke="Black">
                     <Path.StrokeThickness>
                         <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
@@ -670,7 +670,7 @@
                     <Line.RenderTransform>
                         <RotateTransform>
                             <RotateTransform.Angle>
-                                <Binding Path="DataContext.Machine.U.ActualPosition" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                <Binding Path="DataContext.UView" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
                             </RotateTransform.Angle>
                         </RotateTransform>
                     </Line.RenderTransform>
@@ -691,10 +691,10 @@
                     <RowDefinition />
                     <RowDefinition />
                 </Grid.RowDefinitions>
-                <Label Content="{Binding Machine.X.ActualPosition, StringFormat=X:{0}}" />
-                <Label Grid.Row="1" Content="{Binding Machine.Y.ActualPosition, StringFormat=Y:{0}}" />
-                <Label Grid.Row="2" Content="{Binding Machine.Z.ActualPosition, StringFormat=Z:{0}}" />
-                <Label Grid.Row="3" Content="{Binding Machine.U.ActualPosition, StringFormat=U:{0}}" />
+                <TextBlock Text="{Binding StringFormat=X: {0}, Path=XView}" Background="AliceBlue"/>
+                <TextBlock Grid.Row="1" Text="{Binding StringFormat=Y: {0}, Path=YView}" Background="AliceBlue"/>
+                <TextBlock Grid.Row="2" Text="{Binding StringFormat=Z: {0}, Path=ZView}" Background="AliceBlue"/>
+                <TextBlock Grid.Row="3" Text="{Binding StringFormat=U: {0}, Path=UView}" Background="AliceBlue"/>
 
                 <Label Grid.Column="1" Content="{Binding Machine.X.CmdPosition, StringFormat=Xcmd:{0}}" />
                 <Label
@@ -717,7 +717,7 @@
                                 <Style.Triggers>
                                     <DataTrigger Value="True">
                                         <DataTrigger.Binding>
-                                            <Binding Path="Machine.X.LmtN" />
+                                            <Binding Path="XnLmtView" />
                                         </DataTrigger.Binding>
                                         <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
                                     </DataTrigger>
@@ -731,7 +731,7 @@
                                 <Style.Triggers>
                                     <DataTrigger Value="True">
                                         <DataTrigger.Binding>
-                                            <Binding Path="Machine.X.LmtP" />
+                                            <Binding Path="XpLmtView" />
                                         </DataTrigger.Binding>
                                         <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
                                     </DataTrigger>
@@ -745,7 +745,7 @@
                                 <Style.Triggers>
                                     <DataTrigger Value="True">
                                         <DataTrigger.Binding>
-                                            <Binding Path="Machine.X.MotionDone" />
+                                            <Binding Path="XMotDoneView" />
                                         </DataTrigger.Binding>
                                         <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
                                     </DataTrigger>
@@ -764,7 +764,7 @@
                                 <Style.Triggers>
                                     <DataTrigger Value="True">
                                         <DataTrigger.Binding>
-                                            <Binding Path="Machine.Y.LmtN" />
+                                            <Binding Path="YnLmtView" />
                                         </DataTrigger.Binding>
                                         <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
                                     </DataTrigger>
@@ -778,7 +778,7 @@
                                 <Style.Triggers>
                                     <DataTrigger Value="True">
                                         <DataTrigger.Binding>
-                                            <Binding Path="Machine.Y.LmtP" />
+                                            <Binding Path="YpLmtView" />
                                         </DataTrigger.Binding>
                                         <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
                                     </DataTrigger>
@@ -792,7 +792,7 @@
                                 <Style.Triggers>
                                     <DataTrigger Value="True">
                                         <DataTrigger.Binding>
-                                            <Binding Path="Machine.Y.MotionDone" />
+                                            <Binding Path="YMotDoneView" />
                                         </DataTrigger.Binding>
                                         <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
                                     </DataTrigger>
@@ -811,7 +811,7 @@
                                 <Style.Triggers>
                                     <DataTrigger Value="True">
                                         <DataTrigger.Binding>
-                                            <Binding Path="Machine.Z.LmtN" />
+                                            <Binding Path="ZnLmtView" />
                                         </DataTrigger.Binding>
                                         <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
                                     </DataTrigger>
@@ -825,7 +825,7 @@
                                 <Style.Triggers>
                                     <DataTrigger Value="True">
                                         <DataTrigger.Binding>
-                                            <Binding Path="Machine.Z.LmtP" />
+                                            <Binding Path="ZpLmtView" />
                                         </DataTrigger.Binding>
                                         <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
                                     </DataTrigger>
@@ -844,7 +844,7 @@
                                 <Style.Triggers>
                                     <DataTrigger Value="True">
                                         <DataTrigger.Binding>
-                                            <Binding Path="Machine.U.LmtN" />
+                                            <Binding Path="UnLmtView" />
                                         </DataTrigger.Binding>
                                         <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
                                     </DataTrigger>
@@ -858,7 +858,7 @@
                                 <Style.Triggers>
                                     <DataTrigger Value="True">
                                         <DataTrigger.Binding>
-                                            <Binding Path="Machine.U.LmtP" />
+                                            <Binding Path="UpLmtView" />
                                         </DataTrigger.Binding>
                                         <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
                                     </DataTrigger>
@@ -867,18 +867,18 @@
                         </Rectangle.Style>
                     </Rectangle>
                 </StackPanel>
-                <Label
+                <TextBlock
                     Grid.Column="3"
-                    Content="Быстро"
-                    Visibility="{Binding Machine.VelocityRegime, Converter={StaticResource MatchEnumConverter}, ConverterParameter={x:Static local:Velocity.Fast}}" />
-                <Label
+                    Text="Быстро"
+                    Visibility="{Binding VelocityRegime, Converter={StaticResource MatchEnumConverter}, ConverterParameter={x:Static local:Velocity.Fast}}" />
+                <TextBlock
                     Grid.Column="3"
-                    Content="Медленно"
-                    Visibility="{Binding Machine.VelocityRegime, Converter={StaticResource MatchEnumConverter}, ConverterParameter={x:Static local:Velocity.Slow}}" />
-                <Label
+                    Text="Медленно"
+                    Visibility="{Binding VelocityRegime, Converter={StaticResource MatchEnumConverter}, ConverterParameter={x:Static local:Velocity.Slow}}" />
+                <TextBlock
                     Grid.Column="3"
-                    Content="Шаг"
-                    Visibility="{Binding Machine.VelocityRegime, Converter={StaticResource MatchEnumConverter}, ConverterParameter={x:Static local:Velocity.Step}}" />
+                    Text="Шаг"
+                    Visibility="{Binding VelocityRegime, Converter={StaticResource MatchEnumConverter}, ConverterParameter={x:Static local:Velocity.Step}}" />
             </Grid>
         </GroupBox>
         <GroupBox
@@ -898,8 +898,8 @@
                                     HorizontalAlignment="Center"
                                     Maximum="1000"
                                     Minimum="0"
-                                    Value="{Binding Machine.SpindleFreq}" />
-                                <Label Content="{Binding Machine.SpindleFreq}" />
+                                    Value="{Binding SpindleFreqView}" />
+                                <Label Content="{Binding SpindleFreqView}" />
                             </StackPanel>
                         </GroupBox>
                         <GroupBox Header="Ток, А">
@@ -911,8 +911,8 @@
                                     HorizontalAlignment="Center"
                                     Maximum="20"
                                     Minimum="0"
-                                    Value="{Binding Machine.SpindleCurrent}" />
-                                <Label Content="{Binding Machine.SpindleCurrent}" />
+                                    Value="{Binding SpindleCurrentView}" />
+                                <Label Content="{Binding SpindleCurrentView}" />
                             </StackPanel>
                         </GroupBox>
                     </StackPanel>
@@ -963,7 +963,7 @@
                                         <Style.Triggers>
                                             <DataTrigger Value="True">
                                                 <DataTrigger.Binding>
-                                                    <Binding Path="Machine.SpindleWater" />
+                                                    <Binding Path="SpindleCoolantSensorView" />
                                                 </DataTrigger.Binding>
                                                 <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
                                             </DataTrigger>
@@ -980,7 +980,7 @@
                                 <Style.Triggers>
                                     <DataTrigger Value="True">
                                         <DataTrigger.Binding>
-                                            <Binding Path="Machine.SwitchOnCoolantWater" />
+                                            <Binding Path="CoolantValveView" />
                                         </DataTrigger.Binding>
                                         <Setter Property="BorderBrush" Value="{StaticResource SignalGreen}" />
                                     </DataTrigger>
@@ -1000,7 +1000,7 @@
                                         <Style.Triggers>
                                             <DataTrigger Value="True">
                                                 <DataTrigger.Binding>
-                                                    <Binding Path="Machine.CoolantWater" />
+                                                    <Binding Path="CoolantSensorView" />
                                                 </DataTrigger.Binding>
                                                 <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
                                             </DataTrigger>
@@ -1024,7 +1024,7 @@
                                         <Style.Triggers>
                                             <DataTrigger Value="True">
                                                 <DataTrigger.Binding>
-                                                    <Binding Path="Machine.Air" />
+                                                    <Binding Path="AirSensorView" />
                                                 </DataTrigger.Binding>
                                                 <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
                                             </DataTrigger>
@@ -1041,7 +1041,7 @@
                                 <Style.Triggers>
                                     <DataTrigger Value="True">
                                         <DataTrigger.Binding>
-                                            <Binding Path="Machine.SwitchOnChuckVacuum" />
+                                            <Binding Path="ChuckVacuumValveView" />
                                         </DataTrigger.Binding>
                                         <Setter Property="BorderBrush" Value="{StaticResource SignalGreen}" />
                                     </DataTrigger>
@@ -1061,7 +1061,7 @@
                                         <Style.Triggers>
                                             <DataTrigger Value="True">
                                                 <DataTrigger.Binding>
-                                                    <Binding Path="Machine.ChuckVacuum" />
+                                                    <Binding Path="ChuckVacuumSensorView" />
                                                 </DataTrigger.Binding>
                                                 <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
                                             </DataTrigger>
@@ -1078,7 +1078,7 @@
                                 <Style.Triggers>
                                     <DataTrigger Value="True">
                                         <DataTrigger.Binding>
-                                            <Binding Path="Machine.SwitchOnBlowing" />
+                                            <Binding Path="BlowingValveView" />
                                         </DataTrigger.Binding>
                                         <Setter Property="BorderBrush" Value="{StaticResource SignalGreen}" />
                                     </DataTrigger>

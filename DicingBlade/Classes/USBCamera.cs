@@ -22,16 +22,20 @@ namespace DicingBlade.Classes
         }
         public void StartCamera(int ind)
         {
-            _localWebCam = GetCamera(ind);
+            if (_localWebCam is null)
+            {
+                _localWebCam = GetCamera(ind);
 
-            //while (_localWebCam is null)
-            //{
-            //    MessageBox.Show("Включите питание видеокамеры !");
-            //    _localWebCam = GetCamera();
-            //}
+                //while (_localWebCam is null)
+                //{
+                //    MessageBox.Show("Включите питание видеокамеры !");
+                //    _localWebCam = GetCamera();
+                //}
 
-            _localWebCam.VideoResolution = _localWebCam.VideoCapabilities[1]; //8
-            _localWebCam.NewFrame += HandleNewFrame;
+                _localWebCam.VideoResolution = _localWebCam.VideoCapabilities[1]; //8
+                _localWebCam.NewFrame += HandleNewFrame;
+            }
+
             _localWebCam.Start();
         }
         public void StopCamera()
@@ -66,22 +70,14 @@ namespace DicingBlade.Classes
                 bitmap.StreamSource = ms;
                 bitmap.EndInit();
                 bitmap.Freeze();
-
-                //var tmp = BitmapImage;
-                //BitmapImage = bitmap;
-                OnBitmapChanged(bitmap);
-                //if (tmp?.StreamSource != null)
-                //{
-                //    await tmp.StreamSource.DisposeAsync().ConfigureAwait(false);
-                //}
+                OnBitmapChanged?.Invoke(bitmap);                
             }
             catch (Exception ex)
             {
             }
 
-            await Task.Delay(1).ConfigureAwait(false);
+            await Task.Delay(40).ConfigureAwait(false);
         }
-
         public int GetDevicesCount()
         {
             return new FilterInfoCollection(FilterCategory.VideoInputDevice).Count;

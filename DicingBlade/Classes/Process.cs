@@ -38,6 +38,7 @@ namespace DicingBlade.Classes
 
     internal enum Status
     {
+        None,
         StartLearning,
         Learning,
         Working,

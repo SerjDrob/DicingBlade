@@ -10,28 +10,30 @@ namespace DicingBlade.ViewModels
         public ICommand XyObjectiveTeachCmd { get; set; }
         public ICommand XDiskTeachCmd { get; set; }
         public ICommand XyLoadTeachCmd { get; set; }
-        private Machine _machine;
-        internal MachineSettingsViewModel(Machine machine)
+        private double _xCurrentPosition;
+        private double _yCurrentPosition;
+        internal MachineSettingsViewModel(double x, double y)
         {
             //this.machine = new Machine(true);
-            _machine = machine;
+            _xCurrentPosition = x;
+            _yCurrentPosition = y;
             XyObjectiveTeachCmd = new Command(args => XyObjectiveTeach());
             XyLoadTeachCmd = new Command(args => XyLoadTeach());
             XDiskTeachCmd = new Command(args => XDiskTeach());
         }
         private void XyObjectiveTeach()
         {
-            Settings.Default.XObjective = _machine.X.ActualPosition;
-            Settings.Default.YObjective = _machine.Y.ActualPosition;
+            Settings.Default.XObjective = _xCurrentPosition;
+            Settings.Default.YObjective = _yCurrentPosition;
         }
         private void XyLoadTeach()
         {
-            Settings.Default.XLoad = _machine.X.ActualPosition;
-            Settings.Default.YLoad = _machine.Y.ActualPosition;
+            Settings.Default.XLoad = _xCurrentPosition;
+            Settings.Default.YLoad = _yCurrentPosition;
         }
         private void XDiskTeach()
         {
-            Settings.Default.XDisk = _machine.X.ActualPosition;
+            Settings.Default.XDisk = _xCurrentPosition;
         }
     }
 }

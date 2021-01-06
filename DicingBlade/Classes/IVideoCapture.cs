@@ -11,7 +11,7 @@ using System.Windows.Media.Imaging;
 namespace DicingBlade.Classes
 {
     public delegate void BitmapHandler(BitmapImage bitmapImage);
-    interface IVideoCapture
+    public interface IVideoCapture
     {               
         /// <summary>
         /// Start video capture device
