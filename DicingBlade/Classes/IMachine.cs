@@ -96,7 +96,8 @@ namespace DicingBlade.Classes
         public Task GoThereAsync(Place place, bool precisely = false);
         public Task MoveGpInPosAsync(Groups group, double[] position, bool precisely = false);
         public Task MoveGpInPlaceAsync(Groups group, Place place, bool precisely = false);
-        public Task MoveAxInPosAsync(Ax axis, double position, bool precisely = false);
+        public Task MoveAxInPosAsync(Ax axis, double position, bool precisely = false);        
+        public Task MoveAxesInPlaceAsync(Place place);       
         public (Ax, double)[] TranslateActualCoors(Place place);
         public double TranslateActualCoors(Place place, Ax axis);
         public (Ax, double)[] TranslateActualCoors(Place place, (Ax axis,double pos)[] position);        

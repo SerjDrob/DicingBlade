@@ -37,6 +37,7 @@
         <converters:TraceViewToPathConverter x:Key="TraceViewToPathConverter"/>
         <converters:DisableBindingConverter x:Key="DisableBindingConverter" />
         <converters:MulZeroConverter x:Key="MulZeroConverter" />
+        <converters:MouseArgsConverter x:Key="MouseArgsConverter"/>
         <SolidColorBrush x:Key="SignalGreen" Color="MediumSpringGreen" />
         <SolidColorBrush x:Key="SignalRed" Color="IndianRed" />
         <System:Double x:Key="Zero">0</System:Double>
@@ -178,7 +179,7 @@
                                     </DataTemplate>
                                 </MenuItem.HeaderTemplate>
                                 <MenuItem Command="{Binding ToTeachVideoScaleCmd}" Header="_Масштаб видео" />
-                                <MenuItem Command="{Binding ToTeachChipSizeCmd}" Header="_Масштаб видео" />
+                                <MenuItem Command="{Binding ToTeachChipSizeCmd}" Header="_Размер кристалла" />
                                 <MenuItem Header="_Масштаб видео" />
                                 <MenuItem Header="_Масштаб видео" />
                                 <MenuItem Header="_Масштаб видео" />
@@ -695,7 +696,9 @@
                 <TextBlock Grid.Row="1" Text="{Binding StringFormat=Y: {0}, Path=YView}" Background="AliceBlue"/>
                 <TextBlock Grid.Row="2" Text="{Binding StringFormat=Z: {0}, Path=ZView}" Background="AliceBlue"/>
                 <TextBlock Grid.Row="3" Text="{Binding StringFormat=U: {0}, Path=UView}" Background="AliceBlue"/>
-
+                <TextBlock Grid.Column="1" Text="{Binding StringFormat=PointX: {0}, Path=PointX}" Background="AliceBlue"/>
+                <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding StringFormat=PointY: {0}, Path=PointY}" Background="AliceBlue"/>
+                
                 <Label Grid.Column="1" Content="{Binding Machine.X.CmdPosition, StringFormat=Xcmd:{0}}" />
                 <Label
                     Grid.Row="1"
@@ -889,31 +892,31 @@
 
                 <GroupBox Header="Шпиндель">
                     <StackPanel>
-                        <GroupBox Header="Об/мин.">
-                            <StackPanel>
+                        <GroupBox>
+                            <Grid>
                                 <ProgressBar
                                     Width="150"
-                                    Height="10"
+                                    Height="30"
                                     Margin="3"
                                     HorizontalAlignment="Center"
-                                    Maximum="1000"
+                                    Maximum="40000"
                                     Minimum="0"
                                     Value="{Binding SpindleFreqView}" />
-                                <Label Content="{Binding SpindleFreqView}" />
-                            </StackPanel>
+                                <TextBlock Text="{Binding StringFormat={}{0} Об/мин,Path=SpindleFreqView}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Grid>
                         </GroupBox>
-                        <GroupBox Header="Ток, А">
-                            <StackPanel>
+                        <GroupBox>
+                            <Grid>
                                 <ProgressBar
                                     Width="150"
-                                    Height="10"
+                                    Height="30"
                                     Margin="3"
                                     HorizontalAlignment="Center"
-                                    Maximum="20"
-                                    Minimum="0"
+                                    Maximum="12"
+                                    Minimum="0"                                      
                                     Value="{Binding SpindleCurrentView}" />
-                                <Label Content="{Binding SpindleCurrentView}" />
-                            </StackPanel>
+                                <TextBlock Text="{Binding StringFormat={}{0} A,Path=SpindleCurrentView}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Grid>
                         </GroupBox>
                     </StackPanel>
                 </GroupBox>
@@ -1094,13 +1097,21 @@
             </StackPanel>
 
         </GroupBox>
+
         <Image
             Name="VideoImg"
             Grid.RowSpan="{Binding Rows[1]}"
             Grid.Column="{Binding Cols[1]}"
             Margin="3"
             Panel.ZIndex="0"
-            Source="{Binding Bi, Mode=OneWay}" />
+            Source="{Binding Bi, Mode=OneWay}">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="MouseLeftButtonDown">
+                    <i:InvokeCommandAction PassEventArgsToCommand="True" EventArgsConverter="{Binding Source={StaticResource MouseArgsConverter}}" EventArgsConverterParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Image}}" Command="{Binding ClickOnImageCmd, Mode=OneWay}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </Image>
+
 
         <Canvas
             Grid.RowSpan="{Binding Rows[1]}"
@@ -1119,7 +1130,7 @@
                     FontWeight="Bold"
                     Foreground="OrangeRed"
                     RenderTransformOrigin="0.5,-1"
-                    Text="{Binding Path=Process.ProcessMessage}"
+                    Text="{Binding Path=ProcessMessage}"
                     TextAlignment="Center">
 
                     <TextBlock.RenderTransform>
@@ -1219,11 +1230,11 @@
                 Width="{Binding Path=ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}"
                 Stroke="OrangeRed"
                 StrokeThickness="1"
-                Visibility="{Binding Process.TeachVScaleMarkersVisibility, FallbackValue=Hidden}">
+                Visibility="{Binding TeachVScaleMarkersVisibility, FallbackValue=Hidden}">
                 <Rectangle.Height>
                     <MultiBinding Converter="{StaticResource GetRatioConverter}">
                         <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                        <Binding Path="Machine.TeachMarkersRatio" />
+                        <Binding Path="TeachMarkersRatio" />
                     </MultiBinding>
                 </Rectangle.Height>
                 <Canvas.Top>

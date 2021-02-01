@@ -20,20 +20,15 @@ namespace DicingBlade.Classes
             return !GetCurrentCut(currentLine).Status;
         }
         public int DirectionLinesCount => Grid.Lines[Directions[CurrentAngleNum].angle].Count;
-
         public int DirectionsCount => Directions.Count;
         public int CurrentAngleNum { get; private set; }
         private Grid Grid { get; set; }
         public double Thickness { get; set; }
         private List<(double angle, double actualAngle, double indexShift)> Directions { get; set; }
         public double GetCurrentDiretionAngle => Directions[CurrentAngleNum].angle;
-
         public double GetCurrentDiretionActualAngle => Directions[CurrentAngleNum].actualAngle;
-
         public double GetPrevDiretionAngle => CurrentAngleNum != 0 ? Directions[CurrentAngleNum - 1].angle : Directions.Last().angle;
-
         public double GetPrevDiretionActualAngle => CurrentAngleNum != 0 ? Directions[CurrentAngleNum - 1].actualAngle : Directions.Last().actualAngle;
-
         public double SetCurrentDirectionAngle
         {
             set => Directions[CurrentAngleNum] = (Directions[CurrentAngleNum].angle, value, Directions[CurrentAngleNum].indexShift);
@@ -110,6 +105,7 @@ namespace DicingBlade.Classes
         }
         public bool NextDir(bool reset = false)
         {
+            //CurrentAngleNum++;
             if (Directions.Count - 1 == CurrentAngleNum)
             {
                 if (reset) CurrentAngleNum = 0;
@@ -166,11 +162,7 @@ namespace DicingBlade.Classes
         {
             double res = GetCurrentCut(currentLine).CutRatio;
             return (1 - res) * Thickness;
-        }
-        public void Test()
-        {
-            //  List<Cut> cuts = Grid.Lines[CurrentAngleNum];
-        }
+        }       
         public bool CurrentCutIncrement(int currentLine)
         {
             return Grid.Lines.GetItemByIndex(CurrentAngleNum)[currentLine].NextCut();

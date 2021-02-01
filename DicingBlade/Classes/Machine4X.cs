@@ -15,9 +15,16 @@ namespace DicingBlade.Classes
         {
             _videoCamera = new USBCamera();            
             _videoCamera.OnBitmapChanged += GetBitmap;
-
-            _spindle = new Spindle();
-            _spindle.GetSpindleState += _spindle_GetSpindleState;
+            try
+            {
+                _spindle = new Spindle3();
+                _spindle.GetSpindleState += _spindle_GetSpindleState;
+            }
+            catch (SpindleException ex)
+            {
+                throw new MachineException($"Spindle initialization was failed with message: {ex.Message}");
+            }
+            
             MotionDevice = new MotionDevice();
             _exceptionsAgregator = ExceptionsAgregator.GetExceptionsAgregator();
             _exceptionsAgregator.RegisterMessager(MotionDevice);
@@ -271,7 +278,7 @@ namespace DicingBlade.Classes
             }
             foreach (var group in _axesGroups.Values)
             {
-                MotionDevice.SetGroupVelocity(group.groupNum);
+             //   MotionDevice.SetGroupVelocity(group.groupNum);
             }
         }
         public void SetAxFeedSpeed(Ax axis, double feed)
@@ -297,7 +304,28 @@ namespace DicingBlade.Classes
             return MotionDevice.GetAxisDout(_axes[_valves[valve].axis].AxisNum, (ushort)_valves[valve].dOut);
         }
         public async Task MoveGpInPosAsync(Groups group, double[] position, bool precisely = false)
-        {           
+        {
+            var k = new double();
+            try
+            {
+                k = Math.Abs((position.First() - _axes[Ax.X].CmdPosition) / (position.Last() - _axes[Ax.Y].ActualPosition));//ctg a    
+            }
+            catch (DivideByZeroException)
+            {
+                k = 1000;
+            }
+                        
+            var vx = _velRegimes[Ax.X][VelocityRegime];
+            var vy = _velRegimes[Ax.Y][VelocityRegime];
+            var kmax = vx / vy;// ctg a
+
+            var v = (k / kmax) switch
+            {
+                1 => Math.Sqrt(vx * vx + vy * vy),
+                < 1 => vy / Math.Sin(Math.Atan(1/k)),// / Math.Sqrt(1 / (1 + k * k)),//yconst
+                > 1 => vx / Math.Cos(Math.Atan(1/k)) //Math.Sqrt(k * k / (1 + k * k)) //xconst
+            };
+            MotionDevice.SetGroupVelocity(_axesGroups[group].groupNum, v);
 
             if (precisely)
             {
@@ -317,6 +345,13 @@ namespace DicingBlade.Classes
         public async Task MoveGpInPlaceAsync(Groups group, Place place, bool precisely = false)
         {
             MoveGpInPosAsync(group, _places[place].Select(p=>p.pos).ToArray(), precisely);
+        }
+        public async Task MoveAxesInPlaceAsync(Place place)
+        {
+            foreach (var axpos in _places[place])
+            {
+                await MoveAxInPosAsync(axpos.axis, axpos.pos);
+            }
         }
         /// <summary>
         /// Actual coordinates translation
@@ -523,7 +558,7 @@ namespace DicingBlade.Classes
 
         public void SetSpindleFreq(int frequency)
         {
-            throw new NotImplementedException();
+            _spindle.SetSpeed((ushort)frequency);
         }
 
         public void StartSpindle()

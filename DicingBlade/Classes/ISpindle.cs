@@ -9,7 +9,7 @@ namespace DicingBlade.Classes
     public delegate void SpindleStateHandler(bool isConnected, double spinCurrent, double spindleFreq);
     public interface ISpindle
     {       
-        public void SetSpeed(double rpm);
+        public void SetSpeed(ushort rpm);
         public void Start();
         public void Stop();
         /// <summary>

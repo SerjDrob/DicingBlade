@@ -538,5 +538,17 @@ namespace DicingBlade.Properties {
                 this["YLoad"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public double CameraScale {
+            get {
+                return ((double)(this["CameraScale"]));
+            }
+            set {
+                this["CameraScale"] = value;
+            }
+        }
     }
 }

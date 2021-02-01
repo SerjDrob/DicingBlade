@@ -58,8 +58,7 @@ namespace DicingBlade.Classes
         #region Privates
         private (double degree, double length, double side, double index)[] _directions;
         private (double degree, double index)[] _directionsD;
-        private double _diameter;
-        //private double[] ShapeSize { get; set; }
+        private double _diameter;        
         private Vector2 GridCenter { get; set; }
 
         #endregion

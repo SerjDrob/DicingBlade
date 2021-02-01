@@ -1,18 +1,18 @@
 ﻿
 //#nullable enable
 
+using Microsoft.VisualStudio.Workspace;
+using netDxf;
+using netDxf.Entities;
+using PropertyChanged;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using netDxf;
-using Microsoft.VisualStudio.Workspace;
-using PropertyChanged;
-using netDxf.Entities;
-using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Media;
-using System.Linq;
 
 namespace DicingBlade.Classes
 {
@@ -102,14 +102,15 @@ namespace DicingBlade.Classes
 
             _machine = machine ?? throw new ProcessException("Не выбрана установка для процесса"); ;
             _wafer = wafer ?? throw new ProcessException("Не выбрана подложка для процесса");
-            _blade = blade ?? throw new ProcessException("Не выбран диск для процесса"); 
-
-            _machine.OnSensorStateChanged += Machine_OnAirWanished;
-            _machine.OnSensorStateChanged += Machine_OnCoolWaterWanished;
-            _machine.OnSensorStateChanged += Machine_OnSpinWaterWanished;
-            _machine.OnSensorStateChanged += Machine_OnVacuumWanished;
+            _blade = blade ?? throw new ProcessException("Не выбран диск для процесса");            
+            _feedSpeed = technology.FeedSpeed;
+            //_machine.OnSensorStateChanged += Machine_OnAirWanished;
+            //_machine.OnSensorStateChanged += Machine_OnCoolWaterWanished;
+            //_machine.OnSensorStateChanged += Machine_OnSpinWaterWanished;
+            //_machine.OnSensorStateChanged += Machine_OnVacuumWanished;
             _machine.OnSensorStateChanged += _machine_OnSensorStateChanged;
             _machine.OnAxisMotionStateChanged += _machine_OnAxisMotionStateChanged;
+            _machine.OnSpindleStateChanging += _machine_OnSpindleStateChanging;
 
             _machine.SwitchOnValve(Valves.ChuckVacuum);
             Task.Delay(500).Wait();
@@ -117,15 +118,42 @@ namespace DicingBlade.Classes
             {
                 throw new ProcessException("Отсутствует вакуум на столике. Возможно не установлена рамка или неисправна вакуумная система");
             }
+            if (!_spindleWorking)
+            {
+                throw new ProcessException("Не включен шпиндель");
+            }
             Traces = new ObservableCollection<TracePath>();
             TracesView = new WaferView();
             _baseProcess = proc;
             CancelProcess = false;
            // FeedSpeed = PropContainer.Technology.FeedSpeed;
             
-            _checkCut.Set(10, 2);
+            _checkCut.Set(technology.StartControlNum, technology.ControlPeriod);
             _machine.GoThereAsync(Place.CameraChuckCenter).Wait();
             ProcessStatus = Status.StartLearning;
+        }
+
+        private void _machine_OnSpindleStateChanging(int frequency, double current, bool working)
+        {
+            _spindleWorking = working;
+            switch (ProcessStatus)
+            {
+                case Status.None:
+                    break;
+                case Status.StartLearning:
+                    break;
+                case Status.Learning:
+                    break;
+                case Status.Working when IsCutting & !_spindleWorking:
+                    ThrowMessage("Пластине кранты!");
+                    break;
+                case Status.Correcting:
+                    break;
+                case Status.Done:
+                    break;
+                default:
+                    break;
+            }
         }
 
         public static int procCount = 0;
@@ -175,7 +203,7 @@ namespace DicingBlade.Classes
         private double _zActual;
         private double _uActual;
         private bool _machineVacuumSensor;
-
+        private bool _spindleWorking;
         public string ProcessMessage { get; set; } = "";
         public bool UserConfirmation { get; set; } = false;
         private readonly Wafer _wafer;
@@ -242,7 +270,7 @@ namespace DicingBlade.Classes
 
         public int CurrentLine { get; private set; }
         //private double RotationSpeed { get; set; }
-        private double FeedSpeed { get; set; }
+        private double _feedSpeed;
         //private bool Aligned { get; set; }
         //private double OffsetAngle { get; set; }
         public GetRotation GetRotationEvent;
@@ -408,10 +436,8 @@ namespace DicingBlade.Classes
                     break;
                 case Diagram.CuttingX:
                     _machine.SwitchOnValve(Valves.Coolant);
-                    await Task.Delay(300).ConfigureAwait(false);
-
-                    FeedSpeed = 5;
-                    _machine.SetAxFeedSpeed(Ax.X, FeedSpeed);
+                    await Task.Delay(300).ConfigureAwait(false);                   
+                    _machine.SetAxFeedSpeed(Ax.X, _feedSpeed);
                     IsCutting = true;                   
                    
                     x = _machine.TranslateSpecCoor(Place.BladeChuckCenter, - xCurLineEnd, 0);
@@ -625,8 +651,7 @@ namespace DicingBlade.Classes
                 {
                     case Status.StartLearning:
                         ThrowMessage?.Invoke("Вакуум исчез!!!");
-                        ProcessStatus = Status.None;
-                        //throw new AggregateException("csdcscs");//ProcessException("Отсутствует вакуум на столике. Возможно не установлена рамка или неисправна вакуумная система");
+                        ProcessStatus = Status.None;                        
                         break;
                     case Status.Learning:
                         break;
@@ -642,21 +667,7 @@ namespace DicingBlade.Classes
                 if (IsCutting) { }
             }
         }
-        private void Machine_OnSpinWaterWanished(Sensors sensor, bool state)
-        {
-            if (IsCutting) { }
-            //throw new NotImplementedException();
-        }
-        private void Machine_OnCoolWaterWanished(Sensors sensor, bool state)
-        {
-            if (IsCutting) { }
-            //throw new NotImplementedException();
-        }
-        private void Machine_OnAirWanished(Sensors sensor, bool state)
-        {
-            if (IsCutting) { }
-            //throw new NotImplementedException();
-        }
+       
 
         public void Dispose()
         {

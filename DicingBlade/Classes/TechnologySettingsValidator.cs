@@ -6,7 +6,7 @@ namespace DicingBlade.Classes
     {
         public TechnologySettingsValidator()
         {
-            RuleFor(technology => technology.SpindleFreq).NotEmpty().LessThan(60000).GreaterThan(10000);
+            RuleFor(technology => technology.SpindleFreq).NotEmpty().LessThan(30001).GreaterThan(17999);
             RuleFor(technology => technology.FeedSpeed).NotEmpty().LessThan(20).GreaterThan(0.1);
             RuleFor(technology => technology.WaferBladeGap).NotEmpty().LessThan(5).GreaterThan(0.5);
             RuleFor(technology => technology.FilmThickness).NotEmpty().LessThan(0.5).GreaterThan(0);

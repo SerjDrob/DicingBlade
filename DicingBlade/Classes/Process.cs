@@ -43,7 +43,8 @@ namespace DicingBlade.Classes
         Learning,
         Working,
         Correcting,
-        Done
+        Done,
+        MovingNextDir
     }
     /// <summary>
     /// Структура параметров процесса
@@ -58,11 +59,14 @@ namespace DicingBlade.Classes
         //public double XAngle;
         //public double YAngle;
         public bool FirstPointSet;
-        public Vector2 Point1;
-        public Vector2 Point2;
+        public double[] Point1;
+        public double[] Point2;
         public double GetAngle()
         {
-            return Math.Atan2(Point2.Y - Point1.Y, Point2.X - Point1.X);
+            var tan = (Point2[1] - Point1[1]) / (Point2[0] - Point1[0]);
+            var sign = Math.Sign(tan);
+            var angle = Math.Atan(Math.Abs(tan))*180/Math.PI;
+            return sign * angle;
         }
     }
     struct CheckCutControl

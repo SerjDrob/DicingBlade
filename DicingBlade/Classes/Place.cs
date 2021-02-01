@@ -6,6 +6,7 @@
         Loading,
         CameraChuckCenter,
         BladeChuckCenter,
-        ZBladeTouch        
+        ZBladeTouch,
+        ZFocus
     }
 }

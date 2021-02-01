@@ -276,6 +276,21 @@ namespace DicingBlade.Classes
                 throw new MotionException($"Скорость {velHigh} не поддерживается группой № {groupNum}. Ошибка: {(ErrorCode)result}");
             }
         }
+        public void SetGroupVelocity(int groupNum, double velocity)
+        {           
+            double velHigh = velocity;
+            var velLow = velHigh / 2;
+            var result = Motion.mAcm_SetProperty(_mGpHand[groupNum], (uint)PropertyID.PAR_GpVelLow, ref velLow, 8);
+            if (!Success(result))
+            {
+                throw new MotionException($"Скорость {velLow} не поддерживается группой № {groupNum}. Ошибка: {(ErrorCode)result}");
+            }
+            result = Motion.mAcm_SetProperty(_mGpHand[groupNum], (uint)PropertyID.PAR_GpVelHigh, ref velHigh, 8);
+            if (!Success(result))
+            {
+                throw new MotionException($"Скорость {velHigh} не поддерживается группой № {groupNum}. Ошибка: {(ErrorCode)result}");
+            }
+        }
         public void SetBridgeOnAxisDin(int axisNum, int bitNum, bool setReset)
         {
             if (_bridges.Keys.Contains(axisNum))
@@ -554,9 +569,7 @@ namespace DicingBlade.Classes
             uint bufLength = 8;
 
 
-            Motion.mAcm_GpResetError(_mGpHand[groupNum]);
-            //res = Motion.mAcm_SetProperty(_mGpHand[groupNum], (uint)PropertyID.PAR_GpVelLow, ref vel, bufLength);
-            //res = Motion.mAcm_SetProperty(_mGpHand[groupNum], (uint)PropertyID.PAR_GpVelHigh, ref vel, bufLength);
+            Motion.mAcm_GpResetError(_mGpHand[groupNum]);            
             Motion.mAcm_GpMoveLinearAbs(_mGpHand[groupNum], position, ref elements);
             await Task.Run(() =>
             {

@@ -32,17 +32,12 @@ namespace DicingBlade.ViewModels
     {
         private IMachine _machine;
 
-
-
-
-
         public Velocity VelocityRegime { get; set; } = Velocity.Fast;
         private ExceptionsAgregator _exceptionsAgregator;
-
         public ObservableCollection<TraceLine> TracesCollectionView { get; set; } = new ObservableCollection<TraceLine>();
 
         private Task _tracingTask;
-
+        private bool _homeDone = false;
         public double XTrace { get; set; }
         public double YTrace { get; set; }
         public double XTraceEnd { get; set; }
@@ -80,11 +75,15 @@ namespace DicingBlade.ViewModels
         public double ZBladeTouchView { get; set; }
         public int SpindleFreqView { get; set; }
         public double SpindleCurrentView { get; set; }
-
+        public bool SpindleState { get; private set; }
+        private double _cameraScale;
+        public double PointX { get; set; }
+        public double PointY { get; set; }
 
         //private Parameters parameters;
         public Machine Machine { get; set; }
-        public Process2 Process { get; set; }
+        private ITechnology _technology;
+        public Process3 Process { get; set; }
         public Wafer Wafer { get; set; }
         public WaferView WaferView { get; set; }
         public ObservableCollection<TracePath> Traces { get; set; }
@@ -121,32 +120,41 @@ namespace DicingBlade.ViewModels
         public ICommand ToTeachChipSizeCmd { get; set; }
         public ICommand ToTeachVideoScaleCmd { get; set; }
         public ICommand TestCmd { get; set; }
+        public ICommand ClickOnImageCmd { get; set; }
+        public Visibility TeachVScaleMarkersVisibility { get; private set; } = Visibility.Hidden;
+        public string ProcessMessage { get; private set; }
+        public bool UserConfirmation { get; private set; }
+        public double TeachMarkersRatio { get; private set; } = 2;
+
         public MainViewModel()
         {
             Test = false;
             Cols = new int[] { 0, 1 };
             Rows = new int[] { 2, 1 };
-            Condition = new Map();
-            OpenFileCmd = new Command(args => OpenFile());
-            ChangeCmd = new Command(args => Change());
-            KeyDownCmd = new Command(args => KeyDownAsync(args));
-            KeyUpCmd = new Command(args => KeyUp(args));
-            WaferSettingsCmd = new Command(args => WaferSettings());
-            MachineSettingsCmd = new Command(args => MachineSettings());
+            
+            OpenFileCmd           = new Command(args => OpenFile());
+            ChangeCmd             = new Command(args => Change());
+            KeyDownCmd            = new Command(args => KeyDownAsync(args));
+            KeyUpCmd              = new Command(args => KeyUp(args));
+            WaferSettingsCmd      = new Command(args => WaferSettings());
+            MachineSettingsCmd    = new Command(args => MachineSettings());
             TechnologySettingsCmd = new Command(args => TechnologySettings());
-            ToTeachChipSizeCmd = new Command(args => ToTeachChipSizeAsync());
-            ToTeachVideoScaleCmd = new Command(args => ToTeachVideoScaleAsync());
-            TestCmd = new Command(args => Func(args));
+            ToTeachChipSizeCmd    = new Command(args => ToTeachChipSizeAsync());
+            ToTeachVideoScaleCmd  = new Command(args => ToTeachVideoScaleAsync());
+            TestCmd               = new Command(args => Func(args));
+            ClickOnImageCmd       = new Command(args => ClickOnImage(args));
 
             Bi = new BitmapImage();
 
             _exceptionsAgregator = ExceptionsAgregator.GetExceptionsAgregator();
             _exceptionsAgregator.SetShowMethod(s => { MessageBox.Show(s); });
-
-            //Machine = new Machine(Test);
-            //Machine.VideoCamera.OnBitmapChanged += GetCameraImage;
+            _cameraScale = Settings.Default.CameraScale;
+                        
             try
             {
+                _technology = new Technology().DeSerializeObjectJson(Settings.Default.TechnologyLastFile);
+
+
                 _machine = new Machine4X();
                 _machine.ConfigureAxes(new (Ax, double)[]
                 {
@@ -193,18 +201,13 @@ namespace DicingBlade.ViewModels
             }
 
 
-
-
-
             BaseProcess = new Diagram[] {
                 Diagram.GoNextCutXy,
                 Diagram.GoNextDepthZ,
                 Diagram.CuttingX,
                 Diagram.GoTransferingHeightZ,
                 Diagram.GoNextDirection
-            };
-            //Traces = new ObservableCollection<TracePath>();
-            //_tempWafer2.FirstPointSet = false;
+            };            
 
             AjustWaferTechnology();
         }
@@ -213,6 +216,7 @@ namespace DicingBlade.ViewModels
         {
             SpindleFreqView = rpm;
             SpindleCurrentView = current;
+            SpindleState = spinningState;
         }
 
         private void _machine_OnVideoSourceBmpChanged(BitmapImage bitmapImage)
@@ -263,7 +267,6 @@ namespace DicingBlade.ViewModels
                     break;
             }
         }
-
         private void _machine_OnAxisMotionStateChanged(Ax axis, double position, bool nLmt, bool pLmt, bool motionDone)
         {
             position = Math.Round(position, 3);
@@ -297,14 +300,20 @@ namespace DicingBlade.ViewModels
                     break;
             }
         }
-
+        private async Task ClickOnImage(object o)
+        {
+            var point = (Point)o;
+            PointX = XView + point.X * _cameraScale;
+            PointY = YView + point.Y * _cameraScale;
+            _machine.MoveAxInPosAsync(Ax.X, PointX);
+            _machine.MoveAxInPosAsync(Ax.Y, PointY, true);
+        }
         private void SetRotation(double angle, double time)
         {
             WvAngle = angle;
             RotatingTime = time;
             WvRotate ^= true;
         }
-
         private void Machine_OnAirWanished(DiEventArgs eventArgs)
         {
             throw new NotImplementedException();
@@ -319,14 +328,25 @@ namespace DicingBlade.ViewModels
         }
         private async Task ToTeachChipSizeAsync()
         {
-            await Process.ToTeachChipSizeAsync();
+
+            if (MessageBox.Show("Обучить размер кристалла?", "Обучение", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+            {
+                ProcessMessage = "Подведите ориентир к перекрестию и нажмите *";
+                await WaitForConfirmationAsync();
+                var y = YView;
+                ProcessMessage = "Подведите следующий ориентир к перекрестию и нажмите *";
+                await WaitForConfirmationAsync();
+                var size = Math.Round(Math.Abs(y - YView), 3);
+                ProcessMessage = "";
+                if (MessageBox.Show($"\rНовый размер кристалла {size} мм.\n Запомнить?", "Обучение", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+                {
+                    PropContainer.WaferTemp.IndexH = size;//currentIndex?
+                }
+            }
+
             new TempWafer(PropContainer.WaferTemp).SerializeObjectJson(Settings.Default.WaferLastFile);
             AjustWaferTechnology();
-        }
-        private async Task ToTeachVideoScaleAsync()
-        {
-            await Process.ToTeachVideoScale();
-        }
+        }        
         private async Task KeyDownAsync(object args)
         {
             KeyEventArgs key = (KeyEventArgs)args;
@@ -343,7 +363,7 @@ namespace DicingBlade.ViewModels
 
             if (key.Key == Key.Multiply)
             {
-                Process.UserConfirmation = true;
+                UserConfirmation = true;
             }
             if (key.Key == Key.Q)
             {
@@ -390,63 +410,83 @@ namespace DicingBlade.ViewModels
             }
             if (key.Key == Key.F2)
             {
-                _machine.StartSpindle();
+                if (SpindleState)
+                {
+                    _machine.StopSpindle();
+                }
+                else
+                {
+                    try
+                    {
+                        _machine.SetSpindleFreq(_technology.SpindleFreq);
+                        Task.Delay(100).Wait();
+                        _machine.StartSpindle();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message,"Запуск шпинделя");
+                    }
+                    
+                }                
             }
             if (key.Key == Key.F3)
             {
-                _machine.StopSpindle();
+                
             }
             if (key.Key == Key.T) Change();
             if (key.Key == Key.Divide)
             {
-
-                if (Process == null)
+                if (_homeDone)
                 {
+                    if (Process == null)
+                    {
 
-                    try
-                    {
-                        Process = new Process2(_machine, Wafer, new Blade(), new Technology(), BaseProcess);
-                        _exceptionsAgregator.RegisterMessager(Process);
-                        //Machine.SetVelocity(Velocity.Service);
-                        //await Machine.GoThereAsync(Place.CameraChuckCenter);
-                        Process.GetRotationEvent += SetRotation;
-                        Process.ChangeScreensEvent += ChangeScreensRegime;
-                        Process.BladeTracingEvent += Process_BladeTracingEvent;
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.Message);
-                    }
-
-
-                }
-                else
-                {
-                    if (Process.ProcessStatus == Status.Done)
-                    {
-                        Process = null;
-                    }
-                    else
-                    {
                         try
                         {
-                            await Process.StartPauseProc();
+                            Process = new Process3(_machine, Wafer, new Blade(), _technology, BaseProcess);
+                            _exceptionsAgregator.RegisterMessager(Process);
+                            Process.GetRotationEvent += SetRotation;
+                            Process.ChangeScreensEvent += ChangeScreensRegime;
+                            Process.BladeTracingEvent += Process_BladeTracingEvent;
                         }
                         catch (Exception ex)
                         {
-                            MessageBox.Show($"{ex.Message}\n{ex.StackTrace}");
+                            MessageBox.Show(ex.Message);
+                        }
+
+
+                    }
+                    else
+                    {
+                        if (Process.ProcessStatus == Status.Done)
+                        {
+                            Process = null;
+                        }
+                        else
+                        {
+                            try
+                            {
+                                await Process.StartPauseProc();
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show($"{ex.Message}\n{ex.StackTrace}");
+                            }
+
                         }
 
                     }
-
                 }
-
+                else
+                {
+                    MessageBox.Show("Обнулись!");
+                }
 
             }
             if (key.Key == Key.A)
             {
                 _machine.GoWhile(Ax.Y, AxDir.Pos);
-                //Machine.Y.GoWhile(AxDir.Pos);
+                _machine.MoveAxInPosAsync(Ax.Y,Wafer.)
             }
             if (key.Key == Key.Z)
             {
@@ -497,35 +537,21 @@ namespace DicingBlade.ViewModels
                 {
                     var task = Task.Factory.StartNew(() => _machine.GoThereAsync(Place.Home));
                     await task;
+                    _homeDone = true;
                     if (Process != null) Process = null;
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message, ex.StackTrace);
-                }
-
-                // await Machine.GoThereAsync(Place.Home);
+                }                
             }
             if (key.Key == Key.OemMinus)
             {
-                if (Process.ProcessStatus == Status.Learning)
-                {
-                    if (!_tempWafer2.FirstPointSet)
-                    {
-                        _tempWafer2.Point1 = new Vector2(Machine.X.ActualPosition, Machine.Y.ActualPosition);
-                        _tempWafer2.FirstPointSet = true;
-                    }
-                    else
-                    {
-                        _tempWafer2.Point2 = new Vector2(Machine.X.ActualPosition, Machine.Y.ActualPosition);
-                        await Machine.U.MoveAxisInPosAsync(Machine.U.ActualPosition - _tempWafer2.GetAngle());
-                        _tempWafer2.FirstPointSet = false;
-                    }
-                }
+               await Process?.AlignWafer();                
             }
             if (key.Key == Key.Subtract)
             {
-                Machine.VelocityRegime = Velocity.Step;
+                VelocityRegime = Velocity.Step;
             }
             if (key.Key == Key.Add)
             {
@@ -561,7 +587,6 @@ namespace DicingBlade.ViewModels
             }
             //key.Handled = true;
         }
-
         private async void Process_BladeTracingEvent(bool trace)
         {
             if (trace)
@@ -662,7 +687,7 @@ namespace DicingBlade.ViewModels
         {
             new Views.MachineSettingsView()
             {
-                DataContext = new MachineSettingsViewModel(XView, YView)
+                DataContext = new MachineSettingsViewModel(XView, YView, ZView)
             }.ShowDialog();
 
             Settings.Default.Save();
@@ -795,7 +820,8 @@ namespace DicingBlade.ViewModels
                     {Place.BladeChuckCenter, new (Ax,double)[]{ (Ax.X, Settings.Default.XDisk), (Ax.Y, Settings.Default.YObjective + Settings.Default.DiskShift)} },
                     {Place.CameraChuckCenter, new (Ax,double)[]{(Ax.X, Settings.Default.XObjective),(Ax.Y,Settings.Default.YObjective)} },
                     {Place.Loading, new (Ax,double)[]{(Ax.X,Settings.Default.XLoad),(Ax.Y, Settings.Default.YLoad)} },
-                    {Place.ZBladeTouch, new (Ax,double)[]{(Ax.Z, Settings.Default.ZTouch) } }
+                    {Place.ZBladeTouch, new (Ax,double)[]{(Ax.Z, Settings.Default.ZTouch) } },
+                    {Place.ZFocus, new (Ax, double)[]{(Ax.Z, Settings.Default.ZObjective) } }
                 });
 
             _machine.ConfigureGeometry(new Dictionary<Place, double>
@@ -858,7 +884,32 @@ namespace DicingBlade.ViewModels
             Cols = new[] { Cols[1], Cols[0] };
             Rows = new[] { Rows[1], Rows[0] };
         }
+        public async Task ToTeachVideoScaleAsync()
+        {
+            TeachVScaleMarkersVisibility = Visibility.Visible;
+            ProcessMessage = "Подведите ориентир к одному из визиров и нажмите *";
+            await WaitForConfirmationAsync();
+            var y = YView;
+            ProcessMessage = "Подведите ориентир ко второму визиру и нажмите *";
+            await WaitForConfirmationAsync();
+            _cameraScale = TeachMarkersRatio * Math.Abs(y - YView);
+            Settings.Default.CameraScale = _cameraScale;
+            Settings.Default.Save();
+            ProcessMessage = "";
+            TeachVScaleMarkersVisibility = Visibility.Hidden;
+        }
 
+        private async Task WaitForConfirmationAsync()
+        {
+            UserConfirmation = false;
+            await Task.Run(() =>
+            {
+                while (!UserConfirmation)
+                {
+                    Task.Delay(1).Wait();
+                }
+            });
+        }
         private void ChangeScreensRegime(bool regime)
         {
             if (regime && Cols[0] == 0)

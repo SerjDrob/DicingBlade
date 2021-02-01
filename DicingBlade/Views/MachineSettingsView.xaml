@@ -11,7 +11,7 @@
     Title="Настройки"
     Width="auto"
     Height="auto"
-    d:DataContext="{d:DesignInstance model:DicingBlade.Classes.MachineSettingsViewModel,
+    d:DataContext="{d:DesignInstance model:WaferSettingsViewModel,
                                      IsDesignTimeCreatable=False}"
     ResizeMode="NoResize"
     SizeToContent="WidthAndHeight"
@@ -61,7 +61,8 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
-                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -269,22 +270,44 @@
                             <TextBox Grid.Column="1" Text="{Binding Source={x:Static st:Settings.Default}, Path=DiskShift}" />
                         </Grid>
                     </GroupBox>
-                    <GroupBox
-                        Grid.Row="4"
+                    <DockPanel Grid.Row="5">
+                        <GroupBox                        
                         HorizontalAlignment="Left"
                         Header="Z диска">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="auto" />
-                                <ColumnDefinition Width="auto" />
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="auto" />
-                            </Grid.RowDefinitions>
-                            <Label Content="Z" />
-                            <TextBox Grid.Column="1" Text="{Binding Source={x:Static st:Settings.Default}, Path=ZTouch}" />
-                        </Grid>
-                    </GroupBox>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto" />
+                                    <ColumnDefinition Width="auto" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto" />
+                                </Grid.RowDefinitions>
+                                <Label Content="Z" />
+                                <TextBox Grid.Column="1" Text="{Binding Source={x:Static st:Settings.Default}, Path=ZTouch}" Height="25" Margin="3,0,3,3" VerticalAlignment="Bottom" />
+                            </Grid>
+                        </GroupBox>
+                        <GroupBox                        
+                        HorizontalAlignment="Left"
+                        Header="Z объектива">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto" />
+                                    <ColumnDefinition Width="auto" />
+                                    <ColumnDefinition Width="auto" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto" />
+                                </Grid.RowDefinitions>
+                                <Label Content="Z" />
+                                <TextBox Grid.Column="1" Text="{Binding Source={x:Static st:Settings.Default}, Path=ZObjective}" Height="25" Margin="3,0,3,3" VerticalAlignment="Bottom" />
+                                <Button
+                                Grid.Column="2"
+                                Margin="3"
+                                Command="{Binding ZObjectiveTeachCmd}"
+                                Content="Обучить" />
+                            </Grid>
+                        </GroupBox>
+                    </DockPanel>
                 </Grid>
             </TabItem>
             <TabItem Header="Наладка">

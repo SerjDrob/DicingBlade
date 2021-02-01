@@ -33,16 +33,19 @@
   <ItemGroup>
     <PackageReference Include="AForge.Imaging" Version="2.2.5" />
     <PackageReference Include="AForge.Video.DirectShow" Version="2.2.5" />
-    <PackageReference Include="EasyModbusTCP" Version="5.5.0" />
+    <PackageReference Include="AMWD.Modbus.Common" Version="1.0.2" />
+    <PackageReference Include="AMWD.Modbus.Serial" Version="1.0.2" />
+    <PackageReference Include="EasyModbusTCP" Version="5.6.0" />
     <PackageReference Include="Expression.Blend.Sdk.WPF" Version="1.0.1" />
+    <PackageReference Include="FluentModbus" Version="2.4.2" />
     <PackageReference Include="FluentValidation" Version="9.3.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Microsoft.VisualStudio.Workspace" Version="16.3.43" />
-    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.19" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.31" />
     <PackageReference Include="netDXF" Version="2.2.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="NModbus4" Version="2.1.0" />
     <PackageReference Include="PropertyChanged.Fody" Version="3.3.1" />
-    <PackageReference Include="System.IO.Ports" Version="5.0.0" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Settings.Designer.cs">

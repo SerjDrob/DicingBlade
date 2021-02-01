@@ -13,7 +13,7 @@ namespace DicingBlade.Classes
         public Spindle()
         {
             if (EstablishConnectionModbus("COM1"))
-            {
+            {                
                 WatchingStateAsync();
             }
             //modbusClient.UnitIdentifier = 1;// Not necessary since default slaveID = 1;
@@ -39,6 +39,9 @@ namespace DicingBlade.Classes
             //Console.Write("Press any key to continue . . . ");
             //Console.ReadKey(true);
         }
+
+        
+
         private ModbusClient _modbusClient;
 
         public event Action<int, double, bool> GetSpindleState;
@@ -47,35 +50,36 @@ namespace DicingBlade.Classes
         private double SpindleCurrent { get; set; }
         private bool EstablishConnectionModbus(string com)
         {
-            _modbusClient = new ModbusClient(com);
+            _modbusClient = new ModbusClient(com);                        
             _modbusClient.Connect();
             return _modbusClient.Connected;
         }
         private bool IsConnected { get; set; }
 
         private async Task WatchingStateAsync()
-        {
+        {            
             int[] data = new int[2];
             Task.Run(() =>
             {
                 while (_modbusClient.Connected)
                 {
                     try
-                    {
-                        data = _modbusClient.ReadHoldingRegisters(0xD000, 2);
-                        //GetSpindleState?.Invoke(60, 10, true);
+                    {      
+                        if(_modbusClient.Available(100)) data = _modbusClient.ReadHoldingRegisters(0xD000, 2);
+                       // var r = _modbusClient.receiveData;
+                      //  GetSpindleState?.Invoke(data[0]*6, data[1]/10, true);
                     }
                     catch (AggregateException)
                     {
                         throw;
                     }
                     
-                    Task.Delay(100).Wait();
+                    Task.Delay(1000).Wait();
                 }
             });
         }
 
-        public void SetSpeed(double rpm)
+        public void SetSpeed(ushort rpm)
         {
             throw new NotImplementedException();
         }
