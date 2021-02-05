@@ -23,7 +23,9 @@ namespace DicingBlade.Classes
     public interface IShape
     {
         public bool InYArea(double zeroShift, double angle);
-        public Line2D GetLine2D(double zeroShift, double angle);
+        public Line2D GetLine2D(double index, int num, double angle);
+        public double GetLengthSide(int side);
+        public double GetIndexSide(int side);
     }
 
     public enum Side
@@ -32,51 +34,207 @@ namespace DicingBlade.Classes
         H
     }
     public abstract class Wafer2D
-    {
+    {        
         protected IShape _shape;
-        protected double _thickness;
-        protected double _indexH;
-        protected double _indexW;
-        protected Dictionary<int, double> _directions;
-        public Side Side { get; private set; }
-        public double CurrentIndex { get; private set; }
-        public double CurrentShift { get; private set; }
-        public Point3D GetNearestPoint(double y)
+        public double Thickness { get; protected set; }
+        protected Dictionary<int, (double angle, double index, double sideshift, double realangle)> _directions = new();
+        public int CurrentSide { get; private set; }
+        public int CurrentLinesCount
         {
-            return new Point3D();
+            get
+            {
+                return (int)Math.Floor(_shape.GetIndexSide(CurrentSide) / CurrentIndex);
+            }
         }
-        public Point3D this[int dirNum, int cutNum]
+        public double CurrentIndex 
         {
+            get => _directions[CurrentSide].index;            
+        }
+        public int SidesCount
+        {
+            get => _directions.Count;
+        }
+        public double CurrentSideAngle
+        {
+            get => _directions[CurrentSide].angle;
+        }
+        public double CurrentSideActualAngle
+        {
+            get => _directions[CurrentSide].realangle;
+        }
+        private double _prevSideAngle = 0;
+        public double PrevSideAngle { get => _prevSideAngle; }
+        private double _prevSideActualAngle = 0;
+        public double PrevSideActualAngle { get => _prevSideActualAngle; }
+        public void SetSide(int side)
+        {
+            if (side < 0 | side > _directions.Count - 1)
+            {
+                throw new Exception("");
+            }
+            else
+            {
+                _prevSideAngle = _directions[CurrentSide].angle;
+                _prevSideActualAngle = _directions[CurrentSide].realangle;
+                CurrentSide = side;
+            }
+        }
+        public void SetCurrentIndex(double index)
+        {
+            var tuple = _directions[CurrentSide];
+            _directions[CurrentSide] = (tuple.angle, index, tuple.sideshift, tuple.realangle);
+        }
+        public double CurrentSideLength 
+        { 
             get 
             {
-                var shift = cutNum * CurrentIndex + CurrentShift;
-                var angle = _directions[dirNum];
-                var line = _shape.GetLine2D(shift, angle);
-                return new Point3D() { X = line.Start.X, Y = line.Start.Y, Z = 0 };
+                return _shape.GetLengthSide(CurrentSide);
+            }
+        }
+        public double CurrentShift
+        {
+            get
+            {
+                return _directions[CurrentSide].sideshift;
+            }
+        }
+        public void SetShape(IShape shape)
+        {
+            _shape = shape;
+        }
+        public double GetNearestY(double y)
+        {
+            var side = _shape.GetLengthSide(CurrentSide);
+            var index = _directions[CurrentSide].index;            
+            var num = 0;
+            if ((num = GetNearestNum(y))!=-1)
+            {
+                return num * index - side / 2;
+            }
+            else
+            {
+                throw new Exception("");
+            }
+        }
+        public Line2D GetNearestCut(double y)
+        {
+            var side = _shape.GetLengthSide(CurrentSide);
+            var index = _directions[CurrentSide].index;
+            var num = 0;
+            if ((num = GetNearestNum(y)) != -1)
+            {
+                return this[num];
+            }
+            else
+            {
+                throw new Exception("");
+            }
+        }
+        private int GetNearestNum(double y)
+        {
+            var side = _shape.GetLengthSide(CurrentSide);
+            var index = _directions[CurrentSide].index;
+
+            var bias = (side - Math.Floor(side / index) * index) / 2;
+
+            var ypos = y + side / 2;
+            var delta = side;            
+            var num = -1;
+            for (int i = 0; i < side / index; i++)
+            {
+                var d = ypos - i * index - bias;
+                if (Math.Abs(d) <= Math.Abs(delta))
+                {                    
+                    delta = d;
+                    num = i;
+                }
+            }
+            return num;// + 1;
+        }
+        public void TeachSideShift(double y)
+        {
+            _directions[CurrentSide] = (_directions[CurrentSide].angle, _directions[CurrentSide].index, y - GetNearestY(y), _directions[CurrentSide].realangle);
+        }
+        public void AddToSideShift(double delta)
+        {
+            _directions[CurrentSide] = (_directions[CurrentSide].angle, _directions[CurrentSide].index, _directions[CurrentSide].sideshift + delta, _directions[CurrentSide].realangle);
+        }
+        public void TeachSideAngle(double angle)
+        {
+            _directions[CurrentSide] = (_directions[CurrentSide].angle, _directions[CurrentSide].index, _directions[CurrentSide].sideshift, angle);
+        }
+
+        public Line2D this[int cutNum]
+        {
+            get 
+            {   
+                var angle = _directions[CurrentSide].angle;
+                return _shape.GetLine2D(CurrentIndex, cutNum, angle);                
+            }
+        }
+        public double this[double zratio]
+        {
+            get
+            {
+                return zratio * Thickness;
             }
         }
     }
     public class Rectangle2D : IShape
     {
-        private double _width;
-        private double _height;
+        public double Width { get; private set; }
+        public double Height { get; private set; }
         public Rectangle2D(double width, double height)
         {
-            _width = width;
-            _height = height;
+            Width = width;
+            Height = height;
         }
-        public Line2D GetLine2D(double zeroShift, double angle)
+        public Line2D GetLine2D(double index, int num, double angle)
+        {
+            var delta0 = (Height - Math.Floor(Height / index) * index) / 2;
+            var delta90 = (Width - Math.Floor(Width / index) * index) / 2;
+            var zeroShift = index * num;
+            return angle switch
+            {
+                0 => new Line2D() { Start = new Point(-Width/2,zeroShift - (Height/2) + delta0), End=new Point(Width/2,zeroShift-(Height/2) + delta0) },
+                90 => new Line2D() { Start = new Point(-Height / 2, zeroShift-(Width/2) + delta90), End = new Point(Height / 2, zeroShift-(Width/2) + delta90) }
+            };
+        }
+        public bool InYArea(double zeroShift, double angle)
         {
             return angle switch
             {
-                0 => new Line2D() { Start = new Point(-_width/2,zeroShift), End=new Point(_width/2,zeroShift) },
-                90 => new Line2D() { Start = new Point(-_height / 2, zeroShift), End = new Point(_height / 2, zeroShift) }
+                0 => (zeroShift + Height/2) < Height & (zeroShift + Height / 2) > 0,
+                90 => (zeroShift + Width / 2) < Width & (zeroShift + Width / 2) > 0
             };
         }
-
-        public bool InYArea(double zeroShift, double angle)
+        public double GetLengthSide(int side)
         {
-            throw new NotImplementedException();
+            return side switch
+            {
+                0 => Width,
+                1 => Height
+            };
         }
+        public double GetIndexSide(int side)
+        {
+            return side switch
+            {
+                1 => Width,
+                0 => Height
+            };
+        }
+    }
+
+    public class Substrate2D : Wafer2D
+    {
+        public Substrate2D(double indexH, double indexW, double thickness, IShape shape)
+        {
+            Thickness = thickness;
+            _shape = shape;
+            _directions.Add(0, (0, indexH, 0, 0));
+            _directions.Add(1, (90, indexW, 0, 90));
+        }
+
     }
 }

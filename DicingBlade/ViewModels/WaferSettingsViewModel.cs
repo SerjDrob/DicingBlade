@@ -56,6 +56,22 @@ namespace DicingBlade.ViewModels
         public ICommand OpenFileCmd { get; set; }
         public ICommand SaveFileAsCmd { get; set; }
         public ICommand ChangeShapeCmd { get; set; }
+        public void SetCurrentIndex(double index) 
+        {
+            switch (CurrentSide)
+            {
+                case 0:
+                    IndexH = index;                    
+                    break;
+                case 1:
+                    IndexW = index;                    
+                    break;
+                default:
+                    break;
+            };
+        }
+        public int CurrentSide { get; set; }
+
         private void ClosingWnd()
         {
             PropContainer.WaferTemp = this;

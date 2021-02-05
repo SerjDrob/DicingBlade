@@ -56,7 +56,7 @@ namespace DicingBlade.Classes
         {
             try
             {
-                var filter = new Mirror(false, true);
+                var filter = new Mirror(false, false);
                 using var img = (Bitmap)eventArgs.Frame.Clone();
                 filter.ApplyInPlace(img);
 

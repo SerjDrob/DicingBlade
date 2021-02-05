@@ -7,7 +7,7 @@ using System.Windows;
 
 namespace DicingBlade.Classes
 {    
-    internal class MotionDevice : IDisposable, Messager
+    internal class MotionDevice : IDisposable, IMessager
     {
         public MotionDevice()
         {
@@ -22,7 +22,7 @@ namespace DicingBlade.Classes
         private Dictionary<int, int> _bridges;
         public static IntPtr DeviceHandle { get; private set; }
         public event AxisStateHandler TransmitAxState;
-        public event Action<string> ThrowMessage;
+        public event Action<string,int> ThrowMessage;
 
         public bool DevicesConnection()
         {            
@@ -334,7 +334,7 @@ namespace DicingBlade.Classes
             var result  = Motion.mAcm_AxDoSetBit(_mAxishand[axisNum], dOut, b);
             if (!Success(result))
             {
-                ThrowMessage($"Switch on DOUT {dOut} of axis № {axisNum} failed with error:{(ErrorCode)result}");
+                ThrowMessage($"Switch on DOUT {dOut} of axis № {axisNum} failed with error:{(ErrorCode)result}",0);
             }
         }
         public bool GetAxisDout(int axisNum, ushort dOut)
@@ -548,7 +548,7 @@ namespace DicingBlade.Classes
                 }
                 catch (Exception ex)
                 {
-                    ThrowMessage?.Invoke($"{ex.StackTrace} :\n {ex.Message}");                    
+                    ThrowMessage?.Invoke($"{ex.StackTrace} :\n {ex.Message}",0);                    
                     break;
                 }                
 
@@ -556,7 +556,7 @@ namespace DicingBlade.Classes
                 
                 if (!Success(result))
                 {
-                  ThrowMessage?.Invoke($"Ось № {axvel.axisNum} прервало движение домой с ошибкой {(ErrorCode)result}");  
+                  ThrowMessage?.Invoke($"Ось № {axvel.axisNum} прервало движение домой с ошибкой {(ErrorCode)result}",0);  
                 }                                
             }
         }

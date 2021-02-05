@@ -10,6 +10,8 @@
         double IndexH { get; set; }
         double Diameter { get; set; }
         string FileName { get; set; }
+        public void SetCurrentIndex(double index);
+        public int CurrentSide { get; set; }
     }
 
     public class TempWafer : IWafer
@@ -22,6 +24,24 @@
         public double IndexH { get; set; }
         public double Diameter { get; set; }
         public string FileName { get; set; }
+        public void SetCurrentIndex(double index)
+        {
+            switch (CurrentSide)
+            {
+                case 0:
+                    IndexH = index;
+                    
+                    break;
+                case 1:
+                    IndexW = index;
+                    
+                    break;
+                default:
+                    break;
+            };
+        }
+        public int CurrentSide { get ; set; }
+
         public TempWafer(IWafer wafer)
         {
             wafer.CopyPropertiesTo(this);

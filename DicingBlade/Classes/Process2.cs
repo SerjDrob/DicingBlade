@@ -95,7 +95,7 @@ namespace DicingBlade.Classes
     //}
     //public delegate void SetPause(bool pause);
     [AddINotifyPropertyChangedInterface]
-    internal class Process2:Messager, IDisposable
+    internal class Process2:IMessager, IDisposable
     {
         public Process2(IMachine machine, Wafer wafer, Blade blade, ITechnology technology, Diagram[] proc) // В конструкторе происходит загрузка технологических параметров
         {
@@ -145,7 +145,7 @@ namespace DicingBlade.Classes
                 case Status.Learning:
                     break;
                 case Status.Working when IsCutting & !_spindleWorking:
-                    ThrowMessage("Пластине кранты!");
+                    ThrowMessage("Пластине кранты!",0);
                     break;
                 case Status.Correcting:
                     break;
@@ -275,7 +275,7 @@ namespace DicingBlade.Classes
         //private double OffsetAngle { get; set; }
         public GetRotation GetRotationEvent;
 
-        public event Action<string> ThrowMessage;
+        public event Action<string,int> ThrowMessage;
 
         public bool Rotation { get; set; } = false;
         
@@ -650,7 +650,7 @@ namespace DicingBlade.Classes
                 switch (ProcessStatus) 
                 {
                     case Status.StartLearning:
-                        ThrowMessage?.Invoke("Вакуум исчез!!!");
+                        ThrowMessage?.Invoke("Вакуум исчез!!!",0);
                         ProcessStatus = Status.None;                        
                         break;
                     case Status.Learning:
