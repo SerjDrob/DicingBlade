@@ -44,7 +44,8 @@ namespace DicingBlade.Classes
         Working,
         Correcting,
         Done,
-        MovingNextDir
+        MovingNextDir,
+        Ending
     }
     /// <summary>
     /// Структура параметров процесса

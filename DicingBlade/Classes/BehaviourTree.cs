@@ -163,6 +163,21 @@ namespace DicingBlade.Classes
             AddMembers(members);
             return this;
         }
+        public Selector Hire(DoMyWork worker)
+        {
+            _myWorkers.Add((worker, new Condition()));
+            return this;
+        }
+        public Selector SetBlock(Condition condition)
+        {
+            if (_myWorkers.Count!=0)
+            {
+                var last = (_myWorkers.Last().worker, condition);
+                _myWorkers.RemoveAt(_myWorkers.Count - 1);
+                _myWorkers.Add(last);
+            }
+            return this;
+        }
         private List<(DoMyWork worker, Condition condition)> _myWorkers = new();
 
         public override event Action CheckMyCondition;

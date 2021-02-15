@@ -51,15 +51,10 @@
                 Storyboard.TargetProperty="RenderTransform.Children[0].Angle"
                 Duration="{Binding RotatingTime, Converter={StaticResource DoubleToDurationConverter}}" />
             <DoubleAnimation
+                By="{Binding WvAngle}"
                 Storyboard.Target="{Binding ElementName=TracesView}"
                 Storyboard.TargetProperty="RenderTransform.Children[0].Angle"
                 Duration="{Binding RotatingTime, Converter={StaticResource DoubleToDurationConverter}}">
-                <DoubleAnimation.By>
-                    <MultiBinding Converter="{StaticResource MulZeroConverter}">
-                        <Binding Path="WvAngle" />
-                        <Binding Path="Process.CutsRotate" />
-                    </MultiBinding>
-                </DoubleAnimation.By>
             </DoubleAnimation>
         </Storyboard>
     </Window.Resources>
@@ -74,207 +69,139 @@
             <i:ControlStoryboardAction Storyboard="{StaticResource ResourceKey=PathAnimation}" />
         </i:PropertyChangedTrigger>
     </i:Interaction.Triggers>
-
     <Grid>
-        <Grid.Resources>
-            <Style x:Key="Rec1" TargetType="Rectangle">
-                <Setter Property="Margin" Value="3" />
-                <Setter Property="Width" Value="10" />
-                <Setter Property="Height" Value="10" />
-                <Setter Property="Fill" Value="{StaticResource SignalRed}" />
-                <Setter Property="RadiusX" Value="5" />
-                <Setter Property="RadiusY" Value="5" />
-            </Style>
-        </Grid.Resources>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="auto"/>
+            <RowDefinition/>
         </Grid.RowDefinitions>
-        <GroupBox
+        <Menu Height="22">
+            <MenuItem Header="Приводы" Command="{Binding MachineSettingsCmd}"/>
+            <MenuItem Header="Подложка" Command="{Binding WaferSettingsCmd}"/>
+            <MenuItem Header="Технология" Command="{Binding TechnologySettingsCmd}"/>
+            <MenuItem Header="Обучение">
+                <MenuItem Command="{Binding ToTeachVideoScaleCmd}" Header="_Масштаб видео" />
+                <MenuItem Command="{Binding ToTeachChipSizeCmd}" Header="_Размер кристалла" />
+            </MenuItem>
+        </Menu>
+        <Grid Grid.Row="1">
+            <Grid.Resources>
+                <Style x:Key="Rec1" TargetType="Rectangle">
+                    <Setter Property="Margin" Value="3" />
+                    <Setter Property="Width" Value="10" />
+                    <Setter Property="Height" Value="10" />
+                    <Setter Property="Fill" Value="{StaticResource SignalRed}" />
+                    <Setter Property="RadiusX" Value="5" />
+                    <Setter Property="RadiusY" Value="5" />
+                </Style>
+            </Grid.Resources>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <GroupBox
             Grid.Row="1"
             Grid.RowSpan="2"
             Grid.Column="1"
             Header="Параметры">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition />
-                    <RowDefinition />
-                </Grid.RowDefinitions>
-                <GroupBox Grid.Row="1">
-                    <Grid Margin="3">
-                        <Grid.RowDefinitions>
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-                        <Button
-                            Margin="3"
-                            Command="{Binding WaferSettingsCmd}"
-                            Content="Подложка">
-                            <!--<AccessText>_P</AccessText>-->
-                        </Button>
-                        <Button
-                            Grid.Column="1"
-                            Margin="3"
-                            Command="{Binding MachineSettingsCmd}"
-                            Content="Приводы" />
-                        <Button
-                            Grid.Column="2"
-                            Margin="3"
-                            Command="{Binding TechnologySettingsCmd}"
-                            Content="Технология" />
-                        <!--<Button Content="Обучение" Command="{Binding TestCmd}" Grid.Row="1" Margin="3"/>-->
-
-                        <Button
-                            Grid.Row="1"
-                            Grid.Column="1"
-                            Margin="3" />
-                        <Button
-                            Grid.Row="1"
-                            Grid.Column="2"
-                            Margin="3" />
-                        <Button Grid.Row="2" Margin="3" />
-                        <Button
-                            Grid.Row="2"
-                            Grid.Column="1"
-                            Margin="3" />
-                        <Button
-                            Grid.Row="2"
-                            Grid.Column="2"
-                            Margin="3" />
-
-                        <Menu
-                            Grid.Row="1"
-                            Width="{Binding Path=ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Menu}}"
-                            Height="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Menu}}"
-                            Margin="3"
-                            BorderBrush="DimGray"
-                            BorderThickness="1">
-                            <Menu.Background>
-                                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlLightColorKey}}" />
-                            </Menu.Background>
-
-                            <MenuItem HorizontalAlignment="Center">
-                                <MenuItem.HeaderTemplate>
-                                    <DataTemplate>
-                                        <Grid
-                                            Width="{Binding Path=ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Menu}}"
-                                            Height="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Menu}}"
-                                            RenderTransformOrigin="0.5,0.5">
-                                            <TextBlock
-                                                HorizontalAlignment="Center"
-                                                VerticalAlignment="Center"
-                                                Text="Обучение" />
-                                        </Grid>
-                                    </DataTemplate>
-                                </MenuItem.HeaderTemplate>
-                                <MenuItem Command="{Binding ToTeachVideoScaleCmd}" Header="_Масштаб видео" />
-                                <MenuItem Command="{Binding ToTeachChipSizeCmd}" Header="_Размер кристалла" />
-                                <MenuItem Header="_Масштаб видео" />
-                                <MenuItem Header="_Масштаб видео" />
-                                <MenuItem Header="_Масштаб видео" />
-                            </MenuItem>
-                        </Menu>
-                    </Grid>
-                </GroupBox>
-                <GroupBox Header="Наладка">
-                    <Grid>
-                        <StackPanel>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                   
+                    <GroupBox Header="Наладка">
+                        <Grid>
                             <StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <Label Content="ProcessStatus" />
-                                    <Label Content="{Binding Process.ProcessStatus}" />
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Content="ProcessStatus" />
+                                        <Label Content="{Binding Process.ProcessStatus}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Content="SideDone" />
+                                        <Label Content="{Binding Process.SideDone}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Content="SideCounter" />
+                                        <Label Content="{Binding Process.SideCounter}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Content="CurrentLine" />
+                                        <Label Content="{Binding Process.CurrentLine}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Content="SpindleFreq" />
+                                        <Label Content="{Binding Machine.SpindleFreq}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Content="SpindleCurrent" />
+                                        <Label Content="{Binding Machine.SpindleCurrent}" />
+                                    </StackPanel>
                                 </StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <Label Content="SideDone" />
-                                    <Label Content="{Binding Process.SideDone}" />
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <Label Content="SideCounter" />
-                                    <Label Content="{Binding Process.SideCounter}" />
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <Label Content="CurrentLine" />
-                                    <Label Content="{Binding Process.CurrentLine}" />                                    
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <Label Content="SpindleFreq" />
-                                    <Label Content="{Binding Machine.SpindleFreq}" />
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <Label Content="SpindleCurrent" />
-                                    <Label Content="{Binding Machine.SpindleCurrent}" />
-                                </StackPanel>
-                            </StackPanel>
-                            <Border
+                                <Border
                                 Width="30"
                                 BorderBrush="Black"
                                 BorderThickness="2">
-                                <Canvas
+                                    <Canvas
                                     Width="30"
                                     Height="150"
                                     Background="White">
-                                    <Rectangle
+                                        <Rectangle
                                         Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType={x:Type Canvas}}}"
                                         Height="50"
                                         Fill="LightCyan">
-                                        <Rectangle.RenderTransform>
-                                            <TransformGroup>
-                                                <ScaleTransform ScaleY="-1" />
-                                                <TranslateTransform Y="{Binding ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}" />
-                                            </TransformGroup>
-                                        </Rectangle.RenderTransform>
-                                    </Rectangle>
-                                    <Line
+                                            <Rectangle.RenderTransform>
+                                                <TransformGroup>
+                                                    <ScaleTransform ScaleY="-1" />
+                                                    <TranslateTransform Y="{Binding ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}" />
+                                                </TransformGroup>
+                                            </Rectangle.RenderTransform>
+                                        </Rectangle>
+                                        <Line
                                         Stroke="OrangeRed"
                                         StrokeThickness="3"
                                         X1="0"
                                         X2="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType={x:Type Canvas}}}"
                                         Y2="{Binding Y1, RelativeSource={RelativeSource Mode=Self}}">
-                                        <Line.Y1>
-                                            <MultiBinding Converter="{StaticResource ZIndConverter}">
-                                                <Binding Path="ActualHeight" RelativeSource="{RelativeSource AncestorType={x:Type Canvas}, Mode=FindAncestor}" />
-                                                <Binding FallbackValue="1" Path="Wafer.Thickness" />
-                                                <Binding Path="ZView" />
-                                                <Binding Path="ZBladeTouchView" />
-                                            </MultiBinding>
-                                        </Line.Y1>
-                                        <Line.RenderTransform>
-                                            <TransformGroup>
-                                                <ScaleTransform ScaleY="-1" />
-                                                <TranslateTransform Y="{Binding ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}" />
-                                            </TransformGroup>
-                                        </Line.RenderTransform>
-                                    </Line>
-                                </Canvas>
-                            </Border>
-                        </StackPanel>
+                                            <Line.Y1>
+                                                <MultiBinding Converter="{StaticResource ZIndConverter}">
+                                                    <Binding Path="ActualHeight" RelativeSource="{RelativeSource AncestorType={x:Type Canvas}, Mode=FindAncestor}" />
+                                                    <Binding FallbackValue="1" Path="Wafer.Thickness" />
+                                                    <Binding Path="ZView" />
+                                                    <Binding Path="ZBladeTouchView" />
+                                                </MultiBinding>
+                                            </Line.Y1>
+                                            <Line.RenderTransform>
+                                                <TransformGroup>
+                                                    <ScaleTransform ScaleY="-1" />
+                                                    <TranslateTransform Y="{Binding ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}" />
+                                                </TransformGroup>
+                                            </Line.RenderTransform>
+                                        </Line>
+                                    </Canvas>
+                                </Border>
+                            </StackPanel>
 
-                    </Grid>
-                </GroupBox>
-            </Grid>
-        </GroupBox>
-        <Border
+                        </Grid>
+                    </GroupBox>
+                </Grid>
+            </GroupBox>
+            <Border
             Grid.RowSpan="2"
             BorderBrush="LightGray"
             BorderThickness="3" />
-        <Border
+            <Border
             Grid.Column="1"
             BorderBrush="LightGray"
             BorderThickness="3" />
-        <DockPanel Grid.RowSpan="{Binding Rows[0]}" Grid.Column="{Binding Cols[0]}">
-            <WrapPanel DockPanel.Dock="Top">
-                <!--<CheckBox Name="ChuckCursorChk">
+            <DockPanel Grid.RowSpan="{Binding Rows[0]}" Grid.Column="{Binding Cols[0]}">
+                <WrapPanel DockPanel.Dock="Top">
+                    <!--<CheckBox Name="ChuckCursorChk">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="PreviewKeyDown">
                             <cmd:EventToCommand Command="{Binding KeyDownCmd, Mode=OneWay}" PassEventArgsToCommand="True" />
@@ -288,373 +215,372 @@
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </CheckBox>-->
-            </WrapPanel>
-            <Canvas
+                </WrapPanel>
+                <Canvas
                 Margin="3"
                 VerticalAlignment="Stretch"
                 Background="White"
                 ClipToBounds="True">
-                <Ellipse Panel.ZIndex="1" Fill="AliceBlue">
-                    <Ellipse.Visibility>
-                        <Binding
+                    <Ellipse Panel.ZIndex="1" Fill="AliceBlue">
+                        <Ellipse.Visibility>
+                            <Binding
                             Converter="{StaticResource VisConvert}"
                             ConverterParameter="round"
                             Path="WaferView.IsRound" />
-                    </Ellipse.Visibility>
-                    <Ellipse.Width>
-                        <Binding
+                        </Ellipse.Visibility>
+                        <Ellipse.Width>
+                            <Binding
                             FallbackValue="0"
                             Path="DataContext.WaferView.ShapeSize[0]"
                             RelativeSource="{RelativeSource Mode=FindAncestor,
                                                             AncestorType={x:Type Window}}" />
-                    </Ellipse.Width>
-                    <Ellipse.Height>
-                        <Binding
+                        </Ellipse.Width>
+                        <Ellipse.Height>
+                            <Binding
                             FallbackValue="0"
                             Path="DataContext.WaferView.ShapeSize[1]"
                             RelativeSource="{RelativeSource Mode=FindAncestor,
                                                             AncestorType={x:Type Window}}" />
-                    </Ellipse.Height>
-                    <Ellipse.RenderTransform>
-                        <TransformGroup>
-                            <TranslateTransform>
-                                <TranslateTransform.X>
-                                    <MultiBinding Converter="{StaticResource TranslateConverterSchemeInverse}">
-                                        <Binding
+                        </Ellipse.Height>
+                        <Ellipse.RenderTransform>
+                            <TransformGroup>
+                                <TranslateTransform>
+                                    <TranslateTransform.X>
+                                        <MultiBinding Converter="{StaticResource TranslateConverterSchemeInverse}">
+                                            <Binding
                                             FallbackValue="0"
                                             Path="DataContext.WaferView.ShapeSize[0]"
                                             RelativeSource="{RelativeSource Mode=FindAncestor,
                                                                             AncestorType={x:Type Window}}" />
-                                    </MultiBinding>
-                                </TranslateTransform.X>
-                                <TranslateTransform.Y>
-                                    <MultiBinding Converter="{StaticResource TranslateConverterSchemeInverse}">
-                                        <Binding
+                                        </MultiBinding>
+                                    </TranslateTransform.X>
+                                    <TranslateTransform.Y>
+                                        <MultiBinding Converter="{StaticResource TranslateConverterSchemeInverse}">
+                                            <Binding
                                             FallbackValue="0"
                                             Path="DataContext.WaferView.ShapeSize[1]"
                                             RelativeSource="{RelativeSource Mode=FindAncestor,
                                                                             AncestorType={x:Type Window}}" />
-                                    </MultiBinding>
-                                </TranslateTransform.Y>
-                            </TranslateTransform>
-                            <RotateTransform>
-                                <RotateTransform.Angle>
-                                    <Binding Path="DataContext.WaferView.Angle" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                                </RotateTransform.Angle>
-                            </RotateTransform>
-                            <ScaleTransform>
-                                <ScaleTransform.ScaleX>
-                                    <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
-                                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                                        <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                                        <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                                    </MultiBinding>
-                                </ScaleTransform.ScaleX>
-                                <ScaleTransform.ScaleY>
-                                    <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
-                                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                                        <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                                        <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                                    </MultiBinding>
-                                </ScaleTransform.ScaleY>
-                            </ScaleTransform>
-                            <TranslateTransform>
-                                <TranslateTransform.X>
-                                    <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
-                                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                                    </MultiBinding>
-                                </TranslateTransform.X>
-                                <TranslateTransform.Y>
-                                    <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
-                                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                                    </MultiBinding>
-                                </TranslateTransform.Y>
-                            </TranslateTransform>
-                        </TransformGroup>
-                    </Ellipse.RenderTransform>
-                </Ellipse>
-                <Rectangle
+                                        </MultiBinding>
+                                    </TranslateTransform.Y>
+                                </TranslateTransform>
+                                <RotateTransform>
+                                    <RotateTransform.Angle>
+                                        <Binding Path="DataContext.WaferView.Angle" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                    </RotateTransform.Angle>
+                                </RotateTransform>
+                                <ScaleTransform>
+                                    <ScaleTransform.ScaleX>
+                                        <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
+                                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                            <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                            <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                        </MultiBinding>
+                                    </ScaleTransform.ScaleX>
+                                    <ScaleTransform.ScaleY>
+                                        <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
+                                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                            <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                            <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                        </MultiBinding>
+                                    </ScaleTransform.ScaleY>
+                                </ScaleTransform>
+                                <TranslateTransform>
+                                    <TranslateTransform.X>
+                                        <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
+                                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                        </MultiBinding>
+                                    </TranslateTransform.X>
+                                    <TranslateTransform.Y>
+                                        <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
+                                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                        </MultiBinding>
+                                    </TranslateTransform.Y>
+                                </TranslateTransform>
+                            </TransformGroup>
+                        </Ellipse.RenderTransform>
+                    </Ellipse>
+                    <Rectangle
                     x:Name="SquareWafer"
                     Panel.ZIndex="1"
                     Fill="AliceBlue">
-                    <Rectangle.Visibility>
-                        <Binding
+                        <Rectangle.Visibility>
+                            <Binding
                             Converter="{StaticResource VisConvert}"
                             ConverterParameter="square"
                             Path="WaferView.IsRound" />
-                    </Rectangle.Visibility>
-                    <Rectangle.Width>
-                        <Binding
+                        </Rectangle.Visibility>
+                        <Rectangle.Width>
+                            <Binding
                             FallbackValue="0"
                             Path="DataContext.WaferView.ShapeSize[0]"
                             RelativeSource="{RelativeSource Mode=FindAncestor,
                                                             AncestorType={x:Type Window}}" />
-                    </Rectangle.Width>
-                    <Rectangle.Height>
-                        <Binding
+                        </Rectangle.Width>
+                        <Rectangle.Height>
+                            <Binding
                             FallbackValue="0"
                             Path="DataContext.WaferView.ShapeSize[1]"
                             RelativeSource="{RelativeSource Mode=FindAncestor,
                                                             AncestorType={x:Type Window}}" />
-                    </Rectangle.Height>
-                    <Rectangle.Resources>
-                        <Storyboard x:Key="WaferAnimation">
-                            <DoubleAnimation
+                        </Rectangle.Height>
+                        <Rectangle.Resources>
+                            <Storyboard x:Key="WaferAnimation">
+                                <DoubleAnimation
                                 By="{Binding WvAngle}"
                                 Storyboard.Target="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Rectangle}}"
                                 Storyboard.TargetProperty="RenderTransform.Children[1].Angle"
                                 Duration="{Binding RotatingTime, Converter={StaticResource DoubleToDurationConverter}}" />
-                        </Storyboard>
-                    </Rectangle.Resources>
-                    <i:Interaction.Triggers>
-                        <i:PropertyChangedTrigger Binding="{Binding WvRotate}">
-                            <i:ControlStoryboardAction Storyboard="{StaticResource WaferAnimation}" />
-                        </i:PropertyChangedTrigger>
-                    </i:Interaction.Triggers>
-                    <Rectangle.RenderTransform>
-                        <TransformGroup>
-                            <TranslateTransform>
-                                <TranslateTransform.X>
-                                    <MultiBinding Converter="{StaticResource TranslateConverterSchemeInverse}">
-                                        <Binding
+                            </Storyboard>
+                        </Rectangle.Resources>
+                        <i:Interaction.Triggers>
+                            <i:PropertyChangedTrigger Binding="{Binding WvRotate}">
+                                <i:ControlStoryboardAction Storyboard="{StaticResource WaferAnimation}" />
+                            </i:PropertyChangedTrigger>
+                        </i:Interaction.Triggers>
+                        <Rectangle.RenderTransform>
+                            <TransformGroup>
+                                <TranslateTransform>
+                                    <TranslateTransform.X>
+                                        <MultiBinding Converter="{StaticResource TranslateConverterSchemeInverse}">
+                                            <Binding
                                             FallbackValue="0"
                                             Path="DataContext.WaferView.ShapeSize[0]"
                                             RelativeSource="{RelativeSource Mode=FindAncestor,
                                                                             AncestorType={x:Type Window}}" />
-                                    </MultiBinding>
-                                </TranslateTransform.X>
-                                <TranslateTransform.Y>
-                                    <MultiBinding Converter="{StaticResource TranslateConverterSchemeInverse}">
-                                        <Binding
+                                        </MultiBinding>
+                                    </TranslateTransform.X>
+                                    <TranslateTransform.Y>
+                                        <MultiBinding Converter="{StaticResource TranslateConverterSchemeInverse}">
+                                            <Binding
                                             FallbackValue="0"
                                             Path="DataContext.WaferView.ShapeSize[1]"
                                             RelativeSource="{RelativeSource Mode=FindAncestor,
                                                                             AncestorType={x:Type Window}}" />
-                                    </MultiBinding>
-                                </TranslateTransform.Y>
-                            </TranslateTransform>
-                            <RotateTransform />
-                            <!--<RotateTransform>
+                                        </MultiBinding>
+                                    </TranslateTransform.Y>
+                                </TranslateTransform>
+                                <RotateTransform />
+                                <!--<RotateTransform>
                                 <RotateTransform.Angle>
                                     <Binding Path="DataContext.WVAngle" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
                                 </RotateTransform.Angle>
                             </RotateTransform>-->
-                            <ScaleTransform>
-                                <ScaleTransform.ScaleX>
-                                    <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
-                                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                                        <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                                        <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                                    </MultiBinding>
-                                </ScaleTransform.ScaleX>
-                                <ScaleTransform.ScaleY>
-                                    <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
-                                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                                        <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                                        <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                                    </MultiBinding>
-                                </ScaleTransform.ScaleY>
-                            </ScaleTransform>
-                            <TranslateTransform>
-                                <TranslateTransform.X>
-                                    <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
-                                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                                    </MultiBinding>
-                                </TranslateTransform.X>
-                                <TranslateTransform.Y>
-                                    <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
-                                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                                    </MultiBinding>
-                                </TranslateTransform.Y>
-                            </TranslateTransform>
-                        </TransformGroup>
-                    </Rectangle.RenderTransform>
+                                <ScaleTransform>
+                                    <ScaleTransform.ScaleX>
+                                        <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
+                                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                            <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                            <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                        </MultiBinding>
+                                    </ScaleTransform.ScaleX>
+                                    <ScaleTransform.ScaleY>
+                                        <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
+                                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                            <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                            <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                        </MultiBinding>
+                                    </ScaleTransform.ScaleY>
+                                </ScaleTransform>
+                                <TranslateTransform>
+                                    <TranslateTransform.X>
+                                        <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
+                                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                        </MultiBinding>
+                                    </TranslateTransform.X>
+                                    <TranslateTransform.Y>
+                                        <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
+                                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                        </MultiBinding>
+                                    </TranslateTransform.Y>
+                                </TranslateTransform>
+                            </TransformGroup>
+                        </Rectangle.RenderTransform>
 
-                </Rectangle>
-                <Path
+                    </Rectangle>
+                    <Path
                     Name="CutsView"
                     Panel.ZIndex="2"
                     Data="{Binding WaferView.RawLines, Converter={StaticResource WaferViewToPathConverter}}"
                     Stroke="YellowGreen">
-                    <Path.StrokeThickness>
-                        <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
-                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                            <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                            <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                            <Binding Path="DataContext.Thickness" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                        </MultiBinding>
-                    </Path.StrokeThickness>
-                    <Path.RenderTransform>
-                        <TransformGroup>
-                            <RotateTransform />
-                            <ScaleTransform>
-                                <ScaleTransform.ScaleX>
-                                    <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
-                                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                                        <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                                        <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                                    </MultiBinding>
-                                </ScaleTransform.ScaleX>
-                                <ScaleTransform.ScaleY>
-                                    <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
-                                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                                        <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                                        <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                                    </MultiBinding>
-                                </ScaleTransform.ScaleY>
-                            </ScaleTransform>
+                        <Path.StrokeThickness>
+                            <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
+                                <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                <Binding Path="DataContext.Thickness" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                            </MultiBinding>
+                        </Path.StrokeThickness>
+                        <Path.RenderTransform>
+                            <TransformGroup>
+                                <RotateTransform />
+                                <ScaleTransform>
+                                    <ScaleTransform.ScaleX>
+                                        <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
+                                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                            <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                            <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                        </MultiBinding>
+                                    </ScaleTransform.ScaleX>
+                                    <ScaleTransform.ScaleY>
+                                        <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
+                                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                            <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                            <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                        </MultiBinding>
+                                    </ScaleTransform.ScaleY>
+                                </ScaleTransform>
 
-                            <TranslateTransform>
-                                <TranslateTransform.X>
-                                    <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
-                                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                                    </MultiBinding>
-                                </TranslateTransform.X>
-                                <TranslateTransform.Y>
-                                    <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
-                                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                                    </MultiBinding>
-                                </TranslateTransform.Y>
-                            </TranslateTransform>
-                        </TransformGroup>
-                    </Path.RenderTransform>
-                </Path>
-                <Path
+                                <TranslateTransform>
+                                    <TranslateTransform.X>
+                                        <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
+                                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                        </MultiBinding>
+                                    </TranslateTransform.X>
+                                    <TranslateTransform.Y>
+                                        <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
+                                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                        </MultiBinding>
+                                    </TranslateTransform.Y>
+                                </TranslateTransform>
+                            </TransformGroup>
+                        </Path.RenderTransform>
+                    </Path>
+                    <Path
                     x:Name="BladeCursor"
                     Panel.ZIndex="3"
                     Stroke="Green"
                     StrokeThickness="1">
-                    <Path.Data>
-                        <MultiBinding Converter="{StaticResource GetCursor}">
-                            <Binding Path="XView" />
-                            <Binding Path="YView" />
-                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Canvas}" />
-                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Canvas}" />
-                            <Binding Path="BCCenterXView" />
-                            <Binding Path="BCCenterYView" />
-                            <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                            <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                            <Binding Path="DataContext.Wafer.GetCurrentDirectionIndexShift" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                        </MultiBinding>
-                    </Path.Data>
-                    <Path.Style>
-                        <Style TargetType="Path">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding ElementName=ChuckCursorChk, Path=IsChecked}" Value="False">
-                                    <Setter Property="Visibility" Value="Hidden" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Path.Style>
-                </Path>
-                <Path
+                        <Path.Data>
+                            <MultiBinding Converter="{StaticResource GetCursor}">
+                                <Binding Path="XView" />
+                                <Binding Path="YView" />
+                                <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Canvas}" />
+                                <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Canvas}" />
+                                <Binding Path="BCCenterXView" />
+                                <Binding Path="BCCenterYView" />
+                                <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                <Binding Path="DataContext.Wafer.GetCurrentDirectionIndexShift" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                            </MultiBinding>
+                        </Path.Data>
+                        <Path.Style>
+                            <Style TargetType="Path">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=ChuckCursorChk, Path=IsChecked}" Value="False">
+                                        <Setter Property="Visibility" Value="Hidden" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Path.Style>
+                    </Path>
+                    <Path
                     x:Name="CameraCursor"
                     Panel.ZIndex="3"
                     Stroke="OrangeRed"
                     StrokeThickness="1">
-                    <Path.Data>
-                        <MultiBinding Converter="{StaticResource GetCursor}">
-                            <Binding Path="XView" />
-                            <Binding Path="YView" />
-                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Canvas}" />
-                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Canvas}" />
-                            <Binding Path="CCCenterXView" />
-                            <Binding Path="CCCenterYView" />
-                            <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                            <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                            <Binding Path="DataContext.Wafer.GetCurrentDirectionIndexShift" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                        </MultiBinding>
-                    </Path.Data>
-                    <Path.Style>
-                        <Style TargetType="Path">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding ElementName=CameraCursorChk, Path=IsChecked}" Value="False">
-                                    <Setter Property="Visibility" Value="Hidden" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Path.Style>
-                </Path>
-                <Path
+                        <Path.Data>
+                            <MultiBinding Converter="{StaticResource GetCursor}">
+                                <Binding Path="XView" />
+                                <Binding Path="YView" />
+                                <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Canvas}" />
+                                <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Canvas}" />
+                                <Binding Path="CCCenterXView" />
+                                <Binding Path="CCCenterYView" />
+                                <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                <Binding Path="DataContext.Wafer.GetCurrentDirectionIndexShift" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                            </MultiBinding>
+                        </Path.Data>
+                        <Path.Style>
+                            <Style TargetType="Path">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=CameraCursorChk, Path=IsChecked}" Value="False">
+                                        <Setter Property="Visibility" Value="Hidden" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Path.Style>
+                    </Path>
+                    <Path
                     Name="BladeTrace"
                     Panel.ZIndex="4"
                     Stroke="Navy"
                     StrokeDashArray="4 4"
                     StrokeThickness="2">
-                    <Path.Data>
-                        <MultiBinding Converter="{StaticResource TraceConverter}">
-                            <Binding Path="XTrace" />
-                            <Binding Path="YTrace" />
-                            <Binding Path="XTraceEnd" />
-                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Canvas}" />
-                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Canvas}" />
-                            <Binding Path="DataContext.BCCenterXView" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                            <Binding Path="DataContext.BCCenterYView" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                            <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                            <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                            <Binding Path="DataContext.Wafer.GetCurrentDirectionIndexShift" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                        </MultiBinding>
-                    </Path.Data>
-                </Path>
-                <Path
+                        <Path.Data>
+                            <MultiBinding Converter="{StaticResource TraceConverter}">
+                                <Binding Path="XTrace" />
+                                <Binding Path="YTrace" />
+                                <Binding Path="XTraceEnd" />
+                                <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Canvas}" />
+                                <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Canvas}" />
+                                <Binding Path="DataContext.BCCenterXView" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                <Binding Path="DataContext.BCCenterYView" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                <Binding Path="DataContext.Wafer.GetCurrentDirectionIndexShift" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                            </MultiBinding>
+                        </Path.Data>
+                    </Path>
+                    <Path
                     Name="TracesView"
                     Panel.ZIndex="2"
                     Data="{Binding TracesCollectionView, Converter={StaticResource TraceViewToPathConverter}}"
                     Stroke="Black">
-                    <Path.StrokeThickness>
-                        <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
-                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                            <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                            <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                            <Binding Path="DataContext.Thickness" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                        </MultiBinding>
-                    </Path.StrokeThickness>
-                    <Path.RenderTransform>
-                        <TransformGroup>
-                            <RotateTransform />
-                            <ScaleTransform>
-                                <ScaleTransform.ScaleX>
-                                    <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
-                                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                                        <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                                        <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                                    </MultiBinding>
-                                </ScaleTransform.ScaleX>
-                                <ScaleTransform.ScaleY>
-                                    <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
-                                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                                        <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                                        <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                                    </MultiBinding>
-                                </ScaleTransform.ScaleY>
-                            </ScaleTransform>
-
-                            <TranslateTransform>
-                                <TranslateTransform.X>
-                                    <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
-                                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                                    </MultiBinding>
-                                </TranslateTransform.X>
-                                <TranslateTransform.Y>
-                                    <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
-                                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                                    </MultiBinding>
-                                </TranslateTransform.Y>
-                            </TranslateTransform>
-                        </TransformGroup>
-                    </Path.RenderTransform>
-                </Path>
-                <Line
+                        <Path.StrokeThickness>
+                            <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
+                                <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                <Binding Path="DataContext.Thickness" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                            </MultiBinding>
+                        </Path.StrokeThickness>
+                        <Path.RenderTransform>
+                            <TransformGroup>
+                                <RotateTransform />
+                                <ScaleTransform>
+                                    <ScaleTransform.ScaleX>
+                                        <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
+                                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                            <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                            <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                        </MultiBinding>
+                                    </ScaleTransform.ScaleX>
+                                    <ScaleTransform.ScaleY>
+                                        <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
+                                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                            <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                            <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                        </MultiBinding>
+                                    </ScaleTransform.ScaleY>
+                                </ScaleTransform>
+                                <TranslateTransform>
+                                    <TranslateTransform.X>
+                                        <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
+                                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                        </MultiBinding>
+                                    </TranslateTransform.X>
+                                    <TranslateTransform.Y>
+                                        <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
+                                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                        </MultiBinding>
+                                    </TranslateTransform.Y>
+                                </TranslateTransform>
+                            </TransformGroup>
+                        </Path.RenderTransform>
+                    </Path>
+                    <Line
                     Name="AnglePosition"
                     RenderTransformOrigin="0.5,1"
                     Stroke="YellowGreen"
@@ -662,239 +588,226 @@
                     X1="0"
                     X2="{Binding Path=ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}"
                     Y1="{Binding Path=Y2, RelativeSource={RelativeSource Mode=Self}}">
-                    <Line.Y2>
-                        <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
-                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                        </MultiBinding>
-                    </Line.Y2>
+                        <Line.Y2>
+                            <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
+                                <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                            </MultiBinding>
+                        </Line.Y2>
 
-                    <Line.RenderTransform>
-                        <RotateTransform>
-                            <RotateTransform.Angle>
-                                <Binding Path="DataContext.UView" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                            </RotateTransform.Angle>
-                        </RotateTransform>
-                    </Line.RenderTransform>
-                </Line>
-            </Canvas>
-        </DockPanel>
-        <GroupBox Grid.Row="2" VerticalAlignment="Top">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                </Grid.RowDefinitions>
-                <TextBlock Text="{Binding StringFormat=X: {0}, Path=XView}" Background="AliceBlue"/>
-                <TextBlock Grid.Row="1" Text="{Binding StringFormat=Y: {0}, Path=YView}" Background="AliceBlue"/>
-                <TextBlock Grid.Row="2" Text="{Binding StringFormat=Z: {0}, Path=ZView}" Background="AliceBlue"/>
-                <TextBlock Grid.Row="3" Text="{Binding StringFormat=U: {0}, Path=UView}" Background="AliceBlue"/>
-                <TextBlock Grid.Column="1" Text="{Binding StringFormat=PointX: {0}, Path=PointX}" Background="AliceBlue"/>
-                <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding StringFormat=PointY: {0}, Path=PointY}" Background="AliceBlue"/>
-                
-                <Label Grid.Column="1" Content="{Binding Machine.X.CmdPosition, StringFormat=Xcmd:{0}}" />
-                <Label
-                    Grid.Row="1"
-                    Grid.Column="1"
-                    Content="{Binding Machine.Y.CmdPosition, StringFormat=Ycmd:{0}}" />
-                <Label
-                    Grid.Row="2"
-                    Grid.Column="1"
-                    Content="{Binding Machine.Z.CmdPosition, StringFormat=Zcmd:{0}}" />
-                <Label
-                    Grid.Row="3"
-                    Grid.Column="1"
-                    Content="{Binding Machine.U.CmdPosition, StringFormat=Ucmd:{0}}" />
+                        <Line.RenderTransform>
+                            <RotateTransform>
+                                <RotateTransform.Angle>
+                                    <Binding Path="DataContext.UView" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                </RotateTransform.Angle>
+                            </RotateTransform>
+                        </Line.RenderTransform>
+                    </Line>
+                </Canvas>
+            </DockPanel>
+            <GroupBox Grid.Row="2" VerticalAlignment="Top">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="{Binding StringFormat=X: {0}, Path=XView}" Background="AliceBlue"/>
+                    <TextBlock Grid.Row="1" Text="{Binding StringFormat=Y: {0}, Path=YView}" Background="AliceBlue"/>
+                    <TextBlock Grid.Row="2" Text="{Binding StringFormat=Z: {0}, Path=ZView}" Background="AliceBlue"/>
+                    <TextBlock Grid.Row="3" Text="{Binding StringFormat=U: {0}, Path=UView}" Background="AliceBlue"/>
+                    <TextBlock Grid.Column="1" Text="{Binding StringFormat=PointX: {0}, Path=PointX}" Background="AliceBlue"/>
+                    <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding StringFormat=PointY: {0}, Path=PointY}" Background="AliceBlue"/>
+                    <TextBlock Grid.Column="1" Grid.Row="2" Grid.RowSpan="3" Text="{Binding ProcessStatus}" TextAlignment="Center"  Background="AliceBlue" FontStretch="Normal" FontStyle="Normal" FontSize="22" FontFamily="Arial Black" Foreground="#FFF11616"/>
 
-                <StackPanel Grid.Column="2" Orientation="Horizontal">
-                    <Rectangle>
-                        <Rectangle.Style>
-                            <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
-                                <Style.Triggers>
-                                    <DataTrigger Value="True">
-                                        <DataTrigger.Binding>
-                                            <Binding Path="XnLmtView" />
-                                        </DataTrigger.Binding>
-                                        <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Rectangle.Style>
-                    </Rectangle>
-                    <Rectangle>
-                        <Rectangle.Style>
-                            <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
-                                <Style.Triggers>
-                                    <DataTrigger Value="True">
-                                        <DataTrigger.Binding>
-                                            <Binding Path="XpLmtView" />
-                                        </DataTrigger.Binding>
-                                        <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Rectangle.Style>
-                    </Rectangle>
-                    <Rectangle>
-                        <Rectangle.Style>
-                            <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
-                                <Style.Triggers>
-                                    <DataTrigger Value="True">
-                                        <DataTrigger.Binding>
-                                            <Binding Path="XMotDoneView" />
-                                        </DataTrigger.Binding>
-                                        <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Rectangle.Style>
-                    </Rectangle>
-                </StackPanel>
-                <StackPanel
+                    <StackPanel Grid.Column="2" Orientation="Horizontal">
+                        <Rectangle>
+                            <Rectangle.Style>
+                                <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
+                                    <Style.Triggers>
+                                        <DataTrigger Value="True">
+                                            <DataTrigger.Binding>
+                                                <Binding Path="XnLmtView" />
+                                            </DataTrigger.Binding>
+                                            <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Rectangle.Style>
+                        </Rectangle>
+                        <Rectangle>
+                            <Rectangle.Style>
+                                <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
+                                    <Style.Triggers>
+                                        <DataTrigger Value="True">
+                                            <DataTrigger.Binding>
+                                                <Binding Path="XpLmtView" />
+                                            </DataTrigger.Binding>
+                                            <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Rectangle.Style>
+                        </Rectangle>
+                        <Rectangle>
+                            <Rectangle.Style>
+                                <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
+                                    <Style.Triggers>
+                                        <DataTrigger Value="True">
+                                            <DataTrigger.Binding>
+                                                <Binding Path="XMotDoneView" />
+                                            </DataTrigger.Binding>
+                                            <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Rectangle.Style>
+                        </Rectangle>
+                    </StackPanel>
+                    <StackPanel
                     Grid.Row="1"
                     Grid.Column="2"
                     Orientation="Horizontal">
-                    <Rectangle>
-                        <Rectangle.Style>
-                            <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
-                                <Style.Triggers>
-                                    <DataTrigger Value="True">
-                                        <DataTrigger.Binding>
-                                            <Binding Path="YnLmtView" />
-                                        </DataTrigger.Binding>
-                                        <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Rectangle.Style>
-                    </Rectangle>
-                    <Rectangle>
-                        <Rectangle.Style>
-                            <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
-                                <Style.Triggers>
-                                    <DataTrigger Value="True">
-                                        <DataTrigger.Binding>
-                                            <Binding Path="YpLmtView" />
-                                        </DataTrigger.Binding>
-                                        <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Rectangle.Style>
-                    </Rectangle>
-                    <Rectangle>
-                        <Rectangle.Style>
-                            <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
-                                <Style.Triggers>
-                                    <DataTrigger Value="True">
-                                        <DataTrigger.Binding>
-                                            <Binding Path="YMotDoneView" />
-                                        </DataTrigger.Binding>
-                                        <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Rectangle.Style>
-                    </Rectangle>
-                </StackPanel>
-                <StackPanel
+                        <Rectangle>
+                            <Rectangle.Style>
+                                <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
+                                    <Style.Triggers>
+                                        <DataTrigger Value="True">
+                                            <DataTrigger.Binding>
+                                                <Binding Path="YnLmtView" />
+                                            </DataTrigger.Binding>
+                                            <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Rectangle.Style>
+                        </Rectangle>
+                        <Rectangle>
+                            <Rectangle.Style>
+                                <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
+                                    <Style.Triggers>
+                                        <DataTrigger Value="True">
+                                            <DataTrigger.Binding>
+                                                <Binding Path="YpLmtView" />
+                                            </DataTrigger.Binding>
+                                            <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Rectangle.Style>
+                        </Rectangle>
+                        <Rectangle>
+                            <Rectangle.Style>
+                                <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
+                                    <Style.Triggers>
+                                        <DataTrigger Value="True">
+                                            <DataTrigger.Binding>
+                                                <Binding Path="YMotDoneView" />
+                                            </DataTrigger.Binding>
+                                            <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Rectangle.Style>
+                        </Rectangle>
+                    </StackPanel>
+                    <StackPanel
                     Grid.Row="2"
                     Grid.Column="2"
                     Orientation="Horizontal">
-                    <Rectangle>
-                        <Rectangle.Style>
-                            <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
-                                <Style.Triggers>
-                                    <DataTrigger Value="True">
-                                        <DataTrigger.Binding>
-                                            <Binding Path="ZnLmtView" />
-                                        </DataTrigger.Binding>
-                                        <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Rectangle.Style>
-                    </Rectangle>
-                    <Rectangle>
-                        <Rectangle.Style>
-                            <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
-                                <Style.Triggers>
-                                    <DataTrigger Value="True">
-                                        <DataTrigger.Binding>
-                                            <Binding Path="ZpLmtView" />
-                                        </DataTrigger.Binding>
-                                        <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Rectangle.Style>
-                    </Rectangle>
-                </StackPanel>
-                <StackPanel
+                        <Rectangle>
+                            <Rectangle.Style>
+                                <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
+                                    <Style.Triggers>
+                                        <DataTrigger Value="True">
+                                            <DataTrigger.Binding>
+                                                <Binding Path="ZnLmtView" />
+                                            </DataTrigger.Binding>
+                                            <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Rectangle.Style>
+                        </Rectangle>
+                        <Rectangle>
+                            <Rectangle.Style>
+                                <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
+                                    <Style.Triggers>
+                                        <DataTrigger Value="True">
+                                            <DataTrigger.Binding>
+                                                <Binding Path="ZpLmtView" />
+                                            </DataTrigger.Binding>
+                                            <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Rectangle.Style>
+                        </Rectangle>
+                    </StackPanel>
+                    <StackPanel
                     Grid.Row="3"
                     Grid.Column="2"
                     Orientation="Horizontal">
-                    <Rectangle>
-                        <Rectangle.Style>
-                            <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
-                                <Style.Triggers>
-                                    <DataTrigger Value="True">
-                                        <DataTrigger.Binding>
-                                            <Binding Path="UnLmtView" />
-                                        </DataTrigger.Binding>
-                                        <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Rectangle.Style>
-                    </Rectangle>
-                    <Rectangle>
-                        <Rectangle.Style>
-                            <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
-                                <Style.Triggers>
-                                    <DataTrigger Value="True">
-                                        <DataTrigger.Binding>
-                                            <Binding Path="UpLmtView" />
-                                        </DataTrigger.Binding>
-                                        <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Rectangle.Style>
-                    </Rectangle>
-                </StackPanel>
-                <TextBlock
+                        <Rectangle>
+                            <Rectangle.Style>
+                                <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
+                                    <Style.Triggers>
+                                        <DataTrigger Value="True">
+                                            <DataTrigger.Binding>
+                                                <Binding Path="UnLmtView" />
+                                            </DataTrigger.Binding>
+                                            <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Rectangle.Style>
+                        </Rectangle>
+                        <Rectangle>
+                            <Rectangle.Style>
+                                <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
+                                    <Style.Triggers>
+                                        <DataTrigger Value="True">
+                                            <DataTrigger.Binding>
+                                                <Binding Path="UpLmtView" />
+                                            </DataTrigger.Binding>
+                                            <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Rectangle.Style>
+                        </Rectangle>
+                    </StackPanel>
+                    <TextBlock
                     Grid.Column="3"
                     Text="Быстро"
                     Visibility="{Binding VelocityRegime, Converter={StaticResource MatchEnumConverter}, ConverterParameter={x:Static local:Velocity.Fast}}" />
-                <TextBlock
+                    <TextBlock
                     Grid.Column="3"
                     Text="Медленно"
                     Visibility="{Binding VelocityRegime, Converter={StaticResource MatchEnumConverter}, ConverterParameter={x:Static local:Velocity.Slow}}" />
-                <TextBlock
+                    <TextBlock
                     Grid.Column="3"
                     Text="Шаг"
                     Visibility="{Binding VelocityRegime, Converter={StaticResource MatchEnumConverter}, ConverterParameter={x:Static local:Velocity.Step}}" />
-            </Grid>
-        </GroupBox>
-        <GroupBox
+                </Grid>
+            </GroupBox>
+            <GroupBox
             Grid.Row="2"
             HorizontalAlignment="Left"
             VerticalAlignment="Bottom">
-            <StackPanel Orientation="Horizontal">
+                <StackPanel Orientation="Horizontal">
 
-                <GroupBox Header="Шпиндель">
-                    <StackPanel>
-                        <GroupBox>
-                            <Grid>
-                                <ProgressBar
+                    <GroupBox Header="Шпиндель">
+                        <StackPanel>
+                            <GroupBox>
+                                <Grid>
+                                    <ProgressBar
                                     Width="150"
                                     Height="30"
                                     Margin="3"
@@ -902,12 +815,12 @@
                                     Maximum="40000"
                                     Minimum="0"
                                     Value="{Binding SpindleFreqView}" />
-                                <TextBlock Text="{Binding StringFormat={}{0} Об/мин,Path=SpindleFreqView}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Grid>
-                        </GroupBox>
-                        <GroupBox>
-                            <Grid>
-                                <ProgressBar
+                                    <TextBlock Text="{Binding StringFormat={}{0} Об/мин,Path=SpindleFreqView}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                            </GroupBox>
+                            <GroupBox>
+                                <Grid>
+                                    <ProgressBar
                                     Width="150"
                                     Height="30"
                                     Margin="3"
@@ -915,17 +828,17 @@
                                     Maximum="12"
                                     Minimum="0"                                      
                                     Value="{Binding SpindleCurrentView}" />
-                                <TextBlock Text="{Binding StringFormat={}{0} A,Path=SpindleCurrentView}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Grid>
-                        </GroupBox>
-                    </StackPanel>
-                </GroupBox>
+                                    <TextBlock Text="{Binding StringFormat={}{0} A,Path=SpindleCurrentView}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                            </GroupBox>
+                        </StackPanel>
+                    </GroupBox>
 
-                <GroupBox Header="СОЖ">
-                    <StackPanel>
-                        <GroupBox Header="Бок.">
-                            <StackPanel>
-                                <ProgressBar
+                    <GroupBox Header="СОЖ">
+                        <StackPanel>
+                            <GroupBox Header="Бок.">
+                                <StackPanel>
+                                    <ProgressBar
                                     Width="150"
                                     Height="10"
                                     Margin="3"
@@ -933,12 +846,12 @@
                                     Maximum="50000"
                                     Minimum="0"
                                     Value="32300" />
-                                <Label Content="0" />
-                            </StackPanel>
-                        </GroupBox>
-                        <GroupBox Header="Фронт.">
-                            <StackPanel>
-                                <ProgressBar
+                                    <Label Content="0" />
+                                </StackPanel>
+                            </GroupBox>
+                            <GroupBox Header="Фронт.">
+                                <StackPanel>
+                                    <ProgressBar
                                     Width="150"
                                     Height="10"
                                     Margin="3"
@@ -946,182 +859,182 @@
                                     Maximum="50000"
                                     Minimum="0"
                                     Value="3000" />
-                                <Label Content="0" />
-                            </StackPanel>
-                        </GroupBox>
+                                    <Label Content="0" />
+                                </StackPanel>
+                            </GroupBox>
+                        </StackPanel>
+                    </GroupBox>
+                    <StackPanel>
+                        <Border BorderBrush="Transparent" BorderThickness="3">
+                            <DockPanel LastChildFill="False">
+                                <Label Content="Охл. шпинделя" DockPanel.Dock="Left" />
+                                <Rectangle
+                                Width="20"
+                                Height="20"
+                                Margin="3"
+                                DockPanel.Dock="Right">
+                                    <Rectangle.Style>
+                                        <Style TargetType="Rectangle">
+                                            <Setter Property="Fill" Value="{StaticResource SignalRed}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Value="True">
+                                                    <DataTrigger.Binding>
+                                                        <Binding Path="SpindleCoolantSensorView" />
+                                                    </DataTrigger.Binding>
+                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Rectangle.Style>
+                                </Rectangle>
+                            </DockPanel>
+                        </Border>
+                        <Border BorderThickness="3">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="BorderBrush" Value="Transparent" />
+                                    <Style.Triggers>
+                                        <DataTrigger Value="True">
+                                            <DataTrigger.Binding>
+                                                <Binding Path="CoolantValveView" />
+                                            </DataTrigger.Binding>
+                                            <Setter Property="BorderBrush" Value="{StaticResource SignalGreen}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <DockPanel LastChildFill="False">
+                                <Label Content="Вода" DockPanel.Dock="Left" />
+                                <Rectangle
+                                Width="20"
+                                Height="20"
+                                Margin="3"
+                                DockPanel.Dock="Right">
+                                    <Rectangle.Style>
+                                        <Style TargetType="Rectangle">
+                                            <Setter Property="Fill" Value="{StaticResource SignalRed}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Value="True">
+                                                    <DataTrigger.Binding>
+                                                        <Binding Path="CoolantSensorView" />
+                                                    </DataTrigger.Binding>
+                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Rectangle.Style>
+                                </Rectangle>
+                            </DockPanel>
+                        </Border>
+                        <Border BorderBrush="Transparent" BorderThickness="3">
+                            <DockPanel LastChildFill="False">
+                                <Label Content="Воздух" DockPanel.Dock="Left" />
+                                <Rectangle
+                                Width="20"
+                                Height="20"
+                                Margin="3"
+                                DockPanel.Dock="Right">
+                                    <Rectangle.Style>
+                                        <Style TargetType="Rectangle">
+                                            <Setter Property="Fill" Value="{StaticResource SignalRed}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Value="True">
+                                                    <DataTrigger.Binding>
+                                                        <Binding Path="AirSensorView" />
+                                                    </DataTrigger.Binding>
+                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Rectangle.Style>
+                                </Rectangle>
+                            </DockPanel>
+                        </Border>
+                        <Border BorderThickness="3">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="BorderBrush" Value="Transparent" />
+                                    <Style.Triggers>
+                                        <DataTrigger Value="True">
+                                            <DataTrigger.Binding>
+                                                <Binding Path="ChuckVacuumValveView" />
+                                            </DataTrigger.Binding>
+                                            <Setter Property="BorderBrush" Value="{StaticResource SignalGreen}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <DockPanel LastChildFill="False">
+                                <Label Content="Вакуум" DockPanel.Dock="Left" />
+                                <Rectangle
+                                Width="20"
+                                Height="20"
+                                Margin="3"
+                                DockPanel.Dock="Right">
+                                    <Rectangle.Style>
+                                        <Style TargetType="Rectangle">
+                                            <Setter Property="Fill" Value="{StaticResource SignalRed}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Value="True">
+                                                    <DataTrigger.Binding>
+                                                        <Binding Path="ChuckVacuumSensorView" />
+                                                    </DataTrigger.Binding>
+                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Rectangle.Style>
+                                </Rectangle>
+                            </DockPanel>
+                        </Border>
+                        <Border BorderThickness="3">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="BorderBrush" Value="Transparent" />
+                                    <Style.Triggers>
+                                        <DataTrigger Value="True">
+                                            <DataTrigger.Binding>
+                                                <Binding Path="BlowingValveView" />
+                                            </DataTrigger.Binding>
+                                            <Setter Property="BorderBrush" Value="{StaticResource SignalGreen}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <DockPanel LastChildFill="False">
+                                <Label Content="Обдув" DockPanel.Dock="Left" />
+                            </DockPanel>
+                        </Border>
                     </StackPanel>
-                </GroupBox>
-                <StackPanel>
-                    <Border BorderBrush="Transparent" BorderThickness="3">
-                        <DockPanel LastChildFill="False">
-                            <Label Content="Охл. шпинделя" DockPanel.Dock="Left" />
-                            <Rectangle
-                                Width="20"
-                                Height="20"
-                                Margin="3"
-                                DockPanel.Dock="Right">
-                                <Rectangle.Style>
-                                    <Style TargetType="Rectangle">
-                                        <Setter Property="Fill" Value="{StaticResource SignalRed}" />
-                                        <Style.Triggers>
-                                            <DataTrigger Value="True">
-                                                <DataTrigger.Binding>
-                                                    <Binding Path="SpindleCoolantSensorView" />
-                                                </DataTrigger.Binding>
-                                                <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Rectangle.Style>
-                            </Rectangle>
-                        </DockPanel>
-                    </Border>
-                    <Border BorderThickness="3">
-                        <Border.Style>
-                            <Style TargetType="Border">
-                                <Setter Property="BorderBrush" Value="Transparent" />
-                                <Style.Triggers>
-                                    <DataTrigger Value="True">
-                                        <DataTrigger.Binding>
-                                            <Binding Path="CoolantValveView" />
-                                        </DataTrigger.Binding>
-                                        <Setter Property="BorderBrush" Value="{StaticResource SignalGreen}" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Border.Style>
-                        <DockPanel LastChildFill="False">
-                            <Label Content="Вода" DockPanel.Dock="Left" />
-                            <Rectangle
-                                Width="20"
-                                Height="20"
-                                Margin="3"
-                                DockPanel.Dock="Right">
-                                <Rectangle.Style>
-                                    <Style TargetType="Rectangle">
-                                        <Setter Property="Fill" Value="{StaticResource SignalRed}" />
-                                        <Style.Triggers>
-                                            <DataTrigger Value="True">
-                                                <DataTrigger.Binding>
-                                                    <Binding Path="CoolantSensorView" />
-                                                </DataTrigger.Binding>
-                                                <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Rectangle.Style>
-                            </Rectangle>
-                        </DockPanel>
-                    </Border>
-                    <Border BorderBrush="Transparent" BorderThickness="3">
-                        <DockPanel LastChildFill="False">
-                            <Label Content="Воздух" DockPanel.Dock="Left" />
-                            <Rectangle
-                                Width="20"
-                                Height="20"
-                                Margin="3"
-                                DockPanel.Dock="Right">
-                                <Rectangle.Style>
-                                    <Style TargetType="Rectangle">
-                                        <Setter Property="Fill" Value="{StaticResource SignalRed}" />
-                                        <Style.Triggers>
-                                            <DataTrigger Value="True">
-                                                <DataTrigger.Binding>
-                                                    <Binding Path="AirSensorView" />
-                                                </DataTrigger.Binding>
-                                                <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Rectangle.Style>
-                            </Rectangle>
-                        </DockPanel>
-                    </Border>
-                    <Border BorderThickness="3">
-                        <Border.Style>
-                            <Style TargetType="Border">
-                                <Setter Property="BorderBrush" Value="Transparent" />
-                                <Style.Triggers>
-                                    <DataTrigger Value="True">
-                                        <DataTrigger.Binding>
-                                            <Binding Path="ChuckVacuumValveView" />
-                                        </DataTrigger.Binding>
-                                        <Setter Property="BorderBrush" Value="{StaticResource SignalGreen}" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Border.Style>
-                        <DockPanel LastChildFill="False">
-                            <Label Content="Вакуум" DockPanel.Dock="Left" />
-                            <Rectangle
-                                Width="20"
-                                Height="20"
-                                Margin="3"
-                                DockPanel.Dock="Right">
-                                <Rectangle.Style>
-                                    <Style TargetType="Rectangle">
-                                        <Setter Property="Fill" Value="{StaticResource SignalRed}" />
-                                        <Style.Triggers>
-                                            <DataTrigger Value="True">
-                                                <DataTrigger.Binding>
-                                                    <Binding Path="ChuckVacuumSensorView" />
-                                                </DataTrigger.Binding>
-                                                <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Rectangle.Style>
-                            </Rectangle>
-                        </DockPanel>
-                    </Border>
-                    <Border BorderThickness="3">
-                        <Border.Style>
-                            <Style TargetType="Border">
-                                <Setter Property="BorderBrush" Value="Transparent" />
-                                <Style.Triggers>
-                                    <DataTrigger Value="True">
-                                        <DataTrigger.Binding>
-                                            <Binding Path="BlowingValveView" />
-                                        </DataTrigger.Binding>
-                                        <Setter Property="BorderBrush" Value="{StaticResource SignalGreen}" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Border.Style>
-                        <DockPanel LastChildFill="False">
-                            <Label Content="Обдув" DockPanel.Dock="Left" />
-                        </DockPanel>
-                    </Border>
+
                 </StackPanel>
 
-            </StackPanel>
+            </GroupBox>
 
-        </GroupBox>
-
-        <Image
+            <Image
             Name="VideoImg"
             Grid.RowSpan="{Binding Rows[1]}"
             Grid.Column="{Binding Cols[1]}"
             Margin="3"
             Panel.ZIndex="0"
             Source="{Binding Bi, Mode=OneWay}">
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="MouseLeftButtonDown">
-                    <i:InvokeCommandAction PassEventArgsToCommand="True" EventArgsConverter="{Binding Source={StaticResource MouseArgsConverter}}" EventArgsConverterParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Image}}" Command="{Binding ClickOnImageCmd, Mode=OneWay}"/>
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
-        </Image>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseLeftButtonDown">
+                        <i:InvokeCommandAction PassEventArgsToCommand="True" EventArgsConverter="{Binding Source={StaticResource MouseArgsConverter}}" EventArgsConverterParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Image}}" Command="{Binding ClickOnImageCmd, Mode=OneWay}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </Image>
 
 
-        <Canvas
+            <Canvas
             Grid.RowSpan="{Binding Rows[1]}"
             Grid.Column="{Binding Cols[1]}"
             Width="{Binding ElementName=VideoImg, Path=ActualWidth}"
             Height="{Binding ElementName=VideoImg, Path=ActualHeight}"
             Panel.ZIndex="1"
             ClipToBounds="True">
-            <Grid Width="{Binding Path=ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}" Height="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}">
-                <TextBlock
+                <Grid Width="{Binding Path=ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}" Height="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}">
+                    <TextBlock
                     HorizontalAlignment="Center"
                     VerticalAlignment="Top"
                     FontFamily="TimesNewRoman"
@@ -1133,26 +1046,26 @@
                     Text="{Binding Path=ProcessMessage}"
                     TextAlignment="Center">
 
-                    <TextBlock.RenderTransform>
-                        <TransformGroup>
-                            <ScaleTransform>
-                                <ScaleTransform.ScaleX>
-                                    <MultiBinding Converter="{StaticResource GetRatioConverter}">
-                                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                                        <Binding Source="{StaticResource Hundred}" />
-                                    </MultiBinding>
-                                </ScaleTransform.ScaleX>
-                                <ScaleTransform.ScaleY>
-                                    <MultiBinding Converter="{StaticResource GetRatioConverter}">
-                                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                                        <Binding Source="{StaticResource Hundred}" />
-                                    </MultiBinding>
-                                </ScaleTransform.ScaleY>
-                            </ScaleTransform>
-                        </TransformGroup>
-                    </TextBlock.RenderTransform>
-                </TextBlock>
-                <TextBlock
+                        <TextBlock.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform>
+                                    <ScaleTransform.ScaleX>
+                                        <MultiBinding Converter="{StaticResource GetRatioConverter}">
+                                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                            <Binding Source="{StaticResource Hundred}" />
+                                        </MultiBinding>
+                                    </ScaleTransform.ScaleX>
+                                    <ScaleTransform.ScaleY>
+                                        <MultiBinding Converter="{StaticResource GetRatioConverter}">
+                                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                            <Binding Source="{StaticResource Hundred}" />
+                                        </MultiBinding>
+                                    </ScaleTransform.ScaleY>
+                                </ScaleTransform>
+                            </TransformGroup>
+                        </TextBlock.RenderTransform>
+                    </TextBlock>
+                    <TextBlock
                     HorizontalAlignment="Center"
                     VerticalAlignment="Top"
                     FontFamily="TimesNewRoman"
@@ -1161,7 +1074,7 @@
                     FontWeight="Bold"
                     Foreground="GreenYellow"
                     RenderTransformOrigin="0.5,-1"
-                    Text="{Binding Path=Process.CutOffset, StringFormat=Корректировка реза\, мм:  {0}}"
+                    Text="{Binding Path=Process.CutOffset, StringFormat=Корректировка реза\, мм:  {0:N3}}"
                     TextAlignment="Center"
                     Visibility="{Binding Process.CutWidthMarkerVisibility}">
                     <!--<TextBlock.Text>
@@ -1170,141 +1083,142 @@
                             <Binding Path="1" FallbackValue="20"/>
                         </MultiBinding>
                     </TextBlock.Text>-->
-                    <TextBlock.RenderTransform>
-                        <TransformGroup>
-                            <ScaleTransform>
-                                <ScaleTransform.ScaleX>
-                                    <MultiBinding Converter="{StaticResource GetRatioConverter}">
-                                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                                        <Binding Source="{StaticResource Hundred}" />
-                                    </MultiBinding>
-                                </ScaleTransform.ScaleX>
-                                <ScaleTransform.ScaleY>
-                                    <MultiBinding Converter="{StaticResource GetRatioConverter}">
-                                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                                        <Binding Source="{StaticResource Hundred}" />
-                                    </MultiBinding>
-                                </ScaleTransform.ScaleY>
-                            </ScaleTransform>
-                        </TransformGroup>
-                    </TextBlock.RenderTransform>
-                </TextBlock>
-            </Grid>
-            <Rectangle
+                        <TextBlock.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform>
+                                    <ScaleTransform.ScaleX>
+                                        <MultiBinding Converter="{StaticResource GetRatioConverter}">
+                                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                            <Binding Source="{StaticResource Hundred}" />
+                                        </MultiBinding>
+                                    </ScaleTransform.ScaleX>
+                                    <ScaleTransform.ScaleY>
+                                        <MultiBinding Converter="{StaticResource GetRatioConverter}">
+                                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                            <Binding Source="{StaticResource Hundred}" />
+                                        </MultiBinding>
+                                    </ScaleTransform.ScaleY>
+                                </ScaleTransform>
+                            </TransformGroup>
+                        </TextBlock.RenderTransform>
+                    </TextBlock>
+                </Grid>
+                <Rectangle
                 Width="{Binding Path=ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}"
-                Height="{Binding Path=Process.CutWidth}"
+                Height="{Binding Path=CutWidthView}"
                 Stroke="ForestGreen"
                 Visibility="{Binding Process.CutWidthMarkerVisibility, FallbackValue=Hidden}">
-                <Rectangle.StrokeThickness>
-                    <MultiBinding Converter="{StaticResource GetRatioConverter}">
-                        <Binding Source="{StaticResource CutStrokeThickness}" />
-                        <Binding Path="Machine.CameraScale" />
-                    </MultiBinding>
-                </Rectangle.StrokeThickness>
-                <Rectangle.RenderTransform>
-                    <TransformGroup>
-                        <ScaleTransform ScaleY="-1" />
-                        <TranslateTransform>
-                            <TranslateTransform.Y>
-                                <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
-                                    <Binding Path="Process.CutWidth" />
-                                </MultiBinding>
-                            </TranslateTransform.Y>
-                        </TranslateTransform>
-                        <TranslateTransform Y="{Binding Path=Process.CutOffset}" />
-                        <ScaleTransform ScaleY="{Binding Path=Machine.CameraScale}" />
-                        <ScaleTransform ScaleY="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}" />
+                    <Rectangle.StrokeThickness>
+                        <MultiBinding Converter="{StaticResource GetRatioConverter}">
+                            <Binding Source="{StaticResource CutStrokeThickness}" />
+                            <Binding Path="Machine.CameraScale" />
+                        </MultiBinding>
+                    </Rectangle.StrokeThickness>
+                    <Rectangle.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform ScaleY="-1" />
+                            <TranslateTransform>
+                                <TranslateTransform.Y>
+                                    <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
+                                        <Binding Path="CutWidthView" />
+                                    </MultiBinding>
+                                </TranslateTransform.Y>
+                            </TranslateTransform>
+                            <TranslateTransform Y="{Binding Path=Process.CutOffset}" />
+                            <ScaleTransform ScaleY="{Binding Path=Machine.CameraScale}" />
+                            <ScaleTransform ScaleY="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}" />
 
-                        <TranslateTransform>
-                            <TranslateTransform.Y>
-                                <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
-                                    <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                                </MultiBinding>
-                            </TranslateTransform.Y>
-                        </TranslateTransform>
-                    </TransformGroup>
-                </Rectangle.RenderTransform>
-            </Rectangle>
-            <Rectangle
+                            <TranslateTransform>
+                                <TranslateTransform.Y>
+                                    <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
+                                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                    </MultiBinding>
+                                </TranslateTransform.Y>
+                            </TranslateTransform>
+                        </TransformGroup>
+                    </Rectangle.RenderTransform>
+                </Rectangle>
+                <Rectangle
                 Name="TeachScaleMarkers"
                 Width="{Binding Path=ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}"
                 Stroke="OrangeRed"
                 StrokeThickness="1"
                 Visibility="{Binding TeachVScaleMarkersVisibility, FallbackValue=Hidden}">
-                <Rectangle.Height>
-                    <MultiBinding Converter="{StaticResource GetRatioConverter}">
-                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                        <Binding Path="TeachMarkersRatio" />
-                    </MultiBinding>
-                </Rectangle.Height>
-                <Canvas.Top>
-                    <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
-                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                    </MultiBinding>
-                </Canvas.Top>
-                <Rectangle.RenderTransform>
-                    <TransformGroup>
-                        <ScaleTransform ScaleX="1.5" ScaleY="-1" />
-                        <TranslateTransform X="-10">
-                            <TranslateTransform.Y>
-                                <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
-                                    <Binding Path="Height" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Rectangle}" />
-                                </MultiBinding>
-                            </TranslateTransform.Y>
-                        </TranslateTransform>
-                    </TransformGroup>
-                </Rectangle.RenderTransform>
-            </Rectangle>
+                    <Rectangle.Height>
+                        <MultiBinding Converter="{StaticResource GetRatioConverter}">
+                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                            <Binding Path="TeachMarkersRatio" />
+                        </MultiBinding>
+                    </Rectangle.Height>
+                    <Canvas.Top>
+                        <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
+                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                        </MultiBinding>
+                    </Canvas.Top>
+                    <Rectangle.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform ScaleX="1.5" ScaleY="-1" />
+                            <TranslateTransform X="-10">
+                                <TranslateTransform.Y>
+                                    <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
+                                        <Binding Path="Height" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Rectangle}" />
+                                    </MultiBinding>
+                                </TranslateTransform.Y>
+                            </TranslateTransform>
+                        </TransformGroup>
+                    </Rectangle.RenderTransform>
+                </Rectangle>
 
-            <Line Stroke="Red" StrokeThickness="1">
-                <Line.X1>
-                    <MultiBinding Converter="{StaticResource CrossConverter}" ConverterParameter="0,3">
-                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                        <Binding Source="1" />
-                    </MultiBinding>
-                </Line.X1>
-                <Line.X2>
-                    <MultiBinding Converter="{StaticResource CrossConverter}" ConverterParameter="0,3">
-                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                        <Binding Source="2" />
-                    </MultiBinding>
-                </Line.X2>
-                <Line.Y1>
-                    <MultiBinding Converter="{StaticResource CrossConverter}" ConverterParameter="0,3">
-                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                    </MultiBinding>
-                </Line.Y1>
-                <Line.Y2>
-                    <MultiBinding Converter="{StaticResource CrossConverter}" ConverterParameter="0,3">
-                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                    </MultiBinding>
-                </Line.Y2>
-            </Line>
-            <Line Stroke="Red" StrokeThickness="1">
-                <Line.Y1>
-                    <MultiBinding Converter="{StaticResource CrossConverter}" ConverterParameter="0,3">
-                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                        <Binding Source="1" />
-                    </MultiBinding>
-                </Line.Y1>
-                <Line.Y2>
-                    <MultiBinding Converter="{StaticResource CrossConverter}" ConverterParameter="0,3">
-                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                        <Binding Source="2" />
-                    </MultiBinding>
-                </Line.Y2>
-                <Line.X1>
-                    <MultiBinding Converter="{StaticResource CrossConverter}" ConverterParameter="0,3">
-                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                    </MultiBinding>
-                </Line.X1>
-                <Line.X2>
-                    <MultiBinding Converter="{StaticResource CrossConverter}" ConverterParameter="0,3">
-                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
-                    </MultiBinding>
-                </Line.X2>
-            </Line>
-        </Canvas>
+                <Line Stroke="Red" StrokeThickness="1">
+                    <Line.X1>
+                        <MultiBinding Converter="{StaticResource CrossConverter}" ConverterParameter="0,3">
+                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                            <Binding Source="1" />
+                        </MultiBinding>
+                    </Line.X1>
+                    <Line.X2>
+                        <MultiBinding Converter="{StaticResource CrossConverter}" ConverterParameter="0,3">
+                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                            <Binding Source="2" />
+                        </MultiBinding>
+                    </Line.X2>
+                    <Line.Y1>
+                        <MultiBinding Converter="{StaticResource CrossConverter}" ConverterParameter="0,3">
+                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                        </MultiBinding>
+                    </Line.Y1>
+                    <Line.Y2>
+                        <MultiBinding Converter="{StaticResource CrossConverter}" ConverterParameter="0,3">
+                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                        </MultiBinding>
+                    </Line.Y2>
+                </Line>
+                <Line Stroke="Red" StrokeThickness="1">
+                    <Line.Y1>
+                        <MultiBinding Converter="{StaticResource CrossConverter}" ConverterParameter="0,3">
+                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                            <Binding Source="1" />
+                        </MultiBinding>
+                    </Line.Y1>
+                    <Line.Y2>
+                        <MultiBinding Converter="{StaticResource CrossConverter}" ConverterParameter="0,3">
+                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                            <Binding Source="2" />
+                        </MultiBinding>
+                    </Line.Y2>
+                    <Line.X1>
+                        <MultiBinding Converter="{StaticResource CrossConverter}" ConverterParameter="0,3">
+                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                        </MultiBinding>
+                    </Line.X1>
+                    <Line.X2>
+                        <MultiBinding Converter="{StaticResource CrossConverter}" ConverterParameter="0,3">
+                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                        </MultiBinding>
+                    </Line.X2>
+                </Line>
+            </Canvas>
 
+        </Grid>
     </Grid>
 </Window>

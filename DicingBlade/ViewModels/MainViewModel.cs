@@ -79,8 +79,7 @@ namespace DicingBlade.ViewModels
         private double _cameraScale;
         public double PointX { get; set; }
         public double PointY { get; set; }
-
-        //private Parameters parameters;
+        public double CutWidthView { get; set; } = 0.05;
         public Machine Machine { get; set; }
         private ITechnology _technology;
         public Process4 Process { get; set; }
@@ -124,6 +123,7 @@ namespace DicingBlade.ViewModels
         public ICommand ClickOnImageCmd { get; set; }
         public Visibility TeachVScaleMarkersVisibility { get; private set; } = Visibility.Hidden;
         public string ProcessMessage { get; private set; }
+        public string ProcessStatus { get; private set; }
         public bool UserConfirmation { get; private set; }
         public double TeachMarkersRatio { get; private set; } = 2;
                
@@ -307,7 +307,7 @@ namespace DicingBlade.ViewModels
         private async Task ClickOnImage(object o)
         {
             var point = (Point)o;
-            PointX = XView + point.X * _cameraScale;
+            PointX = XView - point.X * _cameraScale;
             PointY = YView + point.Y * _cameraScale;
             _machine.SetVelocity(Velocity.Service);
             _machine.MoveAxInPosAsync(Ax.X, PointX);
@@ -460,9 +460,12 @@ namespace DicingBlade.ViewModels
                         {
                             Process = new Process4(_machine, Substrate/*Wafer*/, new Blade(), _technology, BaseProcess);
                             _exceptionsAgregator.RegisterMessager(Process);
-                            Process.GetRotationEvent += SetRotation;
-                            Process.ChangeScreensEvent += ChangeScreensRegime;
-                            Process.BladeTracingEvent += Process_BladeTracingEvent;
+
+                            Process.GetRotationEvent       += SetRotation;
+                            Process.ChangeScreensEvent     += ChangeScreensRegime;
+                            Process.BladeTracingEvent      += Process_BladeTracingEvent;
+                            Process.OnProcessStatusChanged += Process_OnProcessStatusChanged;
+
                         }
                         catch (Exception ex)
                         {
@@ -614,15 +617,22 @@ namespace DicingBlade.ViewModels
 
             if (key.Key == Key.N)
             {
-                if (Process.PauseProcess) Process.CutOffset += 0.001;
+                
+                if (Process.ProcessStatus==Status.Correcting) Process.CutOffset += 0.001;
             }
 
             if (key.Key == Key.M)
             {
-                if (Process.PauseProcess) Process.CutOffset -= 0.001;
+                if (Process.ProcessStatus == Status.Correcting) Process.CutOffset -= 0.001;
             }
             //key.Handled = true;
         }
+
+        private void Process_OnProcessStatusChanged(string status)
+        {
+            ProcessStatus = status;
+        }
+
         private async void Process_BladeTracingEvent(bool trace)
         {
             if (trace)
@@ -635,28 +645,17 @@ namespace DicingBlade.ViewModels
             }
             else
             {
-                _tracingTaskCancellationTokenSource.Cancel();
-                try
-                {
-                    await _tracingTask;
-                }
-                catch (OperationCanceledException)
-                {
-
-                }
-                finally
-                {
-                    _tracingTaskCancellationTokenSource.Dispose();
-                    _tracingTask?.Dispose();
+                _tracingTaskCancellationTokenSource.Cancel();                
 
                     RotateTransform rotateTransform = new RotateTransform(
-                       -Wafer.GetCurrentDiretionAngle,
+                       //-Wafer.GetCurrentDiretionAngle,
+                       -Substrate.CurrentSideAngle,
                        BCCenterXView,
                        BCCenterYView
                        );
 
-                    var point1 = rotateTransform.Transform(new System.Windows.Point(XTrace, YTrace + Wafer.GetCurrentDirectionIndexShift));
-                    var point2 = rotateTransform.Transform(new System.Windows.Point(XTraceEnd, YTrace + Wafer.GetCurrentDirectionIndexShift));
+                    var point1 = rotateTransform.Transform(new System.Windows.Point(XTrace, YTrace /*+ /*Wafer.GetCurrentDirectionIndexShift+Substrate.CurrentShift*/));
+                    var point2 = rotateTransform.Transform(new System.Windows.Point(XTraceEnd, YTrace /*+ /*Wafer.GetCurrentDirectionIndexShift+Substrate.CurrentShift*/));
                     point1 = new TranslateTransform(-BCCenterXView, -BCCenterYView).Transform(point1);
                     point2 = new TranslateTransform(-BCCenterXView, -BCCenterYView).Transform(point2);
 
@@ -672,6 +671,19 @@ namespace DicingBlade.ViewModels
                     XTrace = new double();
                     YTrace = new double();
                     XTraceEnd = new double();
+               
+                try
+                {
+                    await _tracingTask;
+                }
+                catch (OperationCanceledException)
+                {
+
+                }
+                finally
+                {
+                    _tracingTaskCancellationTokenSource.Dispose();
+                    _tracingTask?.Dispose();
                 }
             }
         }
