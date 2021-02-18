@@ -68,11 +68,11 @@ namespace DicingBlade.Classes
                 .Hire(nextSideLeaf);
 
             _learningSequence = new();
-            _learningCondition = new(true);
+            _learningCondition = new(true);           
 
             var rotationSelector = new Selector();
             var rotationLeaf = new Leaf(IncrementDir,new Leaf(GetFunc(Status.MovingNextDir), new Leaf(GetFunc(Status.StartLearning))))
-                                        .SetBlock(_learningCondition);
+                                        .SetBlock(_rotateLearningCondition);
 
             _learningSequence                
                 .Hire(new Leaf(GetFunc(Status.Learning), rotationLeaf))
@@ -92,6 +92,7 @@ namespace DicingBlade.Classes
             InspectLeaf.CheckMyCondition       += SetConditionsStates;
             workingTicker.CheckMyCondition     += SetConditionsStates;
 
+            _learningDone = false;
             _rootSequence.DoWork();
 
         }
@@ -110,7 +111,8 @@ namespace DicingBlade.Classes
 
         private void SetConditionsStates()
         {
-            _learningCondition.SetState(_learningNextDir);
+            _rotateLearningCondition.SetState(_learningNextDir);
+            _learningCondition.SetState(!_learningDone);
             _cutInspectCondition.SetState(_checkCut.addToCurrentCut());
             _workingCondition.SetState(ProcessStatus != Status.Ending);
             _sideDoneCondition.SetState(SideDone);
@@ -156,19 +158,20 @@ namespace DicingBlade.Classes
         private double _zRatio = 1;
         #endregion
 
-        private bool _learningNextDir          = true;
+        private bool _learningNextDir              = true;
 
-        private Condition _bladeInWaferCond    = new();
-        private Condition _learningCondition   = new();
-        private Sequence _workingSequence      = new();
-        private Selector _learningSelector     = new();
-        private Selector _workingSelector      = new();
-        private Condition _workingCondition    = new();
-        private Condition _cutInspectCondition = new();
-        private Condition _sideDoneCondition   = new(false);
-        private Sequence _rootSequence         = new();
-        private Condition _inspectSelCondition = new();
-        private Condition _correctSelCondition = new();
+        private Condition _bladeInWaferCond        = new();
+        private Condition _learningCondition       = new();
+        private Sequence _workingSequence          = new();
+        private Selector _learningSelector         = new();
+        private Selector _workingSelector          = new();
+        private Condition _workingCondition        = new();
+        private Condition _cutInspectCondition     = new();
+        private Condition _sideDoneCondition       = new(false);
+        private Sequence _rootSequence             = new();
+        private Condition _inspectSelCondition     = new();
+        private Condition _correctSelCondition     = new();
+        private Condition _rotateLearningCondition = new(true);
         private Sequence _learningSequence;
         private TempWafer2D _tempWafer2D;
         private Func<Task> GetFunc(Diagram element)
@@ -242,8 +245,8 @@ namespace DicingBlade.Classes
                         await _machine.MoveAxInPosAsync(Ax.Z, z);
 
                         x = _machine.GetGeometry(Place.CameraChuckCenter, Ax.X);
-                        y = _wafer[CurrentLine != 0 ? CurrentLine : 0].Start.Y - _machine.GetFeature(MFeatures.CameraBladeOffset);
-                        y = _machine.TranslateSpecCoor(Place.BladeChuckCenter, -y, Ax.Y);
+                        y = _wafer[CurrentLine != 0 ? CurrentLine : 0].Start.Y - _wafer.CurrentShift;// - _machine.GetFeature(MFeatures.CameraBladeOffset);
+                        y = _machine.TranslateSpecCoor(Place.CameraChuckCenter, -y, Ax.Y);
                         await _machine.MoveGpInPosAsync(Groups.XY, new double[] { x, y }, true);
                         await _machine.MoveAxesInPlaceAsync(Place.ZFocus);
                     })
@@ -371,11 +374,14 @@ namespace DicingBlade.Classes
 
                 Status.Learning => new Func<Task>(
                     async () =>
-                    {
+                    {                        
                         var y = _machine.TranslateActualCoors(Place.CameraChuckCenter, Ax.Y);
                         _wafer.TeachSideShift(y);
                         _wafer.TeachSideAngle(_uActual);
-                        //_learningNextDir = _wafer.NextDir();
+                        if (!_learningNextDir)
+                        {
+                            _learningDone = true;
+                        }
                     })
                 ,
 
@@ -572,7 +578,8 @@ namespace DicingBlade.Classes
         
         private double _feedSpeed;
        
-        public GetRotation GetRotationEvent;      
+        public GetRotation GetRotationEvent;
+        private bool _learningDone;
 
         public event Action<string,int> ThrowMessage;
 

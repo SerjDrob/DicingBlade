@@ -67,6 +67,7 @@ namespace DicingBlade.ViewModels
         public bool ChuckVacuumSensorView { get; set; }
         public bool CoolantSensorView { get; set; }
         public bool AirSensorView { get; set; }
+        public double CoolantRateView { get; set; }
         public bool SpindleCoolantSensorView { get; set; }
         public double BCCenterXView { get; set; }
         public double BCCenterYView { get; set; }
@@ -121,6 +122,8 @@ namespace DicingBlade.ViewModels
         public ICommand ToTeachVideoScaleCmd { get; set; }
         public ICommand TestCmd { get; set; }
         public ICommand ClickOnImageCmd { get; set; }
+        public ICommand LeftClickOnWaferCmd { get; set; }
+        public ICommand RightClickOnWaferCmd { get; set; }
         public Visibility TeachVScaleMarkersVisibility { get; private set; } = Visibility.Hidden;
         public string ProcessMessage { get; private set; }
         public string ProcessStatus { get; private set; }
@@ -144,6 +147,8 @@ namespace DicingBlade.ViewModels
             ToTeachVideoScaleCmd  = new Command(args => ToTeachVideoScaleAsync());
             TestCmd               = new Command(args => Func(args));
             ClickOnImageCmd       = new Command(args => ClickOnImage(args));
+            LeftClickOnWaferCmd   = new Command(args => LeftClickOnWafer(args));
+            RightClickOnWaferCmd  = new Command(args => RightClickOnWafer(args));
 
             Bi = new BitmapImage();
 
@@ -222,7 +227,6 @@ namespace DicingBlade.ViewModels
             SpindleCurrentView = current;
             SpindleState = spinningState;
         }
-
         private void _machine_OnVideoSourceBmpChanged(BitmapImage bitmapImage)
         {
             Bi = bitmapImage;
@@ -232,7 +236,6 @@ namespace DicingBlade.ViewModels
             //    await tmp.StreamSource.DisposeAsync().ConfigureAwait(false);
             //}            
         }
-
         private void _machine_OnAxisValveStateChanged(Valves valve, bool state)
         {
             switch (valve)
@@ -250,7 +253,6 @@ namespace DicingBlade.ViewModels
                     break;
             }
         }
-
         private void _machine_OnAxisSensorStateChanged(Sensors sensor, bool state)
         {
             switch (sensor)
@@ -312,6 +314,49 @@ namespace DicingBlade.ViewModels
             _machine.SetVelocity(Velocity.Service);
             _machine.MoveAxInPosAsync(Ax.X, PointX);
             _machine.MoveAxInPosAsync(Ax.Y, PointY, true);
+        }
+        private async Task LeftClickOnWafer(object o)
+        {
+            var points = (Point[])o;
+
+            if (WaferView.ShapeSize[0] > WaferView.ShapeSize[1])
+            {
+                PointX = points[0].X * 1.4 * WaferView.ShapeSize[0];
+                PointY = points[0].Y * 1.4 * WaferView.ShapeSize[0];
+            }
+            else
+            {
+                PointX = points[1].X * 1.4 * WaferView.ShapeSize[1];
+                PointY = points[1].Y * 1.4 * WaferView.ShapeSize[1];
+            }
+            PointX = _machine.TranslateSpecCoor(Place.CameraChuckCenter, -PointX, Ax.X);
+            PointY = _machine.TranslateSpecCoor(Place.CameraChuckCenter, -PointY, Ax.Y);
+
+            _machine.SetVelocity(Velocity.Service);
+            _machine.MoveAxInPosAsync(Ax.X, PointX);
+            _machine.MoveAxInPosAsync(Ax.Y, PointY);
+        }
+        private async Task RightClickOnWafer(object o)
+        {
+            var points = (Point[])o;
+
+            if (WaferView.ShapeSize[0] > WaferView.ShapeSize[1])
+            {
+                PointX = points[0].X * 1.4 * WaferView.ShapeSize[0];
+                PointY = points[0].Y * 1.4 * WaferView.ShapeSize[0];
+            }
+            else
+            {
+                PointX = points[1].X * 1.4 * WaferView.ShapeSize[1];
+                PointY = points[1].Y * 1.4 * WaferView.ShapeSize[1];
+            }
+            
+            PointX = _machine.TranslateSpecCoor(Place.CameraChuckCenter, -PointX, Ax.X);
+            PointY = _machine.TranslateSpecCoor(Place.CameraChuckCenter, -Substrate.GetNearestY(PointY), Ax.Y);
+
+            _machine.SetVelocity(Velocity.Service);
+            _machine.MoveAxInPosAsync(Ax.X, PointX);
+            _machine.MoveAxInPosAsync(Ax.Y, PointY);
         }
         private void SetRotation(double angle, double time)
         {
@@ -627,12 +672,10 @@ namespace DicingBlade.ViewModels
             }
             //key.Handled = true;
         }
-
         private void Process_OnProcessStatusChanged(string status)
         {
             ProcessStatus = status;
         }
-
         private async void Process_BladeTracingEvent(bool trace)
         {
             if (trace)

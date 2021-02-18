@@ -15,6 +15,16 @@
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Views\learning.png" />
+    <None Remove="Views\settings.png" />
+    <None Remove="Views\size1.png" />
+    <None Remove="Views\size3.png" />
+    <None Remove="Views\techniology.png" />
+    <None Remove="Views\videoscale.png" />
+    <None Remove="Views\wafer.png" />
+    <None Remove="Views\wafer2.png" />
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="AdvMotAPI, Version=2.0.2.5, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>.\AdvMotAPI.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
@@ -29,6 +39,14 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="ViewModels\FodyWeavers.xml" />
+    <Resource Include="Views\learning.png" />
+    <Resource Include="Views\settings.png" />
+    <Resource Include="Views\size1.png" />
+    <Resource Include="Views\size3.png" />
+    <Resource Include="Views\techniology.png" />
+    <Resource Include="Views\videoscale.png" />
+    <Resource Include="Views\wafer.png" />
+    <Resource Include="Views\wafer2.png" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AForge.Imaging" Version="2.2.5" />

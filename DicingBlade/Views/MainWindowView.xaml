@@ -13,9 +13,10 @@
     Width="1280"
     Height="1024"
     d:DataContext="{d:DesignInstance model:MainViewModel, IsDesignTimeCreatable=False}"
-    Background="Beige"
+    Background="#FFE8E8EC"
     WindowStartupLocation="CenterScreen"
-    mc:Ignorable="d">
+    WindowState="Maximized"
+    mc:Ignorable="d" MinWidth="1280" MinHeight="1024">
     <Window.Resources>
 
         <converters:ScaleConverter x:Key="ScaleCoverterScheme" />
@@ -38,6 +39,7 @@
         <converters:DisableBindingConverter x:Key="DisableBindingConverter" />
         <converters:MulZeroConverter x:Key="MulZeroConverter" />
         <converters:MouseArgsConverter x:Key="MouseArgsConverter"/>
+        <converters:MouseArgsCanvasConverter x:Key="MouseArgsCanvasConverter"/>
         <SolidColorBrush x:Key="SignalGreen" Color="MediumSpringGreen" />
         <SolidColorBrush x:Key="SignalRed" Color="IndianRed" />
         <System:Double x:Key="Zero">0</System:Double>
@@ -72,9 +74,13 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
-            <RowDefinition/>
+            <RowDefinition/>            
         </Grid.RowDefinitions>
-        <Menu Height="22">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Menu Height="22" Grid.ColumnSpan="3">
             <MenuItem Header="Приводы" Command="{Binding MachineSettingsCmd}"/>
             <MenuItem Header="Подложка" Command="{Binding WaferSettingsCmd}"/>
             <MenuItem Header="Технология" Command="{Binding TechnologySettingsCmd}"/>
@@ -83,7 +89,56 @@
                 <MenuItem Command="{Binding ToTeachChipSizeCmd}" Header="_Размер кристалла" />
             </MenuItem>
         </Menu>
-        <Grid Grid.Row="1">
+        <ToolBarTray Grid.Row="1" Orientation="Vertical">
+            <ToolBar>
+                <Button Command="{Binding WaferSettingsCmd}">
+                    <Button.ToolTip>
+                        Параметры пластины
+                    </Button.ToolTip>
+                    <Image Source="/Views/wafer2.png" Height="20"/>
+                </Button>
+                <Button Command="{Binding MachineSettingsCmd}">
+                    <Button.ToolTip>
+                        Настройки машины
+                    </Button.ToolTip>
+                    <Image Source="/Views/settings.png" Height="20"/>
+                </Button>
+                <Button Command="{Binding TechnologySettingsCmd}">
+                    <Button.ToolTip>
+                        Технология
+                    </Button.ToolTip>
+                    <Image Source="/Views/techniology.png" Height="20"/>
+                </Button>
+
+                <Separator/>
+                <Menu ToolTip="Обучение">
+                    <MenuItem>
+                        <MenuItem.Header>
+                            <StackPanel>
+                                <Image Source="/Views/learning.png" Height="20"/>
+                            </StackPanel>
+                        </MenuItem.Header>
+                        <MenuItem Command="{Binding ToTeachChipSizeCmd}">
+                            <MenuItem.Icon>
+                                <Image Source="/Views/size1.png" Height="20"/>
+                            </MenuItem.Icon>
+                            <MenuItem.Header>
+                                <TextBlock Text="Размер кристалла"/>
+                            </MenuItem.Header>
+                        </MenuItem>
+                        <MenuItem Command="{Binding ToTeachVideoScaleCmd}">
+                            <MenuItem.Icon>
+                                <Image Source="/Views/videoscale.png" Height="20"/>
+                            </MenuItem.Icon>
+                            <MenuItem.Header>
+                                <TextBlock Text="Масштаб видео"/>
+                            </MenuItem.Header>
+                        </MenuItem>
+                    </MenuItem>
+                </Menu>
+            </ToolBar>
+        </ToolBarTray>
+        <Grid Grid.Row="1" Grid.Column="1">
             <Grid.Resources>
                 <Style x:Key="Rec1" TargetType="Rectangle">
                     <Setter Property="Margin" Value="3" />
@@ -101,20 +156,395 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
+                <!--<RowDefinition Height="*" />-->
             </Grid.RowDefinitions>
             <GroupBox
-            Grid.Row="1"
-            Grid.RowSpan="2"
-            Grid.Column="1"
-            Header="Параметры">
+            Grid.Row="1"            
+            Grid.Column="1">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition />
                         <RowDefinition />
                     </Grid.RowDefinitions>
-                   
-                    <GroupBox Header="Наладка">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <GroupBox Header="Шпиндель">
+                            <StackPanel>
+                                <Grid>
+                                    <ProgressBar
+                                    Width="150"
+                                    Height="30"
+                                    Margin="3"
+                                    HorizontalAlignment="Center"
+                                    Maximum="40000"
+                                    Minimum="0"
+                                    Value="{Binding SpindleFreqView}" />
+                                    <TextBlock Text="{Binding StringFormat={}{0} Об/мин,Path=SpindleFreqView}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                                <Grid>
+                                    <ProgressBar
+                                    Width="150"
+                                    Height="30"
+                                    Margin="3"
+                                    HorizontalAlignment="Center"
+                                    Maximum="12"
+                                    Minimum="0"                                      
+                                    Value="{Binding SpindleCurrentView}" />
+                                    <TextBlock Text="{Binding StringFormat={}{0} A,Path=SpindleCurrentView}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Header="СОЖ">
+                            <Grid>
+                                <ProgressBar
+                                    Width="150"
+                                    Height="30"
+                                    Margin="3"
+                                    HorizontalAlignment="Center"
+                                    Maximum="12"
+                                    Minimum="0"                                      
+                                    Value="{Binding SpindleCurrentView}" />
+                                <TextBlock Text="{Binding StringFormat={}{0} л/мин, Path=CoolantRateView}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Grid>
+                        </GroupBox>
+                    </StackPanel>
+
+
+                    <StackPanel Grid.Column="1">
+                        <Border BorderBrush="Transparent" BorderThickness="3">
+                            <DockPanel LastChildFill="False">
+                                <Label Content="Охл. шпинделя" DockPanel.Dock="Left" />
+                                <Rectangle
+                                Width="20"
+                                Height="20"
+                                Margin="3"
+                                DockPanel.Dock="Right">
+                                    <Rectangle.Style>
+                                        <Style TargetType="Rectangle">
+                                            <Setter Property="Fill" Value="{StaticResource SignalRed}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Value="True">
+                                                    <DataTrigger.Binding>
+                                                        <Binding Path="SpindleCoolantSensorView" />
+                                                    </DataTrigger.Binding>
+                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Rectangle.Style>
+                                </Rectangle>
+                            </DockPanel>
+                        </Border>
+                        <Border BorderThickness="3">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="BorderBrush" Value="Transparent" />
+                                    <Style.Triggers>
+                                        <DataTrigger Value="True">
+                                            <DataTrigger.Binding>
+                                                <Binding Path="CoolantValveView" />
+                                            </DataTrigger.Binding>
+                                            <Setter Property="BorderBrush" Value="{StaticResource SignalGreen}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <DockPanel LastChildFill="False">
+                                <Label Content="Вода" DockPanel.Dock="Left" />
+                                <Rectangle
+                                Width="20"
+                                Height="20"
+                                Margin="3"
+                                DockPanel.Dock="Right">
+                                    <Rectangle.Style>
+                                        <Style TargetType="Rectangle">
+                                            <Setter Property="Fill" Value="{StaticResource SignalRed}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Value="True">
+                                                    <DataTrigger.Binding>
+                                                        <Binding Path="CoolantSensorView" />
+                                                    </DataTrigger.Binding>
+                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Rectangle.Style>
+                                </Rectangle>
+                            </DockPanel>
+                        </Border>
+                        <Border BorderBrush="Transparent" BorderThickness="3">
+                            <DockPanel LastChildFill="False">
+                                <Label Content="Воздух" DockPanel.Dock="Left" />
+                                <Rectangle
+                                Width="20"
+                                Height="20"
+                                Margin="3"
+                                DockPanel.Dock="Right">
+                                    <Rectangle.Style>
+                                        <Style TargetType="Rectangle">
+                                            <Setter Property="Fill" Value="{StaticResource SignalRed}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Value="True">
+                                                    <DataTrigger.Binding>
+                                                        <Binding Path="AirSensorView" />
+                                                    </DataTrigger.Binding>
+                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Rectangle.Style>
+                                </Rectangle>
+                            </DockPanel>
+                        </Border>
+                        <Border BorderThickness="3">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="BorderBrush" Value="Transparent" />
+                                    <Style.Triggers>
+                                        <DataTrigger Value="True">
+                                            <DataTrigger.Binding>
+                                                <Binding Path="ChuckVacuumValveView" />
+                                            </DataTrigger.Binding>
+                                            <Setter Property="BorderBrush" Value="{StaticResource SignalGreen}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <DockPanel LastChildFill="False">
+                                <Label Content="Вакуум" DockPanel.Dock="Left" />
+                                <Rectangle
+                                Width="20"
+                                Height="20"
+                                Margin="3"
+                                DockPanel.Dock="Right">
+                                    <Rectangle.Style>
+                                        <Style TargetType="Rectangle">
+                                            <Setter Property="Fill" Value="{StaticResource SignalRed}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Value="True">
+                                                    <DataTrigger.Binding>
+                                                        <Binding Path="ChuckVacuumSensorView" />
+                                                    </DataTrigger.Binding>
+                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Rectangle.Style>
+                                </Rectangle>
+                            </DockPanel>
+                        </Border>
+                        <Border BorderThickness="3">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="BorderBrush" Value="Transparent" />
+                                    <Style.Triggers>
+                                        <DataTrigger Value="True">
+                                            <DataTrigger.Binding>
+                                                <Binding Path="BlowingValveView" />
+                                            </DataTrigger.Binding>
+                                            <Setter Property="BorderBrush" Value="{StaticResource SignalGreen}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <DockPanel LastChildFill="False">
+                                <Label Content="Обдув" DockPanel.Dock="Left" />
+                            </DockPanel>
+                        </Border>
+                    </StackPanel>
+                    <GroupBox Grid.Row="2" Grid.ColumnSpan="2" VerticalAlignment="Top">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="80" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Column="1" Text="{Binding StringFormat=X: {0}, Path=XView}" Background="AliceBlue"/>
+                            <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding StringFormat=Y: {0}, Path=YView}" Background="AliceBlue"/>
+                            <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding StringFormat=Z: {0}, Path=ZView}" Background="AliceBlue"/>
+                            <TextBlock Grid.Column="1" Grid.Row="3" Text="{Binding StringFormat=U: {0}, Path=UView}" Background="AliceBlue"/>
+                            <TextBlock Grid.Column="2" Grid.Row="2" Grid.RowSpan="3" Text="{Binding ProcessStatus}" TextAlignment="Center"  Background="AliceBlue" FontStretch="Normal" FontStyle="Normal" FontSize="22" FontFamily="Arial Black" Foreground="#FFF11616"/>
+
+                            <StackPanel Orientation="Horizontal">
+                                <Rectangle>
+                                    <Rectangle.Style>
+                                        <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
+                                            <Style.Triggers>
+                                                <DataTrigger Value="True">
+                                                    <DataTrigger.Binding>
+                                                        <Binding Path="XnLmtView" />
+                                                    </DataTrigger.Binding>
+                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Rectangle.Style>
+                                </Rectangle>
+                                <Rectangle>
+                                    <Rectangle.Style>
+                                        <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
+                                            <Style.Triggers>
+                                                <DataTrigger Value="True">
+                                                    <DataTrigger.Binding>
+                                                        <Binding Path="XpLmtView" />
+                                                    </DataTrigger.Binding>
+                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Rectangle.Style>
+                                </Rectangle>
+                                <Rectangle>
+                                    <Rectangle.Style>
+                                        <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
+                                            <Style.Triggers>
+                                                <DataTrigger Value="True">
+                                                    <DataTrigger.Binding>
+                                                        <Binding Path="XMotDoneView" />
+                                                    </DataTrigger.Binding>
+                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Rectangle.Style>
+                                </Rectangle>
+                            </StackPanel>
+                            <StackPanel
+                    Grid.Row="1"                    
+                    Orientation="Horizontal">
+                                <Rectangle>
+                                    <Rectangle.Style>
+                                        <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
+                                            <Style.Triggers>
+                                                <DataTrigger Value="True">
+                                                    <DataTrigger.Binding>
+                                                        <Binding Path="YnLmtView" />
+                                                    </DataTrigger.Binding>
+                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Rectangle.Style>
+                                </Rectangle>
+                                <Rectangle>
+                                    <Rectangle.Style>
+                                        <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
+                                            <Style.Triggers>
+                                                <DataTrigger Value="True">
+                                                    <DataTrigger.Binding>
+                                                        <Binding Path="YpLmtView" />
+                                                    </DataTrigger.Binding>
+                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Rectangle.Style>
+                                </Rectangle>
+                                <Rectangle>
+                                    <Rectangle.Style>
+                                        <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
+                                            <Style.Triggers>
+                                                <DataTrigger Value="True">
+                                                    <DataTrigger.Binding>
+                                                        <Binding Path="YMotDoneView" />
+                                                    </DataTrigger.Binding>
+                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Rectangle.Style>
+                                </Rectangle>
+                            </StackPanel>
+                            <StackPanel
+                    Grid.Row="2"                   
+                    Orientation="Horizontal">
+                                <Rectangle>
+                                    <Rectangle.Style>
+                                        <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
+                                            <Style.Triggers>
+                                                <DataTrigger Value="True">
+                                                    <DataTrigger.Binding>
+                                                        <Binding Path="ZnLmtView" />
+                                                    </DataTrigger.Binding>
+                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Rectangle.Style>
+                                </Rectangle>
+                                <Rectangle>
+                                    <Rectangle.Style>
+                                        <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
+                                            <Style.Triggers>
+                                                <DataTrigger Value="True">
+                                                    <DataTrigger.Binding>
+                                                        <Binding Path="ZpLmtView" />
+                                                    </DataTrigger.Binding>
+                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Rectangle.Style>
+                                </Rectangle>
+                            </StackPanel>
+                            <StackPanel
+                    Grid.Row="3"                    
+                    Orientation="Horizontal">
+                                <Rectangle>
+                                    <Rectangle.Style>
+                                        <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
+                                            <Style.Triggers>
+                                                <DataTrigger Value="True">
+                                                    <DataTrigger.Binding>
+                                                        <Binding Path="UnLmtView" />
+                                                    </DataTrigger.Binding>
+                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Rectangle.Style>
+                                </Rectangle>
+                                <Rectangle>
+                                    <Rectangle.Style>
+                                        <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
+                                            <Style.Triggers>
+                                                <DataTrigger Value="True">
+                                                    <DataTrigger.Binding>
+                                                        <Binding Path="UpLmtView" />
+                                                    </DataTrigger.Binding>
+                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Rectangle.Style>
+                                </Rectangle>
+                            </StackPanel>
+                            <TextBlock
+                    Grid.Column="3"
+                    Text="Быстро"
+                    Visibility="{Binding VelocityRegime, Converter={StaticResource MatchEnumConverter}, ConverterParameter={x:Static local:Velocity.Fast}}" />
+                            <TextBlock
+                    Grid.Column="3"
+                    Text="Медленно"
+                    Visibility="{Binding VelocityRegime, Converter={StaticResource MatchEnumConverter}, ConverterParameter={x:Static local:Velocity.Slow}}" />
+                            <TextBlock
+                    Grid.Column="3"
+                    Text="Шаг"
+                    Visibility="{Binding VelocityRegime, Converter={StaticResource MatchEnumConverter}, ConverterParameter={x:Static local:Velocity.Step}}" />
+                        </Grid>
+                    </GroupBox>
+                    <!--<GroupBox Header="Наладка">
                         <Grid>
                             <StackPanel>
                                 <StackPanel>
@@ -188,7 +618,7 @@
                             </StackPanel>
 
                         </Grid>
-                    </GroupBox>
+                    </GroupBox>-->
                 </Grid>
             </GroupBox>
             <Border
@@ -362,12 +792,7 @@
                                         </MultiBinding>
                                     </TranslateTransform.Y>
                                 </TranslateTransform>
-                                <RotateTransform />
-                                <!--<RotateTransform>
-                                <RotateTransform.Angle>
-                                    <Binding Path="DataContext.WVAngle" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}"/>
-                                </RotateTransform.Angle>
-                            </RotateTransform>-->
+                                <RotateTransform />                                
                                 <ScaleTransform>
                                     <ScaleTransform.ScaleX>
                                         <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
@@ -602,414 +1027,18 @@
                             </RotateTransform>
                         </Line.RenderTransform>
                     </Line>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseLeftButtonDown">
+                            <i:InvokeCommandAction PassEventArgsToCommand="True" EventArgsConverter="{Binding Source={StaticResource MouseArgsCanvasConverter}}" EventArgsConverterParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}" Command="{Binding LeftClickOnWaferCmd, Mode=OneWay}"/>
+                        </i:EventTrigger>                    
+                        <i:EventTrigger EventName="MouseRightButtonDown">
+                            <i:InvokeCommandAction PassEventArgsToCommand="True" EventArgsConverter="{Binding Source={StaticResource MouseArgsCanvasConverter}}" EventArgsConverterParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}" Command="{Binding RightClickOnWaferCmd, Mode=OneWay}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
                 </Canvas>
             </DockPanel>
-            <GroupBox Grid.Row="2" VerticalAlignment="Top">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
-                    <TextBlock Text="{Binding StringFormat=X: {0}, Path=XView}" Background="AliceBlue"/>
-                    <TextBlock Grid.Row="1" Text="{Binding StringFormat=Y: {0}, Path=YView}" Background="AliceBlue"/>
-                    <TextBlock Grid.Row="2" Text="{Binding StringFormat=Z: {0}, Path=ZView}" Background="AliceBlue"/>
-                    <TextBlock Grid.Row="3" Text="{Binding StringFormat=U: {0}, Path=UView}" Background="AliceBlue"/>
-                    <TextBlock Grid.Column="1" Text="{Binding StringFormat=PointX: {0}, Path=PointX}" Background="AliceBlue"/>
-                    <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding StringFormat=PointY: {0}, Path=PointY}" Background="AliceBlue"/>
-                    <TextBlock Grid.Column="1" Grid.Row="2" Grid.RowSpan="3" Text="{Binding ProcessStatus}" TextAlignment="Center"  Background="AliceBlue" FontStretch="Normal" FontStyle="Normal" FontSize="22" FontFamily="Arial Black" Foreground="#FFF11616"/>
-
-                    <StackPanel Grid.Column="2" Orientation="Horizontal">
-                        <Rectangle>
-                            <Rectangle.Style>
-                                <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
-                                    <Style.Triggers>
-                                        <DataTrigger Value="True">
-                                            <DataTrigger.Binding>
-                                                <Binding Path="XnLmtView" />
-                                            </DataTrigger.Binding>
-                                            <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Rectangle.Style>
-                        </Rectangle>
-                        <Rectangle>
-                            <Rectangle.Style>
-                                <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
-                                    <Style.Triggers>
-                                        <DataTrigger Value="True">
-                                            <DataTrigger.Binding>
-                                                <Binding Path="XpLmtView" />
-                                            </DataTrigger.Binding>
-                                            <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Rectangle.Style>
-                        </Rectangle>
-                        <Rectangle>
-                            <Rectangle.Style>
-                                <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
-                                    <Style.Triggers>
-                                        <DataTrigger Value="True">
-                                            <DataTrigger.Binding>
-                                                <Binding Path="XMotDoneView" />
-                                            </DataTrigger.Binding>
-                                            <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Rectangle.Style>
-                        </Rectangle>
-                    </StackPanel>
-                    <StackPanel
-                    Grid.Row="1"
-                    Grid.Column="2"
-                    Orientation="Horizontal">
-                        <Rectangle>
-                            <Rectangle.Style>
-                                <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
-                                    <Style.Triggers>
-                                        <DataTrigger Value="True">
-                                            <DataTrigger.Binding>
-                                                <Binding Path="YnLmtView" />
-                                            </DataTrigger.Binding>
-                                            <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Rectangle.Style>
-                        </Rectangle>
-                        <Rectangle>
-                            <Rectangle.Style>
-                                <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
-                                    <Style.Triggers>
-                                        <DataTrigger Value="True">
-                                            <DataTrigger.Binding>
-                                                <Binding Path="YpLmtView" />
-                                            </DataTrigger.Binding>
-                                            <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Rectangle.Style>
-                        </Rectangle>
-                        <Rectangle>
-                            <Rectangle.Style>
-                                <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
-                                    <Style.Triggers>
-                                        <DataTrigger Value="True">
-                                            <DataTrigger.Binding>
-                                                <Binding Path="YMotDoneView" />
-                                            </DataTrigger.Binding>
-                                            <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Rectangle.Style>
-                        </Rectangle>
-                    </StackPanel>
-                    <StackPanel
-                    Grid.Row="2"
-                    Grid.Column="2"
-                    Orientation="Horizontal">
-                        <Rectangle>
-                            <Rectangle.Style>
-                                <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
-                                    <Style.Triggers>
-                                        <DataTrigger Value="True">
-                                            <DataTrigger.Binding>
-                                                <Binding Path="ZnLmtView" />
-                                            </DataTrigger.Binding>
-                                            <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Rectangle.Style>
-                        </Rectangle>
-                        <Rectangle>
-                            <Rectangle.Style>
-                                <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
-                                    <Style.Triggers>
-                                        <DataTrigger Value="True">
-                                            <DataTrigger.Binding>
-                                                <Binding Path="ZpLmtView" />
-                                            </DataTrigger.Binding>
-                                            <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Rectangle.Style>
-                        </Rectangle>
-                    </StackPanel>
-                    <StackPanel
-                    Grid.Row="3"
-                    Grid.Column="2"
-                    Orientation="Horizontal">
-                        <Rectangle>
-                            <Rectangle.Style>
-                                <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
-                                    <Style.Triggers>
-                                        <DataTrigger Value="True">
-                                            <DataTrigger.Binding>
-                                                <Binding Path="UnLmtView" />
-                                            </DataTrigger.Binding>
-                                            <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Rectangle.Style>
-                        </Rectangle>
-                        <Rectangle>
-                            <Rectangle.Style>
-                                <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
-                                    <Style.Triggers>
-                                        <DataTrigger Value="True">
-                                            <DataTrigger.Binding>
-                                                <Binding Path="UpLmtView" />
-                                            </DataTrigger.Binding>
-                                            <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Rectangle.Style>
-                        </Rectangle>
-                    </StackPanel>
-                    <TextBlock
-                    Grid.Column="3"
-                    Text="Быстро"
-                    Visibility="{Binding VelocityRegime, Converter={StaticResource MatchEnumConverter}, ConverterParameter={x:Static local:Velocity.Fast}}" />
-                    <TextBlock
-                    Grid.Column="3"
-                    Text="Медленно"
-                    Visibility="{Binding VelocityRegime, Converter={StaticResource MatchEnumConverter}, ConverterParameter={x:Static local:Velocity.Slow}}" />
-                    <TextBlock
-                    Grid.Column="3"
-                    Text="Шаг"
-                    Visibility="{Binding VelocityRegime, Converter={StaticResource MatchEnumConverter}, ConverterParameter={x:Static local:Velocity.Step}}" />
-                </Grid>
-            </GroupBox>
-            <GroupBox
-            Grid.Row="2"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Bottom">
-                <StackPanel Orientation="Horizontal">
-
-                    <GroupBox Header="Шпиндель">
-                        <StackPanel>
-                            <GroupBox>
-                                <Grid>
-                                    <ProgressBar
-                                    Width="150"
-                                    Height="30"
-                                    Margin="3"
-                                    HorizontalAlignment="Center"
-                                    Maximum="40000"
-                                    Minimum="0"
-                                    Value="{Binding SpindleFreqView}" />
-                                    <TextBlock Text="{Binding StringFormat={}{0} Об/мин,Path=SpindleFreqView}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Grid>
-                            </GroupBox>
-                            <GroupBox>
-                                <Grid>
-                                    <ProgressBar
-                                    Width="150"
-                                    Height="30"
-                                    Margin="3"
-                                    HorizontalAlignment="Center"
-                                    Maximum="12"
-                                    Minimum="0"                                      
-                                    Value="{Binding SpindleCurrentView}" />
-                                    <TextBlock Text="{Binding StringFormat={}{0} A,Path=SpindleCurrentView}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Grid>
-                            </GroupBox>
-                        </StackPanel>
-                    </GroupBox>
-
-                    <GroupBox Header="СОЖ">
-                        <StackPanel>
-                            <GroupBox Header="Бок.">
-                                <StackPanel>
-                                    <ProgressBar
-                                    Width="150"
-                                    Height="10"
-                                    Margin="3"
-                                    HorizontalAlignment="Center"
-                                    Maximum="50000"
-                                    Minimum="0"
-                                    Value="32300" />
-                                    <Label Content="0" />
-                                </StackPanel>
-                            </GroupBox>
-                            <GroupBox Header="Фронт.">
-                                <StackPanel>
-                                    <ProgressBar
-                                    Width="150"
-                                    Height="10"
-                                    Margin="3"
-                                    HorizontalAlignment="Center"
-                                    Maximum="50000"
-                                    Minimum="0"
-                                    Value="3000" />
-                                    <Label Content="0" />
-                                </StackPanel>
-                            </GroupBox>
-                        </StackPanel>
-                    </GroupBox>
-                    <StackPanel>
-                        <Border BorderBrush="Transparent" BorderThickness="3">
-                            <DockPanel LastChildFill="False">
-                                <Label Content="Охл. шпинделя" DockPanel.Dock="Left" />
-                                <Rectangle
-                                Width="20"
-                                Height="20"
-                                Margin="3"
-                                DockPanel.Dock="Right">
-                                    <Rectangle.Style>
-                                        <Style TargetType="Rectangle">
-                                            <Setter Property="Fill" Value="{StaticResource SignalRed}" />
-                                            <Style.Triggers>
-                                                <DataTrigger Value="True">
-                                                    <DataTrigger.Binding>
-                                                        <Binding Path="SpindleCoolantSensorView" />
-                                                    </DataTrigger.Binding>
-                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Rectangle.Style>
-                                </Rectangle>
-                            </DockPanel>
-                        </Border>
-                        <Border BorderThickness="3">
-                            <Border.Style>
-                                <Style TargetType="Border">
-                                    <Setter Property="BorderBrush" Value="Transparent" />
-                                    <Style.Triggers>
-                                        <DataTrigger Value="True">
-                                            <DataTrigger.Binding>
-                                                <Binding Path="CoolantValveView" />
-                                            </DataTrigger.Binding>
-                                            <Setter Property="BorderBrush" Value="{StaticResource SignalGreen}" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Border.Style>
-                            <DockPanel LastChildFill="False">
-                                <Label Content="Вода" DockPanel.Dock="Left" />
-                                <Rectangle
-                                Width="20"
-                                Height="20"
-                                Margin="3"
-                                DockPanel.Dock="Right">
-                                    <Rectangle.Style>
-                                        <Style TargetType="Rectangle">
-                                            <Setter Property="Fill" Value="{StaticResource SignalRed}" />
-                                            <Style.Triggers>
-                                                <DataTrigger Value="True">
-                                                    <DataTrigger.Binding>
-                                                        <Binding Path="CoolantSensorView" />
-                                                    </DataTrigger.Binding>
-                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Rectangle.Style>
-                                </Rectangle>
-                            </DockPanel>
-                        </Border>
-                        <Border BorderBrush="Transparent" BorderThickness="3">
-                            <DockPanel LastChildFill="False">
-                                <Label Content="Воздух" DockPanel.Dock="Left" />
-                                <Rectangle
-                                Width="20"
-                                Height="20"
-                                Margin="3"
-                                DockPanel.Dock="Right">
-                                    <Rectangle.Style>
-                                        <Style TargetType="Rectangle">
-                                            <Setter Property="Fill" Value="{StaticResource SignalRed}" />
-                                            <Style.Triggers>
-                                                <DataTrigger Value="True">
-                                                    <DataTrigger.Binding>
-                                                        <Binding Path="AirSensorView" />
-                                                    </DataTrigger.Binding>
-                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Rectangle.Style>
-                                </Rectangle>
-                            </DockPanel>
-                        </Border>
-                        <Border BorderThickness="3">
-                            <Border.Style>
-                                <Style TargetType="Border">
-                                    <Setter Property="BorderBrush" Value="Transparent" />
-                                    <Style.Triggers>
-                                        <DataTrigger Value="True">
-                                            <DataTrigger.Binding>
-                                                <Binding Path="ChuckVacuumValveView" />
-                                            </DataTrigger.Binding>
-                                            <Setter Property="BorderBrush" Value="{StaticResource SignalGreen}" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Border.Style>
-                            <DockPanel LastChildFill="False">
-                                <Label Content="Вакуум" DockPanel.Dock="Left" />
-                                <Rectangle
-                                Width="20"
-                                Height="20"
-                                Margin="3"
-                                DockPanel.Dock="Right">
-                                    <Rectangle.Style>
-                                        <Style TargetType="Rectangle">
-                                            <Setter Property="Fill" Value="{StaticResource SignalRed}" />
-                                            <Style.Triggers>
-                                                <DataTrigger Value="True">
-                                                    <DataTrigger.Binding>
-                                                        <Binding Path="ChuckVacuumSensorView" />
-                                                    </DataTrigger.Binding>
-                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Rectangle.Style>
-                                </Rectangle>
-                            </DockPanel>
-                        </Border>
-                        <Border BorderThickness="3">
-                            <Border.Style>
-                                <Style TargetType="Border">
-                                    <Setter Property="BorderBrush" Value="Transparent" />
-                                    <Style.Triggers>
-                                        <DataTrigger Value="True">
-                                            <DataTrigger.Binding>
-                                                <Binding Path="BlowingValveView" />
-                                            </DataTrigger.Binding>
-                                            <Setter Property="BorderBrush" Value="{StaticResource SignalGreen}" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Border.Style>
-                            <DockPanel LastChildFill="False">
-                                <Label Content="Обдув" DockPanel.Dock="Left" />
-                            </DockPanel>
-                        </Border>
-                    </StackPanel>
-
-                </StackPanel>
-
-            </GroupBox>
+            
+            
 
             <Image
             Name="VideoImg"

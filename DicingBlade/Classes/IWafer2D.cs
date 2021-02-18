@@ -104,12 +104,14 @@ namespace DicingBlade.Classes
         }
         public double GetNearestY(double y)
         {
-            var side = _shape.GetLengthSide(CurrentSide);
-            var index = _directions[CurrentSide].index;            
+            var side = _shape.GetIndexSide(CurrentSide);
+            var index = _directions[CurrentSide].index;
+            var bias = (side - Math.Floor(side / index) * index) / 2;
+
             var num = 0;
             if ((num = GetNearestNum(y))!=-1)
             {
-                return num * index - side / 2;
+                return num * index + bias - side / 2;
             }
             else
             {
@@ -132,9 +134,8 @@ namespace DicingBlade.Classes
         }
         private int GetNearestNum(double y)
         {
-            var side = _shape.GetLengthSide(CurrentSide);
+            var side = _shape.GetIndexSide(CurrentSide);
             var index = _directions[CurrentSide].index;
-
             var bias = (side - Math.Floor(side / index) * index) / 2;
 
             var ypos = y + side / 2;
@@ -142,18 +143,18 @@ namespace DicingBlade.Classes
             var num = -1;
             for (int i = 0; i < side / index; i++)
             {
-                var d = ypos - i * index - bias;
-                if (Math.Abs(d) <= Math.Abs(delta))
+                var d = Math.Abs(ypos - i * index - bias);
+                if (d <= delta)
                 {                    
                     delta = d;
                     num = i;
                 }
             }
-            return num;// + 1;
+            return num;
         }
         public void TeachSideShift(double y)
         {
-            _directions[CurrentSide] = (_directions[CurrentSide].angle, _directions[CurrentSide].index, y - GetNearestY(y), _directions[CurrentSide].realangle);
+            _directions[CurrentSide] = (_directions[CurrentSide].angle, _directions[CurrentSide].index, -y + GetNearestY(y), _directions[CurrentSide].realangle);
         }
         public void AddToSideShift(double delta)
         {
