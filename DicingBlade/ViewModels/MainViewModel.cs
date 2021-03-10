@@ -16,12 +16,14 @@ using System.Windows.Media;
 
 namespace DicingBlade.Classes
 {
+    [AddINotifyPropertyChangedInterface]
     public class TraceLine
     {
-        public double XStart;
-        public double XEnd;
-        public double YStart;
-        public double YEnd;
+        public double XStart { get; set; }
+        public double XEnd { get; set; }
+        public double YStart { get; set; }
+        public double YEnd { get; set; }
+        public Brush Brush { get; set; }
     }
 }
 
@@ -76,6 +78,8 @@ namespace DicingBlade.ViewModels
         public double ZBladeTouchView { get; set; }
         public int SpindleFreqView { get; set; }
         public double SpindleCurrentView { get; set; }
+        public double WaferCurrentShiftView { get; set; }
+        public ObservableCollection<TraceLine> ControlPointsView { get; set; } = new();
         public bool SpindleState { get; private set; }
         private double _cameraScale;
         public double PointX { get; set; }
@@ -124,6 +128,7 @@ namespace DicingBlade.ViewModels
         public ICommand ClickOnImageCmd { get; set; }
         public ICommand LeftClickOnWaferCmd { get; set; }
         public ICommand RightClickOnWaferCmd { get; set; }
+        public ICommand ToTeachCutShiftCmd { get; set; }
         public Visibility TeachVScaleMarkersVisibility { get; private set; } = Visibility.Hidden;
         public string ProcessMessage { get; private set; }
         public string ProcessStatus { get; private set; }
@@ -145,13 +150,14 @@ namespace DicingBlade.ViewModels
             TechnologySettingsCmd = new Command(args => TechnologySettings());
             ToTeachChipSizeCmd    = new Command(args => ToTeachChipSizeAsync());
             ToTeachVideoScaleCmd  = new Command(args => ToTeachVideoScaleAsync());
+            ToTeachCutShiftCmd    = new Command(args => ToTeachCutShift());
             TestCmd               = new Command(args => Func(args));
             ClickOnImageCmd       = new Command(args => ClickOnImage(args));
             LeftClickOnWaferCmd   = new Command(args => LeftClickOnWafer(args));
             RightClickOnWaferCmd  = new Command(args => RightClickOnWafer(args));
 
-            Bi = new BitmapImage();
 
+            Bi = new BitmapImage();
 
 
             _exceptionsAgregator = ExceptionsAgregator.GetExceptionsAgregator();
@@ -181,28 +187,30 @@ namespace DicingBlade.ViewModels
                 {
                     {Valves.Blowing,(Ax.Z,Do.Out6) },
                     {Valves.ChuckVacuum,(Ax.Z,Do.Out4) },
-                    {Valves.Coolant,(Ax.U,Do.Out4) }
+                    {Valves.Coolant,(Ax.U,Do.Out4) },
+                    {Valves.SpindleContact,(Ax.U,Do.Out5) }
                 });
 
                 _machine.SwitchOffValve(Valves.Blowing);
                 _machine.SwitchOffValve(Valves.ChuckVacuum);
                 _machine.SwitchOffValve(Valves.Coolant);
+                _machine.SwitchOffValve(Valves.SpindleContact);
 
                 _machine.ConfigureSensors(new Dictionary<Sensors, (Ax, Di)>
                 {
                     {Sensors.Air,(Ax.Z,Di.In1)},
-                    {Sensors.ChuckVacuum,(Ax.X,Di.In3)},
-                    {Sensors.Coolant,(Ax.X,Di.In2)},
+                    {Sensors.ChuckVacuum,(Ax.X,Di.In2)},
+                    {Sensors.Coolant,(Ax.X,Di.In3)},
                     {Sensors.SpindleCoolant,(Ax.X,Di.In1) }
                 });
 
                 ImplementMachineSettings();
                 _machine.StartVideoCapture(0);
-                _machine.OnVideoSourceBmpChanged += _machine_OnVideoSourceBmpChanged;
+                _machine.OnVideoSourceBmpChanged  += _machine_OnVideoSourceBmpChanged;
                 _machine.OnAxisMotionStateChanged += _machine_OnAxisMotionStateChanged;
-                _machine.OnSensorStateChanged += _machine_OnAxisSensorStateChanged;
-                _machine.OnValveStateChanged += _machine_OnAxisValveStateChanged;
-                _machine.OnSpindleStateChanging += _machine_OnSpindleStateChanging;
+                _machine.OnSensorStateChanged     += _machine_OnAxisSensorStateChanged;
+                _machine.OnValveStateChanged      += _machine_OnAxisValveStateChanged;
+                _machine.OnSpindleStateChanging   += _machine_OnSpindleStateChanging;
             }
             catch (MotionException ex)
             {
@@ -219,6 +227,24 @@ namespace DicingBlade.ViewModels
             };            
 
             AjustWaferTechnology();
+        }
+
+        private async Task ToTeachCutShift()
+        {
+            if(MessageBox.Show("Обучить смещение реза от ТВ?","Обучение", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+            {
+                ProcessMessage = "Совместите горизонтальный визир с центром последнего реза и нажмите *";
+                await WaitForConfirmationAsync();
+                if (Process is not null)
+                {
+                    Process.TeachDiskShift();                    
+                }
+                _machine.ConfigureGeometry(new Dictionary<Place, (Ax, double)[]>
+                {
+                    {Place.BladeChuckCenter, new (Ax,double)[]{ (Ax.X, Settings.Default.XDisk), (Ax.Y, Settings.Default.YObjective + Settings.Default.DiskShift)} },                    
+                });
+                ProcessMessage = "";
+            }
         }
 
         private void _machine_OnSpindleStateChanging(int rpm, double current, bool spinningState)
@@ -510,6 +536,8 @@ namespace DicingBlade.ViewModels
                             Process.ChangeScreensEvent     += ChangeScreensRegime;
                             Process.BladeTracingEvent      += Process_BladeTracingEvent;
                             Process.OnProcessStatusChanged += Process_OnProcessStatusChanged;
+                            Process.OnProcParamsChanged    += Process_OnProcParamsChanged;
+                            Process.OnControlPointAppeared += Process_OnControlPointAppeared;
 
                         }
                         catch (Exception ex)
@@ -550,7 +578,8 @@ namespace DicingBlade.ViewModels
             {                
                 if (VelocityRegime == Velocity.Step)
                 {
-                    await _machine.MoveAxInPosAsync(Ax.Y, YView + Substrate.CurrentIndex);
+                    _machine.SetVelocity(Velocity.Fast);
+                    await _machine.MoveAxInPosAsync(Ax.Y, YView + Substrate.CurrentIndex,true);
                 }
                 else
                 {
@@ -561,7 +590,8 @@ namespace DicingBlade.ViewModels
             {
                 if (VelocityRegime == Velocity.Step)
                 {
-                    await _machine.MoveAxInPosAsync(Ax.Y, YView - Substrate.CurrentIndex);
+                    _machine.SetVelocity(Velocity.Fast);
+                    await _machine.MoveAxInPosAsync(Ax.Y, YView - Substrate.CurrentIndex,true);
                 }
                 else
                 {
@@ -672,6 +702,25 @@ namespace DicingBlade.ViewModels
             }
             //key.Handled = true;
         }
+        
+        private void Process_OnControlPointAppeared()
+        {
+            RotateTransform rotateTransform = new RotateTransform(-Substrate.CurrentSideAngle);           
+            
+            var point = new TranslateTransform(-CCCenterXView, -CCCenterYView).Transform(new(XView, YView));
+            var point1 = rotateTransform.Transform(new(point.X - 1,point.Y));
+            var point2 = rotateTransform.Transform(new(point.X + 1, point.Y));
+            List<TraceLine> temp = new(ControlPointsView);            
+            temp.ForEach(br => br.Brush = Brushes.Blue);
+            temp.Add(new() { XStart=point1.X,XEnd=point2.X,YStart=point1.Y,YEnd=point2.Y, Brush = Brushes.OrangeRed});
+            ControlPointsView = new(temp);
+        }
+
+        private void Process_OnProcParamsChanged(object arg1, ProcParams procParamsEventArgs)
+        {
+            WaferCurrentShiftView = procParamsEventArgs.currentShift;
+        }
+
         private void Process_OnProcessStatusChanged(string status)
         {
             ProcessStatus = status;
@@ -697,8 +746,8 @@ namespace DicingBlade.ViewModels
                        BCCenterYView
                        );
 
-                    var point1 = rotateTransform.Transform(new System.Windows.Point(XTrace, YTrace /*+ /*Wafer.GetCurrentDirectionIndexShift+Substrate.CurrentShift*/));
-                    var point2 = rotateTransform.Transform(new System.Windows.Point(XTraceEnd, YTrace /*+ /*Wafer.GetCurrentDirectionIndexShift+Substrate.CurrentShift*/));
+                    var point1 = rotateTransform.Transform(new (XTrace, YTrace + WaferCurrentShiftView/*+ /*Wafer.GetCurrentDirectionIndexShift+Substrate.CurrentShift*/));
+                    var point2 = rotateTransform.Transform(new (XTraceEnd, YTrace + WaferCurrentShiftView/*+ /*Wafer.GetCurrentDirectionIndexShift+Substrate.CurrentShift*/));
                     point1 = new TranslateTransform(-BCCenterXView, -BCCenterYView).Transform(point1);
                     point2 = new TranslateTransform(-BCCenterXView, -BCCenterYView).Transform(point2);
 

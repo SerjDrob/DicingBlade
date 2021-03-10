@@ -1,0 +1,664 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" GroupingSetting="Alphabetical" MembersFormat="FullSignature">
+  <Class Name="DicingBlade.Classes.Axis" Collapsed="true">
+    <Position X="13.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\Axis.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DicingBlade.Classes.Axis2" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="15.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\Axis2.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DicingBlade.Classes.BehaviourTree" Collapsed="true">
+    <Position X="17.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\BehaviourTree.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DicingBlade.Classes.Sequence" Collapsed="true">
+    <Position X="6.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\BehaviourTree.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DicingBlade.Classes.Leaf" Collapsed="true">
+    <Position X="9" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\BehaviourTree.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DicingBlade.Classes.Selector" Collapsed="true">
+    <Position X="11.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\BehaviourTree.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DicingBlade.Classes.Condition" Collapsed="true">
+    <Position X="22.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\BehaviourTree.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DicingBlade.Classes.Ticker" Collapsed="true">
+    <Position X="4.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\BehaviourTree.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DicingBlade.Classes.DoMyWork" Collapsed="true">
+    <Position X="7.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\BehaviourTree.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DicingBlade.Classes.Blade" Collapsed="true">
+    <Position X="19" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\Blade.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DicingBlade.Classes.Command" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="20.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\Command.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DicingBlade.Classes.Cut" Collapsed="true">
+    <Position X="24.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACIAAAEAAIAAAAAAAAAAAAAAAAEAAAAAAAAAEAAgEA=</HashCode>
+      <FileName>Classes\Cut.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DicingBlade.Classes.DBConst" Collapsed="true">
+    <Position X="13.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\DBConst.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DicingBlade.Classes.ExceptionsAgregator" Collapsed="true">
+    <Position X="15.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\ExceptionsAgregator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DicingBlade.Classes.Grid" Collapsed="true">
+    <Position X="17.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\Grid.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DicingBlade.Classes.TempWafer" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="20.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\IWafer.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DicingBlade.Classes.Wafer2D" Collapsed="true">
+    <Position X="4.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\IWafer2D.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DicingBlade.Classes.Rectangle2D" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="17.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\IWafer2D.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DicingBlade.Classes.Substrate2D" Collapsed="true">
+    <Position X="4.25" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\IWafer2D.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DicingBlade.Classes.Machine" Collapsed="true">
+    <Position X="19" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\Machine.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DicingBlade.Classes.Machine4X" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="20.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\Machine4X.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DicingBlade.Classes.MachineException" Collapsed="true">
+    <Position X="22.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\MachineException.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DicingBlade.Classes.MachineState" Collapsed="true">
+    <Position X="24.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\MachineState.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DicingBlade.Classes.Map" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="13.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\Map.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DicingBlade.Classes.MotionDevice" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="15.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\MotionDevice.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DicingBlade.Classes.MotionException" Collapsed="true">
+    <Position X="17.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\MotionException.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DicingBlade.Classes.Parameters" Collapsed="true">
+    <Position X="19" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\Parameters.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DicingBlade.Classes.Process" Collapsed="true">
+    <Position X="20.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AFAEICwYARABOIBABCgAQCQQiQYOAlKAQIACAgAggII=</HashCode>
+      <FileName>Classes\Process.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DicingBlade.Classes.Process2" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="22.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\Process2.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DicingBlade.Classes.Process3" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="24.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\Process3.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DicingBlade.Classes.ProcessException" Collapsed="true">
+    <Position X="13.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\ProcessException.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DicingBlade.Classes.PropContainer" Collapsed="true">
+    <Position X="15.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\PropContainer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DicingBlade.Classes.Spindle" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="19" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\Spindle.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DicingBlade.Classes.Spindle2" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="20.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\Spindle2.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DicingBlade.Classes.Spindle3" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="22.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\Spindle3.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DicingBlade.Classes.SpindleException" Collapsed="true">
+    <Position X="24.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\SpindleException.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DicingBlade.Classes.SquareWafer" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="13.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\SquareWafer.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DicingBlade.Classes.StatMethods" Collapsed="true">
+    <Position X="15.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\StatMethods.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DicingBlade.Classes.Technology" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="17.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\Technology.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DicingBlade.Classes.TechnologySettingsValidator" Collapsed="true">
+    <Position X="19" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\TechnologySettingsValidator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DicingBlade.Classes.TracePath" Collapsed="true">
+    <Position X="24.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\TracePath.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DicingBlade.Classes.TracesView" Collapsed="true">
+    <Position X="13.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\TracesView.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DicingBlade.Classes.USBCamera" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="15.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\USBCamera.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DicingBlade.Classes.Wafer" Collapsed="true">
+    <Position X="17.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\Wafer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DicingBlade.Classes.WaferView" Collapsed="true">
+    <Position X="19" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\WaferView.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DicingBlade.Classes.TraceLine" Collapsed="true">
+    <Position X="22.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ViewModels\MainViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DicingBlade.Classes.Process4" Collapsed="true">
+    <Position X="26" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\Process4.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Struct Name="DicingBlade.Classes.Bridge" Collapsed="true">
+    <Position X="15.5" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\Bridge.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="DicingBlade.Classes.DiEventArgs" Collapsed="true">
+    <Position X="19" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\DiEventArgs.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="DicingBlade.Classes.MotionDeviceConfigs" Collapsed="true">
+    <Position X="22.5" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQQAAGgAACAAkgBIAAkACAAiAEAAAAAAAAQAAAAAA=</HashCode>
+      <FileName>Classes\IMachine.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="DicingBlade.Classes.AxisState" Collapsed="true">
+    <Position X="13.75" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAEAAAAAAAAAAAACACAAAAAAAAAABACAAAAAABAAAA=</HashCode>
+      <FileName>Classes\IMachine.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="DicingBlade.Classes.Point3D" Collapsed="true">
+    <Position X="24.25" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\IWafer2D.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="DicingBlade.Classes.Line2D" Collapsed="true">
+    <Position X="20.75" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\IWafer2D.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="DicingBlade.Classes.TempWafer2D" Collapsed="true">
+    <Position X="13.75" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAAAAAAAgAAAAAAAAAAAAAAAAIAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\Process.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="DicingBlade.Classes.CheckCutControl" Collapsed="true">
+    <Position X="17.25" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAQABgAAAAAAAAAAAAAAAAAAAAAAQAAAAAQ=</HashCode>
+      <FileName>Classes\Process.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="DicingBlade.ProcParams" Collapsed="true">
+    <Position X="15.5" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ProcParams.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Interface Name="DicingBlade.Classes.IMessager" Collapsed="true">
+    <Position X="17.25" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\ExceptionsAgregator.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="DicingBlade.Classes.IAxis" Collapsed="true">
+    <Position X="13.75" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\IAxis.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="DicingBlade.Classes.IMachine" Collapsed="true">
+    <Position X="15.5" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BCABmQIEwAAAEAAAABAAgACAIpFgAgIBIsAIQiQQAwU=</HashCode>
+      <FileName>Classes\IMachine.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="DicingBlade.Classes.ISpindle" Collapsed="true">
+    <Position X="20.75" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\ISpindle.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="DicingBlade.Classes.ITechnology" Collapsed="true">
+    <Position X="22.5" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\ITechnology.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="DicingBlade.Classes.IVideoCapture" Collapsed="true">
+    <Position X="24.25" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\IVideoCapture.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="DicingBlade.Classes.IWafer" Collapsed="true">
+    <Position X="13.75" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\IWafer.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="DicingBlade.Classes.IWafer2" Collapsed="true">
+    <Position X="15.5" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\IWafer2.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="DicingBlade.Classes.IShape" Collapsed="true">
+    <Position X="19" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\IWafer2D.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Enum Name="DicingBlade.Classes.Ax" Collapsed="true">
+    <Position X="13.75" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAACYAE=</HashCode>
+      <FileName>Classes\Ax.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="DicingBlade.Classes.AxDir" Collapsed="true">
+    <Position X="15.5" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAACAAAAAAAAAAAACAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\AxDir.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="DicingBlade.Classes.AxisDirections" Collapsed="true">
+    <Position X="17.25" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>YAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA0AAI=</HashCode>
+      <FileName>Classes\AxisDirections.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="DicingBlade.Classes.Directions" Collapsed="true">
+    <Position X="22.5" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAACAAAAAAA=</HashCode>
+      <FileName>Classes\Cut.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="DicingBlade.Classes.Di" Collapsed="true">
+    <Position X="19" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACA=</HashCode>
+      <FileName>Classes\Di.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="DicingBlade.Classes.Do" Collapsed="true">
+    <Position X="24.25" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAeAAAAAAA=</HashCode>
+      <FileName>Classes\Do.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="DicingBlade.Classes.Groups" Collapsed="true">
+    <Position X="15.5" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\IMachine.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="DicingBlade.Classes.Valves" Collapsed="true">
+    <Position X="17.25" Y="12.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAACIAAAAAAAAAAAAAAAAACAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\IMachine.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="DicingBlade.Classes.Sensors" Collapsed="true">
+    <Position X="22.5" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAACAAAAUAAAAAAAAAAAAACAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\IMachine.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="DicingBlade.Classes.Side" Collapsed="true">
+    <Position X="24.25" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\IWafer2D.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="DicingBlade.Classes.States" Collapsed="true">
+    <Position X="13.75" Y="12.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAApAEAAAA=</HashCode>
+      <FileName>Classes\MachineState.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="DicingBlade.Classes.Func" Collapsed="true">
+    <Position X="13.75" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAAEAAAAAAACAAAAAAABAAA=</HashCode>
+      <FileName>Classes\MachineState.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="DicingBlade.Classes.Messages" Collapsed="true">
+    <Position X="17.25" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\Messages.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="DicingBlade.Classes.MFeatures" Collapsed="true">
+    <Position X="19" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAA=</HashCode>
+      <FileName>Classes\MFeatures.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="DicingBlade.Classes.Place" Collapsed="true">
+    <Position X="20.75" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAAAAAAAAABAAAAIAAAAQAAAAAAAAAAAAAQQA=</HashCode>
+      <FileName>Classes\Place.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="DicingBlade.Classes.Diagram" Collapsed="true">
+    <Position X="20.75" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAQAAUBABQAAEAAAAAAAAAAABQoAADAgAAAAAAAA=</HashCode>
+      <FileName>Classes\Process.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="DicingBlade.Classes.Status" Collapsed="true">
+    <Position X="15.5" Y="12.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAAEAkAIAAAAAAAAAAAAAAAAAABAAIAAEAAAA=</HashCode>
+      <FileName>Classes\Process.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="DicingBlade.Classes.Velocity" Collapsed="true">
+    <Position X="19" Y="12.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgAAAAAAAAAAAAAAAAAAAAIAAAAQAAAIAAAAAAABAA=</HashCode>
+      <FileName>Classes\Velocity.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Delegate Name="DicingBlade.Classes.DiEventHandler" Collapsed="true">
+    <Position X="20.75" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\DiEventHandler.cs</FileName>
+    </TypeIdentifier>
+  </Delegate>
+  <Delegate Name="DicingBlade.Classes.AxisStateHandler" Collapsed="true">
+    <Position X="15.5" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\IMachine.cs</FileName>
+    </TypeIdentifier>
+  </Delegate>
+  <Delegate Name="DicingBlade.Classes.SensorStateHandler" Collapsed="true">
+    <Position X="24.25" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAgAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\IMachine.cs</FileName>
+    </TypeIdentifier>
+  </Delegate>
+  <Delegate Name="DicingBlade.Classes.ValveStateHandler" Collapsed="true">
+    <Position X="15.5" Y="14" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAgAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\IMachine.cs</FileName>
+    </TypeIdentifier>
+  </Delegate>
+  <Delegate Name="DicingBlade.Classes.AxisMotioStateHandler" Collapsed="true">
+    <Position X="13.75" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAgAAAAAAAAAAAIAAAAAAAAAgAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\IMachine.cs</FileName>
+    </TypeIdentifier>
+  </Delegate>
+  <Delegate Name="DicingBlade.Classes.SpindleStateHandler" Collapsed="true">
+    <Position X="13.75" Y="14" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\ISpindle.cs</FileName>
+    </TypeIdentifier>
+  </Delegate>
+  <Delegate Name="DicingBlade.Classes.BitmapHandler" Collapsed="true">
+    <Position X="17.25" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\IVideoCapture.cs</FileName>
+    </TypeIdentifier>
+  </Delegate>
+  <Delegate Name="DicingBlade.Classes.GetRotation" Collapsed="true">
+    <Position X="22.5" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAQAAAA=</HashCode>
+      <FileName>Classes\Process.cs</FileName>
+    </TypeIdentifier>
+  </Delegate>
+  <Delegate Name="DicingBlade.Classes.ChangeScreens" Collapsed="true">
+    <Position X="19" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\Process.cs</FileName>
+    </TypeIdentifier>
+  </Delegate>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

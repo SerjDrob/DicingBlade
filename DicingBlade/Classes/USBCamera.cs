@@ -32,8 +32,19 @@ namespace DicingBlade.Classes
                 //    _localWebCam = GetCamera();
                 //}
 
-                _localWebCam.VideoResolution = _localWebCam.VideoCapabilities[1]; //8
-                _localWebCam.NewFrame += HandleNewFrame;
+                try
+                {
+                    _localWebCam.VideoResolution = _localWebCam.VideoCapabilities[1]; //8
+                    _localWebCam.NewFrame += HandleNewFrame;
+                }
+                catch (IndexOutOfRangeException)
+                {
+                    throw;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
             }
 
             _localWebCam.Start();

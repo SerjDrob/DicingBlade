@@ -39,6 +39,7 @@ namespace DicingBlade.Classes
         public double Thickness { get; protected set; }
         protected Dictionary<int, (double angle, double index, double sideshift, double realangle)> _directions = new();
         public int CurrentSide { get; private set; }
+        public bool XMirror { get; set; } = true;
         public int CurrentLinesCount
         {
             get
@@ -164,13 +165,16 @@ namespace DicingBlade.Classes
         {
             _directions[CurrentSide] = (_directions[CurrentSide].angle, _directions[CurrentSide].index, _directions[CurrentSide].sideshift, angle);
         }
-
         public Line2D this[int cutNum]
         {
             get 
             {   
                 var angle = _directions[CurrentSide].angle;
-                return _shape.GetLine2D(CurrentIndex, cutNum, angle);                
+                var line = _shape.GetLine2D(CurrentIndex, cutNum, angle);
+                var sign = XMirror ? -1 : 1;
+                line.Start.X *= sign;
+                line.End.X *= sign;
+                return line;    
             }
         }
         public double this[double zratio]
@@ -194,7 +198,7 @@ namespace DicingBlade.Classes
         {
             var delta0 = (Height - Math.Floor(Height / index) * index) / 2;
             var delta90 = (Width - Math.Floor(Width / index) * index) / 2;
-            var zeroShift = index * num;
+            var zeroShift = index * num;           
             return angle switch
             {
                 0 => new Line2D() { Start = new Point(-Width/2,zeroShift - (Height/2) + delta0), End=new Point(Width/2,zeroShift-(Height/2) + delta0) },
@@ -226,7 +230,7 @@ namespace DicingBlade.Classes
             };
         }
     }
-
+   
     public class Substrate2D : Wafer2D
     {
         public Substrate2D(double indexH, double indexW, double thickness, IShape shape)

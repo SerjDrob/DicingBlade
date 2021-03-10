@@ -35,10 +35,10 @@
     <Setting Name="YJerk" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">1</Value>
     </Setting>
-    <Setting Name="ZVelLow" Type="System.UInt32" Scope="User">
+    <Setting Name="ZVelLow" Type="System.Double" Scope="User">
       <Value Profile="(Default)">1</Value>
     </Setting>
-    <Setting Name="ZVelHigh" Type="System.UInt32" Scope="User">
+    <Setting Name="ZVelHigh" Type="System.Double" Scope="User">
       <Value Profile="(Default)">5</Value>
     </Setting>
     <Setting Name="ZAcc" Type="System.Double" Scope="User">

@@ -14,7 +14,8 @@ namespace DicingBlade.Classes
     {
         Blowing,
         Coolant,
-        ChuckVacuum
+        ChuckVacuum,
+        SpindleContact
     }
     public enum Sensors
     {

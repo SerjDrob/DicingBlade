@@ -158,9 +158,9 @@ namespace DicingBlade.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("1")]
-        public uint ZVelLow {
+        public double ZVelLow {
             get {
-                return ((uint)(this["ZVelLow"]));
+                return ((double)(this["ZVelLow"]));
             }
             set {
                 this["ZVelLow"] = value;
@@ -170,9 +170,9 @@ namespace DicingBlade.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("5")]
-        public uint ZVelHigh {
+        public double ZVelHigh {
             get {
-                return ((uint)(this["ZVelHigh"]));
+                return ((double)(this["ZVelHigh"]));
             }
             set {
                 this["ZVelHigh"] = value;

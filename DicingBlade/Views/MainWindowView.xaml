@@ -40,6 +40,7 @@
         <converters:MulZeroConverter x:Key="MulZeroConverter" />
         <converters:MouseArgsConverter x:Key="MouseArgsConverter"/>
         <converters:MouseArgsCanvasConverter x:Key="MouseArgsCanvasConverter"/>
+        <converters:DivideConverter x:Key="DivideConverter"/>
         <SolidColorBrush x:Key="SignalGreen" Color="MediumSpringGreen" />
         <SolidColorBrush x:Key="SignalRed" Color="IndianRed" />
         <System:Double x:Key="Zero">0</System:Double>
@@ -56,8 +57,12 @@
                 By="{Binding WvAngle}"
                 Storyboard.Target="{Binding ElementName=TracesView}"
                 Storyboard.TargetProperty="RenderTransform.Children[0].Angle"
-                Duration="{Binding RotatingTime, Converter={StaticResource DoubleToDurationConverter}}">
-            </DoubleAnimation>
+                Duration="{Binding RotatingTime, Converter={StaticResource DoubleToDurationConverter}}"/>
+            <DoubleAnimation
+                By="{Binding WvAngle}"
+                Storyboard.Target="{Binding ElementName=ControlPoints}"
+                Storyboard.TargetProperty="RenderTransform.Children[0].Angle"
+                Duration="{Binding RotatingTime, Converter={StaticResource DoubleToDurationConverter}}"/>
         </Storyboard>
     </Window.Resources>
     <i:Interaction.Triggers>
@@ -132,6 +137,14 @@
                             </MenuItem.Icon>
                             <MenuItem.Header>
                                 <TextBlock Text="Масштаб видео"/>
+                            </MenuItem.Header>
+                        </MenuItem>
+                        <MenuItem Command="{Binding ToTeachCutShiftCmd}">
+                            <MenuItem.Icon>
+                                <Image Source="/Views/cutshift.png" Height="20"/>
+                            </MenuItem.Icon>
+                            <MenuItem.Header>
+                                <TextBlock Text="Смещение реза от ТВ"/>
                             </MenuItem.Header>
                         </MenuItem>
                     </MenuItem>
@@ -212,9 +225,8 @@
                             </Grid>
                         </GroupBox>
                     </StackPanel>
-
-
                     <StackPanel Grid.Column="1">
+                        <Label Content="{Binding WaferCurrentShiftView}"/>
                         <Border BorderBrush="Transparent" BorderThickness="3">
                             <DockPanel LastChildFill="False">
                                 <Label Content="Охл. шпинделя" DockPanel.Dock="Left" />
@@ -629,23 +641,7 @@
             Grid.Column="1"
             BorderBrush="LightGray"
             BorderThickness="3" />
-            <DockPanel Grid.RowSpan="{Binding Rows[0]}" Grid.Column="{Binding Cols[0]}">
-                <WrapPanel DockPanel.Dock="Top">
-                    <!--<CheckBox Name="ChuckCursorChk">
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="PreviewKeyDown">
-                            <cmd:EventToCommand Command="{Binding KeyDownCmd, Mode=OneWay}" PassEventArgsToCommand="True" />
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                </CheckBox>
-                <CheckBox Name="CameraCursorChk">
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="PreviewKeyDown">
-                            <cmd:EventToCommand Command="{Binding KeyDownCmd, Mode=OneWay}" PassEventArgsToCommand="True" />
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                </CheckBox>-->
-                </WrapPanel>
+            <DockPanel Grid.RowSpan="{Binding Rows[0]}" Grid.Column="{Binding Cols[0]}">                
                 <Canvas
                 Margin="3"
                 VerticalAlignment="Stretch"
@@ -893,18 +889,12 @@
                                 <Binding Path="BCCenterYView" />
                                 <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
                                 <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                                <Binding Path="DataContext.Wafer.GetCurrentDirectionIndexShift" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                <Binding Path="DataContext.WaferCurrentShiftView"  RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
                             </MultiBinding>
                         </Path.Data>
-                        <Path.Style>
-                            <Style TargetType="Path">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ElementName=ChuckCursorChk, Path=IsChecked}" Value="False">
-                                        <Setter Property="Visibility" Value="Hidden" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Path.Style>
+                        <!--<Path.RenderTransform>
+                            <ScaleTransform X="-1"/>
+                        </Path.RenderTransform>-->
                     </Path>
                     <Path
                     x:Name="CameraCursor"
@@ -921,18 +911,9 @@
                                 <Binding Path="CCCenterYView" />
                                 <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
                                 <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                                <Binding Path="DataContext.Wafer.GetCurrentDirectionIndexShift" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                <Binding Path="DataContext.WaferCurrentShiftView" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
                             </MultiBinding>
-                        </Path.Data>
-                        <Path.Style>
-                            <Style TargetType="Path">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ElementName=CameraCursorChk, Path=IsChecked}" Value="False">
-                                        <Setter Property="Visibility" Value="Hidden" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Path.Style>
+                        </Path.Data>                        
                     </Path>
                     <Path
                     Name="BladeTrace"
@@ -951,7 +932,7 @@
                                 <Binding Path="DataContext.BCCenterYView" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
                                 <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
                                 <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                                <Binding Path="DataContext.Wafer.GetCurrentDirectionIndexShift" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                <Binding Path="DataContext.WaferCurrentShiftView" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
                             </MultiBinding>
                         </Path.Data>
                     </Path>
@@ -1004,7 +985,8 @@
                                 </TranslateTransform>
                             </TransformGroup>
                         </Path.RenderTransform>
-                    </Path>
+                    </Path>                    
+                    
                     <Line
                     Name="AnglePosition"
                     RenderTransformOrigin="0.5,1"
@@ -1027,6 +1009,58 @@
                             </RotateTransform>
                         </Line.RenderTransform>
                     </Line>
+                    <ItemsControl x:Name="ControlPoints" ItemsSource="{Binding ControlPointsView}" Panel.ZIndex="5">
+                        <ItemsControl.RenderTransform>
+                            <TransformGroup>
+                                <RotateTransform />
+                                                                
+                                <ScaleTransform>
+                                    <ScaleTransform.ScaleX>
+                                        <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
+                                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                            <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                            <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                        </MultiBinding>
+                                    </ScaleTransform.ScaleX>
+                                    <ScaleTransform.ScaleY>
+                                        <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
+                                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                            <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                            <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                        </MultiBinding>
+                                    </ScaleTransform.ScaleY>
+                                </ScaleTransform>
+                                <TranslateTransform>
+                                    <TranslateTransform.X>
+                                        <Binding Path="ActualWidth" Converter="{StaticResource DivideConverter}" ConverterParameter="2" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                    </TranslateTransform.X>
+                                    <TranslateTransform.Y>
+                                        <MultiBinding Converter="{StaticResource TranslateConverterScheme}">
+                                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
+                                        </MultiBinding>
+                                    </TranslateTransform.Y>
+                                </TranslateTransform>
+                            </TransformGroup>
+                        </ItemsControl.RenderTransform>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Canvas>
+                                    <Line X1="{Binding Path=XStart}"
+                                          X2="{Binding Path=XEnd}"
+                                          Y1="{Binding Path=YStart}"
+                                          Y2="{Binding Path=YEnd}"
+                                          StrokeThickness="0.3"
+                                          Stroke="{Binding Path=Brush}"
+                                          StrokeEndLineCap="Round"                                          
+                                          >
+                                        
+                                    </Line>
+                                </Canvas>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="MouseLeftButtonDown">
                             <i:InvokeCommandAction PassEventArgsToCommand="True" EventArgsConverter="{Binding Source={StaticResource MouseArgsCanvasConverter}}" EventArgsConverterParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}" Command="{Binding LeftClickOnWaferCmd, Mode=OneWay}"/>
@@ -1035,6 +1069,12 @@
                             <i:InvokeCommandAction PassEventArgsToCommand="True" EventArgsConverter="{Binding Source={StaticResource MouseArgsCanvasConverter}}" EventArgsConverterParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}" Command="{Binding RightClickOnWaferCmd, Mode=OneWay}"/>
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
+                    <Canvas.RenderTransformOrigin>
+                        <Point X="0.5"/>
+                    </Canvas.RenderTransformOrigin>
+                    <Canvas.RenderTransform>                        
+                        <ScaleTransform ScaleX="-1"/>
+                    </Canvas.RenderTransform>
                 </Canvas>
             </DockPanel>
             
@@ -1053,8 +1093,6 @@
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </Image>
-
-
             <Canvas
             Grid.RowSpan="{Binding Rows[1]}"
             Grid.Column="{Binding Cols[1]}"

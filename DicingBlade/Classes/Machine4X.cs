@@ -131,7 +131,25 @@ namespace DicingBlade.Classes
         
         public void ConfigureGeometry(Dictionary<Place, (Ax,double)[]> places)
         {
-            _places = new Dictionary<Place, (Ax,double)[]>(places);
+            if (_places is not null)
+            {
+                places.ToList().ForEach(e => 
+                {
+                    if (_places.ContainsKey(e.Key))
+                    {
+                       _places[e.Key] = e.Value;
+                    }
+                    else
+                    {
+                       _places.Add(e.Key, e.Value);
+                    }
+                });
+            }
+            else
+            {
+                _places = new Dictionary<Place, (Ax, double)[]>(places);
+            }
+            
         }
 
         public void ConfigureSensors(Dictionary<Sensors, (Ax, Di)> sensors)

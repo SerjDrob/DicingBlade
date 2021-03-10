@@ -15,6 +15,7 @@
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Views\cutshift.png" />
     <None Remove="Views\learning.png" />
     <None Remove="Views\settings.png" />
     <None Remove="Views\size1.png" />
@@ -31,7 +32,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Classes\DicingBladeClassDiagram.cd" />
     <None Include="DicingBlade.ruleset" />
   </ItemGroup>
   <ItemGroup>
@@ -39,6 +39,7 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="ViewModels\FodyWeavers.xml" />
+    <Resource Include="Views\cutshift.png" />
     <Resource Include="Views\learning.png" />
     <Resource Include="Views\settings.png" />
     <Resource Include="Views\size1.png" />

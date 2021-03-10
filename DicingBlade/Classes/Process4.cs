@@ -26,6 +26,8 @@ namespace DicingBlade.Classes
             _wafer = wafer ?? throw new ProcessException("Не выбрана подложка для процесса");
             _blade = blade ?? throw new ProcessException("Не выбран диск для процесса");
             _feedSpeed = technology.FeedSpeed;
+            _undercut = technology.UnterCut;
+            
             //_machine.OnSensorStateChanged += Machine_OnAirWanished;
             //_machine.OnSensorStateChanged += Machine_OnCoolWaterWanished;
             //_machine.OnSensorStateChanged += Machine_OnSpinWaterWanished;
@@ -92,6 +94,7 @@ namespace DicingBlade.Classes
             InspectLeaf.CheckMyCondition       += SetConditionsStates;
             workingTicker.CheckMyCondition     += SetConditionsStates;
 
+            _inspectX = _machine.GetGeometry(Place.CameraChuckCenter, Ax.X);
             _learningDone = false;
             _rootSequence.DoWork();
 
@@ -102,13 +105,11 @@ namespace DicingBlade.Classes
             await _machine.MoveGpInPlaceAsync(Groups.XY, Place.Loading);
             ThrowMessage("Всё!",0);
         }
-
         private async Task SetProcessStatus()
         {
             ProcessStatus = Status.Working;
             OnProcessStatusChanged("Работа");
         }
-
         private void SetConditionsStates()
         {
             _rotateLearningCondition.SetState(_learningNextDir);
@@ -132,7 +133,6 @@ namespace DicingBlade.Classes
                 _wafer.SetSide(_currentDirection = 0);
             }
         }
-
         private async Task IncrementLine()
         {
             if (CurrentLine != _wafer.CurrentLinesCount)
@@ -155,11 +155,10 @@ namespace DicingBlade.Classes
         }
         #region NewFields
         private int _currentDirection;
-        private double _zRatio = 1;
+        private double _zRatio = 0;
         #endregion
 
         private bool _learningNextDir              = true;
-
         private Condition _bladeInWaferCond        = new();
         private Condition _learningCondition       = new();
         private Sequence _workingSequence          = new();
@@ -210,7 +209,7 @@ namespace DicingBlade.Classes
                     async () =>
                     {
                         _machine.SetVelocity(Velocity.Service);                        
-                        z = _machine.TranslateSpecCoor(Place.ZBladeTouch, _wafer[_zRatio], Ax.Z);
+                        z = _machine.TranslateSpecCoor(Place.ZBladeTouch, _wafer[_zRatio] + _undercut, Ax.Z);
                         await _machine.MoveAxInPosAsync(Ax.Z, z);
                     })
                 ,
@@ -230,7 +229,7 @@ namespace DicingBlade.Classes
                         await _machine.MoveAxInPosAsync(Ax.X, x);
                         BladeTracingEvent(false);
                         IsCutting = false;
-
+                        _lastCutY = _yActual;
                         _machine.SwitchOffValve(Valves.Coolant);                      
 
                     })
@@ -244,10 +243,10 @@ namespace DicingBlade.Classes
                         z = _machine.TranslateSpecCoor(Place.ZBladeTouch, _wafer.Thickness + _bladeTransferGapZ, Ax.Z);
                         await _machine.MoveAxInPosAsync(Ax.Z, z);
 
-                        x = _machine.GetGeometry(Place.CameraChuckCenter, Ax.X);
+                       // x = _machine.GetGeometry(Place.CameraChuckCenter, Ax.X);
                         y = _wafer[CurrentLine != 0 ? CurrentLine : 0].Start.Y - _wafer.CurrentShift;// - _machine.GetFeature(MFeatures.CameraBladeOffset);
                         y = _machine.TranslateSpecCoor(Place.CameraChuckCenter, -y, Ax.Y);
-                        await _machine.MoveGpInPosAsync(Groups.XY, new double[] { x, y }, true);
+                        await _machine.MoveGpInPosAsync(Groups.XY, new double[] { _inspectX, y }, true);
                         await _machine.MoveAxesInPlaceAsync(Place.ZFocus);
                     })
                 ,
@@ -297,7 +296,7 @@ namespace DicingBlade.Classes
                         // if (BladeInWafer) ;
                         _machine.SetVelocity(Velocity.Service);
                         x = _wafer[CurrentLine].Start.X;
-                        y = _wafer[CurrentLine].Start.Y;
+                        y = _wafer[CurrentLine].Start.Y - _wafer.CurrentShift;
                         var arr = _machine.TranslateActualCoors(Place.BladeChuckCenter, new (Ax, double)[] { (Ax.X, -x), (Ax.Y, -y) });
                         var xy = new double[] { arr.GetVal(Ax.X), arr.GetVal(Ax.Y) };
                         await _machine.MoveGpInPosAsync(Groups.XY, xy, true);
@@ -325,6 +324,10 @@ namespace DicingBlade.Classes
                     {
                         _machine.SetVelocity(Velocity.Service);
                         await MoveNextDirAsync();
+
+                        _procParamsEventArgs.currentShift = _wafer.CurrentShift;
+                        OnProcParamsChanged(this, _procParamsEventArgs);
+
                         SideDone = false;
                         CurrentLine = 0;
                         //SideCounter++;                       
@@ -377,6 +380,10 @@ namespace DicingBlade.Classes
                     {                        
                         var y = _machine.TranslateActualCoors(Place.CameraChuckCenter, Ax.Y);
                         _wafer.TeachSideShift(y);
+                        
+                        _procParamsEventArgs.currentShift = _wafer.CurrentShift;
+                        OnProcParamsChanged(this, _procParamsEventArgs);
+                        
                         _wafer.TeachSideAngle(_uActual);
                         if (!_learningNextDir)
                         {
@@ -390,6 +397,9 @@ namespace DicingBlade.Classes
                     {
                         _machine.SetVelocity(Velocity.Service);
                         await MoveNextDirAsync(false);
+
+                        _procParamsEventArgs.currentShift = _wafer.CurrentShift;
+                        OnProcParamsChanged(this, _procParamsEventArgs);
                     }),
 
                 Status.Working => new Func<Task>(
@@ -510,6 +520,11 @@ namespace DicingBlade.Classes
                     break;
             }
         }
+        public void TeachDiskShift()
+        {
+            Properties.Settings.Default.DiskShift = _lastCutY - _yActual;
+            Properties.Settings.Default.Save();
+        }
 
         private double _xActual;
         private double _yActual;
@@ -517,6 +532,8 @@ namespace DicingBlade.Classes
         private double _uActual;
         private bool _machineVacuumSensor;
         private bool _spindleWorking;
+        private double _inspectX;
+        private double _lastCutY;
         
         private readonly Wafer2D _wafer;
         private readonly IMachine _machine;
@@ -525,11 +542,14 @@ namespace DicingBlade.Classes
         public ChangeScreens ChangeScreensEvent;
         public event Action<bool> BladeTracingEvent;
         public event Action<string> OnProcessStatusChanged;
+        public event Action OnControlPointAppeared;
+
+
         public Visibility CutWidthMarkerVisibility { get; set; } = Visibility.Hidden;
         public Status ProcessStatus { get; private set; }       
         public double CutOffset { get; set; } = 0;
 
-        private double _bladeTransferGapZ /*{ get; set; }*/ = 1;
+        private double _bladeTransferGapZ /*{ get; set; }*/ = 2;
         private bool IsCutting { get; set; } = false;       
 
         private bool _pauseProcess;
@@ -572,14 +592,15 @@ namespace DicingBlade.Classes
         private CancellationTokenSource _cancellationToken;
         public bool SideDone { get; private set; } = false;
        
-        private bool BladeInWafer => _zActual > _machine.GetGeometry(Place.ZBladeTouch, 2) - _wafer.Thickness - _bladeTransferGapZ;
+        private bool BladeInWafer => _zActual > _machine.GetGeometry(Place.ZBladeTouch,Ax.Z) - _wafer.Thickness - _bladeTransferGapZ;
 
         public int CurrentLine { get; private set; }
         
         private double _feedSpeed;
-       
+        private double _undercut;
         public GetRotation GetRotationEvent;
         private bool _learningDone;
+        private ProcParams _procParamsEventArgs;
 
         public event Action<string,int> ThrowMessage;
 
@@ -662,13 +683,13 @@ namespace DicingBlade.Classes
         private async Task TakeThePhotoAsync()
         {
             _machine.StartVideoCapture(0);
-            await ProcElementDispatcherAsync(Diagram.GoTransferingHeightZ);
-            //await ProcElementDispatcherAsync(Diagram.GoCameraPointXyz);
+            await ProcElementDispatcherAsync(Diagram.GoTransferingHeightZ);            
             await Task.Run(GetFunc(Diagram.GoCameraPointXyz));
             _machine.SwitchOnValve(Valves.Blowing);
             await Task.Delay(100).ConfigureAwait(false);
             _machine.FreezeVideoCapture();
             _machine.SwitchOffValve(Valves.Blowing);
+            OnControlPointAppeared();
         }
         private async Task CorrectionAsync()
         {
@@ -687,6 +708,8 @@ namespace DicingBlade.Classes
             {
                 while (ProcessStatus == Status.Correcting) ;                
             });
+            _inspectX = _xActual;
+            OnControlPointAppeared();
         }
         public async Task StartPauseProc()
         {
@@ -751,6 +774,8 @@ namespace DicingBlade.Classes
         {
             Dispose();
         }
+
+        public event Action<object, ProcParams> OnProcParamsChanged;
     }
 }
 
