@@ -56,11 +56,12 @@ namespace DicingBlade.Classes
         public bool nLmt;
         public bool motionDone;
         public bool homeDone;
+        public bool vhStart;
     }
     public delegate void AxisStateHandler(int axisNum, AxisState state);
     public delegate void SensorStateHandler(Sensors sensor, bool state);
     public delegate void ValveStateHandler(Valves valve, bool state);
-    public delegate void AxisMotioStateHandler(Ax axis, double position, bool nLmt, bool pLmt, bool motionDone);
+    public delegate void AxisMotioStateHandler(Ax axis, double position, bool nLmt, bool pLmt, bool motionDone, bool motionStart);
     interface IMachine
     {
         public bool MachineInit { get; set; }

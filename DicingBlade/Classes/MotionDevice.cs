@@ -60,6 +60,7 @@ namespace DicingBlade.Classes
                 axisEnableEvent[i] |= (uint)EventType.EVT_AX_MOTION_DONE;
                 axisEnableEvent[i] |= (uint)EventType.EVT_AX_VH_START;
                 axisEnableEvent[i] |= (uint)EventType.EVT_AX_HOME_DONE;
+                axisEnableEvent[i] |= (uint)EventType.EVT_AX_VH_START;                
             }
 
             result = Motion.mAcm_EnableMotionEvent(MotionDevice.DeviceHandle, axisEnableEvent, gpEnableEvent, (uint)AxisCount, 1);
@@ -142,13 +143,7 @@ namespace DicingBlade.Classes
                     {
                         axState.motionDone = (axEvtStatusArray[num] & (uint)EventType.EVT_AX_MOTION_DONE) > 0;
                         axState.homeDone = (axEvtStatusArray[num] & (uint)EventType.EVT_AX_HOME_DONE) > 0;
-                        //for (var i = 0; i < _axes.Length; i++)
-                        //{
-                        //    if ((axEvtStatusArray[i] & (uint)EventType.EVT_AX_MOTION_DONE) > 0)
-                        //        _axes[i].MotionDone = true;
-
-                        //    if ((axEvtStatusArray[i] & (uint)EventType.EVT_AX_HOME_DONE) > 0) _axes[i].HomeDone = true;
-                        //}
+                        axState.vhStart = (axEvtStatusArray[num] & (uint)EventType.EVT_AX_VH_START) > 0;
                     }
                     
                     TransmitAxState(num, axState);

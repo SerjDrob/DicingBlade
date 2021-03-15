@@ -96,7 +96,7 @@ namespace DicingBlade.Classes
                     2,
                     _lowFreqLimit,//500,//lower limiting frequency/10
                     _highFreqLimit,//upper limiting frequency/10
-                    500//acceleration time/10                
+                    900//acceleration time/10                
                 });
                 
                 _client.WriteMultipleRegisters(1, 0xF00B, new ushort[]
@@ -109,7 +109,7 @@ namespace DicingBlade.Classes
                 _client.WriteMultipleRegisters(1, 0xF20F, new ushort[] 
                 {                    
                     4999,//f3/10
-                    25//V3
+                    30//V3
                 });
 
                 _client.WriteMultipleRegisters(1, 0xF20D, new ushort[]

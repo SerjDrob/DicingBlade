@@ -33,7 +33,8 @@ namespace DicingBlade.Classes
         GoTransferingHeightZ,
         GoDockHeightZ,
         GoNextDirection,
-        GoCameraPointLearningXyz
+        GoCameraPointLearningXyz,
+        GoCurPositionCutXy
     }
 
     internal enum Status

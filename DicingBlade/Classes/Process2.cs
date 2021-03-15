@@ -175,7 +175,7 @@ namespace DicingBlade.Classes
             }
         }
 
-        private void _machine_OnAxisMotionStateChanged(Ax axis, double position, bool nLmt, bool pLmt, bool motionDone)
+        private void _machine_OnAxisMotionStateChanged(Ax axis, double position, bool nLmt, bool pLmt, bool motionDone, bool motionStart)
         {
             switch (axis)
             {

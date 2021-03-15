@@ -20,7 +20,9 @@ namespace DicingBlade.Classes
     internal class Process4 : IMessager, IDisposable
     {
         public Process4(IMachine machine, Wafer2D wafer, Blade blade, ITechnology technology, Diagram[] proc) // В конструкторе происходит загрузка технологических параметров
-        {
+        {            
+            blade.Thickness = 0.11;
+            blade.Diameter = 55.6;
 
             _machine = machine ?? throw new ProcessException("Не выбрана установка для процесса"); ;
             _wafer = wafer ?? throw new ProcessException("Не выбрана подложка для процесса");
@@ -52,6 +54,19 @@ namespace DicingBlade.Classes
             _checkCut.Set(technology.StartControlNum, technology.ControlPeriod);
             
             ProcessStatus = Status.StartLearning;
+
+            var singleCutCondition = new Condition(true);
+            var _singleCutSequence = new Sequence()
+                .Hire(new Leaf(GetFunc(Diagram.GoTransferingHeightZ)))
+                .Hire(new Leaf(GetFunc(Diagram.GoCurPositionCutXy)))
+                .Hire(new Leaf(GetFunc(Diagram.GoNextDepthZ)))
+                .Hire(new Leaf(GetFunc(Diagram.CuttingX)))                
+                //.Hire(new Leaf(GetFunc(Diagram.GoTransferingHeightZ)))
+                .Hire(new Leaf(GetFunc(Diagram.GoCameraPointXyz)))
+                .Hire(new Leaf(async ()=> { singleCutCondition.SetState(false); }));
+
+            var _singleCutTicker = new Ticker(_singleCutSequence, singleCutCondition);
+            _singleCutLeaf = new Leaf(async () => { singleCutCondition.SetState(true); }, _singleCutTicker);
 
             _workingCondition = new(true);
             var InspectLeaf = new Leaf(TakeThePhotoAsync);//.SetBlock(_cutInspectCondition);
@@ -97,7 +112,7 @@ namespace DicingBlade.Classes
             _inspectX = _machine.GetGeometry(Place.CameraChuckCenter, Ax.X);
             _learningDone = false;
             _rootSequence.DoWork();
-
+            procCount++;
         }
 
         private async Task EndProcess()
@@ -167,12 +182,26 @@ namespace DicingBlade.Classes
         private Condition _workingCondition        = new();
         private Condition _cutInspectCondition     = new();
         private Condition _sideDoneCondition       = new(false);
-        private Sequence _rootSequence             = new();
+        private Sequence _rootSequence             = new();        
         private Condition _inspectSelCondition     = new();
         private Condition _correctSelCondition     = new();
         private Condition _rotateLearningCondition = new(true);
         private Sequence _learningSequence;
+        private Leaf _singleCutLeaf;
         private TempWafer2D _tempWafer2D;
+        private List<Task> _localTasks = new();
+
+        private async Task AwaitTaskAsync(Task task)
+        {
+            _localTasks.Add(task);
+            await task.ConfigureAwait(true);
+        }
+
+        public async Task WaitProcDoneAsync()
+        {
+            await Task.WhenAll(_localTasks);            
+        }
+
         private Func<Task> GetFunc(Diagram element)
         {
             var x = new double();
@@ -189,8 +218,8 @@ namespace DicingBlade.Classes
                     if (BladeInWafer) ;
                     _machine.SetVelocity(Velocity.Service);
                     x = _machine.TranslateSpecCoor(Place.BladeChuckCenter, -xCurLineEnd, 0);
-                    double xGap = _blade.XGap(_wafer.Thickness);                    
-                    await _machine.MoveAxInPosAsync(Ax.X, x + xGap);
+                    double xGap = _blade.XGap(_wafer.Thickness);
+                    await AwaitTaskAsync(_machine.MoveAxInPosAsync(Ax.X, x + xGap));
                 })
                 ,
 
@@ -201,7 +230,7 @@ namespace DicingBlade.Classes
                          var xCurLineEnd = _wafer[CurrentLine].End.X;
                          _machine.SetVelocity(Velocity.Service);
                          x = _machine.TranslateSpecCoor(Place.BladeChuckCenter, -xCurLineEnd, 0);
-                         await _machine.MoveAxInPosAsync(Ax.X, x);
+                         await AwaitTaskAsync(_machine.MoveAxInPosAsync(Ax.X, x));
                      })
                 ,
 
@@ -210,7 +239,7 @@ namespace DicingBlade.Classes
                     {
                         _machine.SetVelocity(Velocity.Service);                        
                         z = _machine.TranslateSpecCoor(Place.ZBladeTouch, _wafer[_zRatio] + _undercut, Ax.Z);
-                        await _machine.MoveAxInPosAsync(Ax.Z, z);
+                        await AwaitTaskAsync(_machine.MoveAxInPosAsync(Ax.Z, z));
                     })
                 ,
 
@@ -218,7 +247,7 @@ namespace DicingBlade.Classes
                     async () =>
                     {
                         _machine.SwitchOnValve(Valves.Coolant);
-                        await Task.Delay(300).ConfigureAwait(false);
+                        await AwaitTaskAsync(Task.Delay(300));
                         _machine.SetAxFeedSpeed(Ax.X, _feedSpeed);
                         IsCutting = true;
 
@@ -226,12 +255,11 @@ namespace DicingBlade.Classes
                         x = _machine.TranslateSpecCoor(Place.BladeChuckCenter, -xCurLineEnd, 0);
 
                         BladeTracingEvent(true);
-                        await _machine.MoveAxInPosAsync(Ax.X, x);
+                        await AwaitTaskAsync(_machine.MoveAxInPosAsync(Ax.X, x));
                         BladeTracingEvent(false);
                         IsCutting = false;
                         _lastCutY = _yActual;
-                        _machine.SwitchOffValve(Valves.Coolant);                      
-
+                        _machine.SwitchOffValve(Valves.Coolant);     
                     })
                 ,
 
@@ -241,13 +269,14 @@ namespace DicingBlade.Classes
                     {
                         _machine.SetVelocity(Velocity.Service);
                         z = _machine.TranslateSpecCoor(Place.ZBladeTouch, _wafer.Thickness + _bladeTransferGapZ, Ax.Z);
-                        await _machine.MoveAxInPosAsync(Ax.Z, z);
+                        await AwaitTaskAsync(_machine.MoveAxInPosAsync(Ax.Z, z));
 
-                       // x = _machine.GetGeometry(Place.CameraChuckCenter, Ax.X);
-                        y = _wafer[CurrentLine != 0 ? CurrentLine : 0].Start.Y - _wafer.CurrentShift;// - _machine.GetFeature(MFeatures.CameraBladeOffset);
+                        // x = _machine.GetGeometry(Place.CameraChuckCenter, Ax.X);
+                        // y = _wafer[CurrentLine != 0 ? CurrentLine : 0].Start.Y - _wafer.CurrentShift;// - _machine.GetFeature(MFeatures.CameraBladeOffset);
+                        y = - _machine.TranslateSpecCoor(Place.BladeChuckCenter, _yActual, Ax.Y);
                         y = _machine.TranslateSpecCoor(Place.CameraChuckCenter, -y, Ax.Y);
-                        await _machine.MoveGpInPosAsync(Groups.XY, new double[] { _inspectX, y }, true);
-                        await _machine.MoveAxesInPlaceAsync(Place.ZFocus);
+                        await AwaitTaskAsync(_machine.MoveGpInPosAsync(Groups.XY, new double[] { _inspectX, y }, true));
+                        await AwaitTaskAsync(_machine.MoveAxesInPlaceAsync(Place.ZFocus));
                     })
                 ,
 
@@ -257,7 +286,7 @@ namespace DicingBlade.Classes
                         if (BladeInWafer) ;
                         _machine.SetVelocity(Velocity.Service);
                         x = _wafer.GetNearestCut(_yActual - _machine.GetGeometry(Place.CameraChuckCenter, Ax.Y)).End.X;
-                        await _machine.MoveAxInPosAsync(Ax.X, x);
+                        await AwaitTaskAsync(_machine.MoveAxInPosAsync(Ax.X, x));
                     })
                 ,
 
@@ -267,7 +296,7 @@ namespace DicingBlade.Classes
                         if (BladeInWafer) ;
                         _machine.SetVelocity(Velocity.Service);
                         x = _wafer.GetNearestCut(_yActual - _machine.GetGeometry(Place.CameraChuckCenter, Ax.Y)).Start.X;
-                        await _machine.MoveAxInPosAsync(Ax.X, x);
+                        await AwaitTaskAsync(_machine.MoveAxInPosAsync(Ax.X, x));
                     })
                 ,
 
@@ -276,7 +305,7 @@ namespace DicingBlade.Classes
                     {
                         if (BladeInWafer) ;
                         _machine.SetVelocity(Velocity.Service);
-                        await _machine.MoveGpInPlaceAsync(Groups.XY, Place.CameraChuckCenter);
+                        await AwaitTaskAsync(_machine.MoveGpInPlaceAsync(Groups.XY, Place.CameraChuckCenter));
                     })
                 ,
 
@@ -286,7 +315,7 @@ namespace DicingBlade.Classes
                         if (BladeInWafer) ;
                         _machine.SetVelocity(Velocity.Service);
                         y = _machine.TranslateSpecCoor(Place.BladeChuckCenter, _wafer[CurrentLine].Start.Y, Ax.Y);
-                        await _machine.MoveAxInPosAsync(Ax.Y, y);
+                        await AwaitTaskAsync(_machine.MoveAxInPosAsync(Ax.Y, y));
                     })
                 ,
 
@@ -296,18 +325,34 @@ namespace DicingBlade.Classes
                         // if (BladeInWafer) ;
                         _machine.SetVelocity(Velocity.Service);
                         x = _wafer[CurrentLine].Start.X;
+                        x = x + Math.Sign(x) * _blade.XGap(_wafer.Thickness);
                         y = _wafer[CurrentLine].Start.Y - _wafer.CurrentShift;
                         var arr = _machine.TranslateActualCoors(Place.BladeChuckCenter, new (Ax, double)[] { (Ax.X, -x), (Ax.Y, -y) });
                         var xy = new double[] { arr.GetVal(Ax.X), arr.GetVal(Ax.Y) };
-                        await _machine.MoveGpInPosAsync(Groups.XY, xy, true);
+                        await AwaitTaskAsync(_machine.MoveGpInPosAsync(Groups.XY, xy, true));
                     })
+                ,
+
+                Diagram.GoCurPositionCutXy => new Func<Task>(
+                   async () =>
+                   {
+                        // if (BladeInWafer) ;
+                       _machine.SetVelocity(Velocity.Service);
+                       x = _wafer[CurrentLine].Start.X;
+                       x = x + Math.Sign(x) * _blade.XGap(_wafer.Thickness);
+                       y = - _machine.TranslateSpecCoor(Place.CameraChuckCenter, _yActual, Ax.Y);
+                       //y = _wafer[CurrentLine].Start.Y - _wafer.CurrentShift;
+                       var arr = _machine.TranslateActualCoors(Place.BladeChuckCenter, new (Ax, double)[] { (Ax.X, -x), (Ax.Y, -y) });
+                       var xy = new double[] { arr.GetVal(Ax.X), arr.GetVal(Ax.Y) };
+                       await AwaitTaskAsync(_machine.MoveGpInPosAsync(Groups.XY, xy, true));
+                   })
                 ,
 
                 Diagram.GoTransferingHeightZ => new Func<Task>(
                     async () =>
                     {
                         _machine.SetVelocity(Velocity.Service);
-                        await _machine.MoveAxInPosAsync(Ax.Z, _machine.GetFeature(MFeatures.ZBladeTouch) - _wafer.Thickness - _bladeTransferGapZ);
+                        await AwaitTaskAsync(_machine.MoveAxInPosAsync(Ax.Z, _machine.GetFeature(MFeatures.ZBladeTouch) - _wafer.Thickness - _bladeTransferGapZ));
                     })
                 ,
 
@@ -315,7 +360,7 @@ namespace DicingBlade.Classes
                     async () =>
                     {
                         _machine.SetVelocity(Velocity.Service);
-                        await _machine.MoveAxInPosAsync(Ax.Z, 1);
+                        await AwaitTaskAsync(_machine.MoveAxInPosAsync(Ax.Z, 1));
                     })
                 ,
 
@@ -323,7 +368,7 @@ namespace DicingBlade.Classes
                     async () =>
                     {
                         _machine.SetVelocity(Velocity.Service);
-                        await MoveNextDirAsync();
+                        await AwaitTaskAsync(MoveNextDirAsync());
 
                         _procParamsEventArgs.currentShift = _wafer.CurrentShift;
                         OnProcParamsChanged(this, _procParamsEventArgs);
@@ -338,12 +383,12 @@ namespace DicingBlade.Classes
                     async () =>
                     {
                         _machine.SetVelocity(Velocity.Service);
-                        await _machine.MoveAxInPosAsync(Ax.Z, _machine.GetFeature(MFeatures.ZBladeTouch) - _wafer.Thickness - _bladeTransferGapZ);
+                        await AwaitTaskAsync(_machine.MoveAxInPosAsync(Ax.Z, _machine.GetFeature(MFeatures.ZBladeTouch) - _wafer.Thickness - _bladeTransferGapZ));
                         y = _wafer.GetNearestCut(0).Start.Y;
                         var arr = _machine.TranslateActualCoors(Place.CameraChuckCenter, new (Ax, double)[] { (Ax.X, 0), (Ax.Y, -y) });
                         var point = new double[] { arr.GetVal(Ax.X), arr.GetVal(Ax.Y) };
-                        await _machine.MoveGpInPosAsync(Groups.XY, point);
-                        await _machine.MoveAxesInPlaceAsync(Place.ZFocus);
+                        await AwaitTaskAsync(_machine.MoveGpInPosAsync(Groups.XY, point));
+                        await AwaitTaskAsync(_machine.MoveAxesInPlaceAsync(Place.ZFocus));
 
                     })
                 ,
@@ -361,16 +406,14 @@ namespace DicingBlade.Classes
                     async () =>
                     {
                         _machine.SetVelocity(Velocity.Service);
-                        await _machine.MoveAxInPosAsync(Ax.Z, _machine.GetFeature(MFeatures.ZBladeTouch) - _wafer.Thickness - _bladeTransferGapZ);
+                        await AwaitTaskAsync(_machine.MoveAxInPosAsync(Ax.Z, _machine.GetFeature(MFeatures.ZBladeTouch) - _wafer.Thickness - _bladeTransferGapZ));
                         var y = _wafer.GetNearestCut(0).Start.Y;
                         var arr = _machine.TranslateActualCoors(Place.CameraChuckCenter, new (Ax, double)[] { (Ax.X, 0), (Ax.Y, -y) });
-
                         //_machine.MoveAxInPosAsync(Ax.Y, arr.GetVal(Ax.Y));
                         //_machine.MoveAxInPosAsync(Ax.X, arr.GetVal(Ax.X));
-                        var point = new double[] { arr.GetVal(Ax.X), arr.GetVal(Ax.Y) };
-                        await _machine.MoveGpInPosAsync(Groups.XY, point);
-                        await _machine.MoveAxesInPlaceAsync(Place.ZFocus);
-
+                        var point = new double[] { arr.GetVal(Ax.X), arr.GetVal(Ax.Y) };  
+                        await AwaitTaskAsync(_machine.MoveGpInPosAsync(Groups.XY, point));
+                        await AwaitTaskAsync(_machine.MoveAxesInPlaceAsync(Place.ZFocus));
                         ProcessStatus = Status.Learning;
                     })
                 ,
@@ -396,7 +439,7 @@ namespace DicingBlade.Classes
                     async () =>
                     {
                         _machine.SetVelocity(Velocity.Service);
-                        await MoveNextDirAsync(false);
+                        await AwaitTaskAsync(MoveNextDirAsync(false));
 
                         _procParamsEventArgs.currentShift = _wafer.CurrentShift;
                         OnProcParamsChanged(this, _procParamsEventArgs);
@@ -406,7 +449,7 @@ namespace DicingBlade.Classes
                     async () =>
                     {
                         PauseProcess = true;
-                        if (PauseProcess) await PauseScenarioAsync();
+                        if (PauseProcess) AwaitTaskAsync(PauseScenarioAsync());
                         CutWidthMarkerVisibility = Visibility.Visible;
                         ChangeScreensEvent?.Invoke(true);
                         ProcessStatus = Status.Correcting;
@@ -447,12 +490,12 @@ namespace DicingBlade.Classes
                     _tempWafer2D.Point2 = new double[] { _xActual, _yActual };
                     _machine.SetVelocity(Velocity.Service);
                     var angle = _tempWafer2D.GetAngle();
-                    await _machine.MoveAxInPosAsync(Ax.U, _uActual - angle);
+                    await AwaitTaskAsync(_machine.MoveAxInPosAsync(Ax.U, _uActual - angle));
                     var rotation = new RotateTransform(-angle);
                     rotation.CenterX = _machine.GetGeometry(Place.CameraChuckCenter, Ax.X);
                     rotation.CenterY = _machine.GetGeometry(Place.CameraChuckCenter, Ax.Y);
                     var point = rotation.Transform(new System.Windows.Point(_tempWafer2D.Point2[0], _tempWafer2D.Point2[1]));
-                    await _machine.MoveAxInPosAsync(Ax.Y, point.Y);
+                    await AwaitTaskAsync(_machine.MoveAxInPosAsync(Ax.Y, point.Y));
                     _tempWafer2D.FirstPointSet = false;
                     ThrowMessage("", 1);
                 }
@@ -498,7 +541,7 @@ namespace DicingBlade.Classes
                     break;
             }
         }
-        private void _machine_OnAxisMotionStateChanged(Ax axis, double position, bool nLmt, bool pLmt, bool motionDone)
+        private void _machine_OnAxisMotionStateChanged(Ax axis, double position, bool nLmt, bool pLmt, bool motionDone, bool motionStart)
         {
             switch (axis)
             {
@@ -525,6 +568,7 @@ namespace DicingBlade.Classes
             Properties.Settings.Default.DiskShift = _lastCutY - _yActual;
             Properties.Settings.Default.Save();
         }
+        public async Task DoSingleCut() => await AwaitTaskAsync(_singleCutLeaf.DoWork());
 
         private double _xActual;
         private double _yActual;
@@ -608,9 +652,9 @@ namespace DicingBlade.Classes
 
         public async Task PauseScenarioAsync()
         {
-            await _machine.WaitUntilAxisStopAsync(Ax.X);
+            await AwaitTaskAsync(_machine.WaitUntilAxisStopAsync(Ax.X));
             //Machine.EmgStop();
-            await ProcElementDispatcherAsync(Diagram.GoCameraPointXyz);
+            await AwaitTaskAsync(ProcElementDispatcherAsync(Diagram.GoCameraPointXyz));
         }
                
         private async Task MoveNextDirAsync(bool next = true)
@@ -771,7 +815,7 @@ namespace DicingBlade.Classes
             _cancellationToken?.Dispose();
         }
         ~Process4()
-        {
+        {            
             Dispose();
         }
 

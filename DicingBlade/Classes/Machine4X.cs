@@ -60,7 +60,7 @@ namespace DicingBlade.Classes
                     position = state.cmdPos;
                 }
                 
-                OnAxisMotionStateChanged?.Invoke(axis, position, state.nLmt, state.pLmt, state.motionDone);
+                OnAxisMotionStateChanged?.Invoke(axis, position, state.nLmt, state.pLmt, state.motionDone, state.vhStart);
 
                 foreach (var sensor in Enum.GetValues(typeof(Sensors)))
                 {

@@ -63,8 +63,38 @@
                 Storyboard.Target="{Binding ElementName=ControlPoints}"
                 Storyboard.TargetProperty="RenderTransform.Children[0].Angle"
                 Duration="{Binding RotatingTime, Converter={StaticResource DoubleToDurationConverter}}"/>
+            <DoubleAnimation
+                By="{Binding WvAngle}"
+                Storyboard.Target="{Binding ElementName=SquareWafer}"
+                Storyboard.TargetProperty="RenderTransform.Children[1].Angle"
+                Duration="{Binding RotatingTime, Converter={StaticResource DoubleToDurationConverter}}"/>
+        </Storyboard>
+        <Storyboard x:Key="ResetView">
+            <DoubleAnimation
+                To="0"
+                Storyboard.Target="{Binding ElementName=CutsView}"
+                Storyboard.TargetProperty="RenderTransform.Children[0].Angle"
+                Duration="0" />
+            <DoubleAnimation
+                To="0"
+                Storyboard.Target="{Binding ElementName=TracesView}"
+                Storyboard.TargetProperty="RenderTransform.Children[0].Angle"
+                Duration="0"/>
+            <DoubleAnimation
+                To="0"
+                Storyboard.Target="{Binding ElementName=ControlPoints}"
+                Storyboard.TargetProperty="RenderTransform.Children[0].Angle"
+                Duration="0"/>
+            <DoubleAnimation
+                To="0"
+                Storyboard.Target="{Binding ElementName=SquareWafer}"
+                Storyboard.TargetProperty="RenderTransform.Children[1].Angle"
+                Duration="0"/>
         </Storyboard>
     </Window.Resources>
+    <Window.InputBindings>
+        <KeyBinding Command="{Binding ToTeachCutShiftCmd}" Key="F6"/>
+    </Window.InputBindings>
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="KeyDown">
             <i:InvokeCommandAction Command="{Binding KeyDownCmd, Mode=OneWay}" PassEventArgsToCommand="True" />
@@ -74,6 +104,9 @@
         </i:EventTrigger>
         <i:PropertyChangedTrigger Binding="{Binding WvRotate}">
             <i:ControlStoryboardAction Storyboard="{StaticResource ResourceKey=PathAnimation}" />
+        </i:PropertyChangedTrigger>
+        <i:PropertyChangedTrigger Binding="{Binding ResetView}">
+            <i:ControlStoryboardAction Storyboard="{StaticResource ResourceKey=ResetView}" />
         </i:PropertyChangedTrigger>
     </i:Interaction.Triggers>
     <Grid>
@@ -139,7 +172,7 @@
                                 <TextBlock Text="Масштаб видео"/>
                             </MenuItem.Header>
                         </MenuItem>
-                        <MenuItem Command="{Binding ToTeachCutShiftCmd}">
+                        <MenuItem Command="{Binding ToTeachCutShiftCmd}" InputGestureText="F6">
                             <MenuItem.Icon>
                                 <Image Source="/Views/cutshift.png" Height="20"/>
                             </MenuItem.Icon>
@@ -509,6 +542,20 @@
                                         </Style>
                                     </Rectangle.Style>
                                 </Rectangle>
+                                <Rectangle>
+                                    <Rectangle.Style>
+                                        <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
+                                            <Style.Triggers>
+                                                <DataTrigger Value="True">
+                                                    <DataTrigger.Binding>
+                                                        <Binding Path="ZMotDoneView" />
+                                                    </DataTrigger.Binding>
+                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Rectangle.Style>
+                                </Rectangle>
                             </StackPanel>
                             <StackPanel
                     Grid.Row="3"                    
@@ -534,6 +581,20 @@
                                                 <DataTrigger Value="True">
                                                     <DataTrigger.Binding>
                                                         <Binding Path="UpLmtView" />
+                                                    </DataTrigger.Binding>
+                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Rectangle.Style>
+                                </Rectangle>
+                                <Rectangle>
+                                    <Rectangle.Style>
+                                        <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
+                                            <Style.Triggers>
+                                                <DataTrigger Value="True">
+                                                    <DataTrigger.Binding>
+                                                        <Binding Path="UMotDoneView" />
                                                     </DataTrigger.Binding>
                                                     <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
                                                 </DataTrigger>
@@ -752,7 +813,7 @@
                             RelativeSource="{RelativeSource Mode=FindAncestor,
                                                             AncestorType={x:Type Window}}" />
                         </Rectangle.Height>
-                        <Rectangle.Resources>
+                        <!--<Rectangle.Resources>
                             <Storyboard x:Key="WaferAnimation">
                                 <DoubleAnimation
                                 By="{Binding WvAngle}"
@@ -760,12 +821,23 @@
                                 Storyboard.TargetProperty="RenderTransform.Children[1].Angle"
                                 Duration="{Binding RotatingTime, Converter={StaticResource DoubleToDurationConverter}}" />
                             </Storyboard>
+                            <Storyboard x:Key="ResetWafer">
+                                <DoubleAnimation
+                                To="0"                                
+                                Storyboard.Target="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Rectangle}}"
+                                Storyboard.TargetProperty="RenderTransform.Children[1].Angle"
+                                Duration="0"
+                                />
+                            </Storyboard>
                         </Rectangle.Resources>
                         <i:Interaction.Triggers>
                             <i:PropertyChangedTrigger Binding="{Binding WvRotate}">
                                 <i:ControlStoryboardAction Storyboard="{StaticResource WaferAnimation}" />
                             </i:PropertyChangedTrigger>
-                        </i:Interaction.Triggers>
+                            <i:PropertyChangedTrigger Binding="{Binding ResetView}">                                
+                                <i:ControlStoryboardAction Storyboard="{StaticResource ResetWafer}" />
+                            </i:PropertyChangedTrigger>
+                        </i:Interaction.Triggers>-->
                         <Rectangle.RenderTransform>
                             <TransformGroup>
                                 <TranslateTransform>
@@ -985,8 +1057,7 @@
                                 </TranslateTransform>
                             </TransformGroup>
                         </Path.RenderTransform>
-                    </Path>                    
-                    
+                    </Path>  
                     <Line
                     Name="AnglePosition"
                     RenderTransformOrigin="0.5,1"
