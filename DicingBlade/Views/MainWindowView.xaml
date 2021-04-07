@@ -1242,10 +1242,12 @@
                     </TextBlock>
                 </Grid>
                 <Rectangle
-                Width="{Binding Path=ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}"
-                Height="{Binding Path=CutWidthView}"
-                Stroke="ForestGreen"
-                Visibility="{Binding Process.CutWidthMarkerVisibility, FallbackValue=Hidden}">
+                    Name="CutWidth"
+                    IsHitTestVisible="False"
+                    Width="{Binding Path=ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}"
+                    Height="{Binding Path=CutWidthView}"
+                    Stroke="ForestGreen"
+                    Visibility="{Binding Process.CutWidthMarkerVisibility, FallbackValue=Hidden}">
                     <Rectangle.StrokeThickness>
                         <MultiBinding Converter="{StaticResource GetRatioConverter}">
                             <Binding Source="{StaticResource CutStrokeThickness}" />
@@ -1307,7 +1309,9 @@
                     </Rectangle.RenderTransform>
                 </Rectangle>
 
-                <Line Stroke="Red" StrokeThickness="1">
+                <Line
+                    IsHitTestVisible="False"
+                    Stroke="Red" StrokeThickness="1">
                     <Line.X1>
                         <MultiBinding Converter="{StaticResource CrossConverter}" ConverterParameter="0,3">
                             <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />
@@ -1331,7 +1335,9 @@
                         </MultiBinding>
                     </Line.Y2>
                 </Line>
-                <Line Stroke="Red" StrokeThickness="1">
+                <Line
+                    IsHitTestVisible="False"
+                    Stroke="Red" StrokeThickness="1">
                     <Line.Y1>
                         <MultiBinding Converter="{StaticResource CrossConverter}" ConverterParameter="0,3">
                             <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Canvas}" />

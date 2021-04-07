@@ -34,11 +34,19 @@ namespace DicingBlade.Classes
         H
     }
     public abstract class Wafer2D
-    {        
+    {          
         protected IShape _shape;
         public double Thickness { get; protected set; }
-        protected Dictionary<int, (double angle, double index, double sideshift, double realangle)> _directions = new();
+        protected Dictionary<int, (double angle, double index, double sideshift, double realangle)> _directions;
         public int CurrentSide { get; private set; }
+        public void SetChanges(double indexH, double indexW, double thickness, IShape shape)
+        {
+            Thickness = thickness;
+            _shape = shape;
+            _directions = new();
+            _directions.Add(0, (0, indexH, 0, 0));
+            _directions.Add(1, (90, indexW, 0, 90));
+        }
         public bool XMirror { get; set; } = true;
         public int CurrentLinesCount
         {
@@ -235,10 +243,7 @@ namespace DicingBlade.Classes
     {
         public Substrate2D(double indexH, double indexW, double thickness, IShape shape)
         {
-            Thickness = thickness;
-            _shape = shape;
-            _directions.Add(0, (0, indexH, 0, 0));
-            _directions.Add(1, (90, indexW, 0, 90));
+            base.SetChanges(indexH, indexW, thickness, shape);
         }
 
     }

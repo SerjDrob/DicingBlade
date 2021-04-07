@@ -97,7 +97,7 @@ namespace DicingBlade.Classes
         private void SetConditiosStates()
         {
             _learningCondition.SetState(_learningNextDir);
-            _cutInspectCondition.SetState(_checkCut.addToCurrentCut());
+            _cutInspectCondition.SetState(_checkCut.Check);
             _workingCondition.SetState(!(SideCounter == _wafer.DirectionsCount));
             _sideDoneCondition.SetState(SideDone);
 
@@ -677,7 +677,8 @@ namespace DicingBlade.Classes
                     {
                         NextLine();
                     }
-                    if (_checkCut.addToCurrentCut()) await TakeThePhotoAsync();
+                    _checkCut.addToCurrentCut();
+                    if (_checkCut.Check) await TakeThePhotoAsync();
                     break;
 
                 case Diagram.GoCameraPointXyz:

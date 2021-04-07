@@ -80,5 +80,27 @@ namespace DicingBlade.Classes
         {
             return arr.Where(n => n.num == @enum).Select(v => v.val).First();
         }
+
+        public static int FindIndex<T>(this IEnumerable<T> items, Func<T,bool> predicate)
+        {
+            if (items is null)
+            {
+                throw new ArgumentNullException("items");
+            }
+            if (predicate is null)
+            {
+                throw new ArgumentNullException("predicate");
+            }
+            var n = 0;
+            foreach (var item in items)
+            {
+                if (predicate(item))
+                {
+                    return n;
+                }
+                n++;
+            }
+            return -1;
+        }
     }
 }

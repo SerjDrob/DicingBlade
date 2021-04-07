@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using PropertyChanged;
 using System.Windows.Media.Imaging;
+using DicingBlade.Classes;
 
 namespace DicingBlade.Classes
 {
@@ -351,8 +352,16 @@ namespace DicingBlade.Classes
                 var axesNums = _axes.Where(a => _axesGroups[group].axes.Contains(a.Key)).Select(n => n.Value.AxisNum);
                 var lineCoeffs = _axes.Where(a => _axesGroups[group].axes.Contains(a.Key)).Select(n => n.Value.LineCoefficient);
                 var gpAxes = axesNums.Zip(lineCoeffs, (a, b) => new ValueTuple<int,double>(a, b)).ToArray();
-                
+
+                var n = _axesGroups[group].axes.FindIndex(a => a == Ax.Y);
+
+                position[n] -= 0.03;
+
                 await MotionDevice.MoveGroupPreciselyAsync(gpNum, position, gpAxes);
+
+                position[n] += 0.03;
+
+                await MotionDevice.MoveAxisPreciselyAsync(_axes[Ax.Y].AxisNum, _axes[Ax.Y].LineCoefficient, position[n]);
             }
             else
             {

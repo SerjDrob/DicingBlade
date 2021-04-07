@@ -498,7 +498,8 @@ namespace DicingBlade.Classes
                     {
                         NextLine();
                     }
-                    if (_checkCut.addToCurrentCut()) await TakeThePhotoAsync();
+                    _checkCut.addToCurrentCut();
+                    if (_checkCut.Check) await TakeThePhotoAsync();
                     break;
 
                 case Diagram.GoCameraPointXyz:

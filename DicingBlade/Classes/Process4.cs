@@ -27,9 +27,8 @@ namespace DicingBlade.Classes
             _machine = machine ?? throw new ProcessException("Не выбрана установка для процесса"); ;
             _wafer = wafer ?? throw new ProcessException("Не выбрана подложка для процесса");
             _blade = blade ?? throw new ProcessException("Не выбран диск для процесса");
-            _feedSpeed = technology.FeedSpeed;
-            _undercut = technology.UnterCut;
-            
+            _technology = technology;
+            RefresfTechnology(_technology);            
             //_machine.OnSensorStateChanged += Machine_OnAirWanished;
             //_machine.OnSensorStateChanged += Machine_OnCoolWaterWanished;
             //_machine.OnSensorStateChanged += Machine_OnSpinWaterWanished;
@@ -108,6 +107,7 @@ namespace DicingBlade.Classes
             rotationSelector.CheckMyCondition  += SetConditionsStates;
             InspectLeaf.CheckMyCondition       += SetConditionsStates;
             workingTicker.CheckMyCondition     += SetConditionsStates;
+            inspectSelector.CheckMyCondition   += SetConditionsStates;
 
             _inspectX = _machine.GetGeometry(Place.CameraChuckCenter, Ax.X);
             _learningDone = false;
@@ -115,11 +115,18 @@ namespace DicingBlade.Classes
             procCount++;
         }
 
+        public void RefresfTechnology(ITechnology technology)
+        {
+            _feedSpeed = technology.FeedSpeed;
+            _undercut = technology.UnterCut;
+        }
         private async Task EndProcess()
         {
             await _machine.MoveGpInPlaceAsync(Groups.XY, Place.Loading);
+            ProcessStatus = Status.Done;
             ThrowMessage("Всё!",0);
         }
+        private ITechnology _technology;
         private async Task SetProcessStatus()
         {
             ProcessStatus = Status.Working;
@@ -129,7 +136,7 @@ namespace DicingBlade.Classes
         {
             _rotateLearningCondition.SetState(_learningNextDir);
             _learningCondition.SetState(!_learningDone);
-            _cutInspectCondition.SetState(_checkCut.addToCurrentCut());
+            _cutInspectCondition.SetState(_checkCut.Check & !_correctSelCondition.State);
             _workingCondition.SetState(ProcessStatus != Status.Ending);
             _sideDoneCondition.SetState(SideDone);
         }
@@ -189,7 +196,7 @@ namespace DicingBlade.Classes
         private Sequence _learningSequence;
         private Leaf _singleCutLeaf;
         private TempWafer2D _tempWafer2D;
-        private List<Task> _localTasks = new();
+        private List<Task> _localTasks             = new();
 
         private async Task AwaitTaskAsync(Task task)
         {
@@ -259,6 +266,7 @@ namespace DicingBlade.Classes
                         BladeTracingEvent(false);
                         IsCutting = false;
                         _lastCutY = _yActual;
+                        _checkCut.addToCurrentCut();
                         _machine.SwitchOffValve(Valves.Coolant);     
                     })
                 ,
@@ -759,7 +767,7 @@ namespace DicingBlade.Classes
         {
             if (ProcessStatus!=Status.Working & ProcessStatus !=Status.Correcting)
             {
-                await _rootSequence.DoWork();
+                /*await*/ _rootSequence.DoWork();
             }
             else
             {
@@ -772,7 +780,6 @@ namespace DicingBlade.Classes
                     CutOffset = 0;
                     PauseProcess = false;
                     _machine.FreezeVideoCapture();
-
                     _correctSelCondition.SetState(false);
                     OnProcessStatusChanged("Работа");
                     ProcessStatus = Status.Working;

@@ -90,7 +90,7 @@ namespace DicingBlade.ViewModels
         private ITechnology _technology;
         public Process4 Process { get; set; }
         public Wafer Wafer { get; set; }
-        public Substrate2D Substrate { get; private set; }
+        public Wafer2D Substrate { get; private set; }
         public WaferView WaferView { get; set; }
         public ObservableCollection<TracePath> Traces { get; set; }
         public double WvAngle { get; set; }
@@ -548,14 +548,13 @@ namespace DicingBlade.ViewModels
                             MessageBox.Show(ex.Message);
                             Process = null;
                         }
-
-
                     }
                     else
                     {
                         if (Process.ProcessStatus == Status.Done)
                         {
                             Process = null;
+                            AjustWaferTechnology();
                         }
                         else
                         {
@@ -579,29 +578,39 @@ namespace DicingBlade.ViewModels
 
             }
             if (key.Key == Key.A)
-            {                
+            {
                 if (VelocityRegime == Velocity.Step)
                 {
-                    _machine.SetVelocity(Velocity.Fast);
-                    await _machine.MoveAxInPosAsync(Ax.Y, YView + Substrate.CurrentIndex,true);
+                    var velocity = VelocityRegime;
+                    _machine.SetVelocity(Velocity.Service);
+                    var y = YView - 0.03;
+                    await _machine.MoveAxInPosAsync(Ax.Y, y + Substrate.CurrentIndex, true);
+                    await Task.Delay(300);
+                    await _machine.MoveAxInPosAsync(Ax.Y, y + 0.03 + Substrate.CurrentIndex, true);
+                    _machine.SetVelocity(velocity);
                 }
                 else
                 {
                     _machine.GoWhile(Ax.Y, AxDir.Pos);
-                }                
+                }
             }
             if (key.Key == Key.Z)
             {
                 if (VelocityRegime == Velocity.Step)
                 {
-                    _machine.SetVelocity(Velocity.Fast);
-                    await _machine.MoveAxInPosAsync(Ax.Y, YView - Substrate.CurrentIndex,true);
+                    var velocity = VelocityRegime;
+                    _machine.SetVelocity(Velocity.Service);
+                    var y = YView - 0.03;
+                    await _machine.MoveAxInPosAsync(Ax.Y, y - Substrate.CurrentIndex, true);
+                    await Task.Delay(300);
+                    await _machine.MoveAxInPosAsync(Ax.Y, y + 0.03 - Substrate.CurrentIndex, true);
+                    _machine.SetVelocity(velocity);
                 }
                 else
                 {
                     _machine.GoWhile(Ax.Y, AxDir.Neg);
                 }
-                
+
             }
             if (key.Key == Key.X)
             {
@@ -629,33 +638,35 @@ namespace DicingBlade.ViewModels
             }
             if (key.Key == Key.J)
             {
+                var velocity = VelocityRegime != Velocity.Step ? VelocityRegime : Velocity.Slow;
+                _machine.SetVelocity(Velocity.Service);
                 var x = _machine.TranslateSpecCoor(Place.CameraChuckCenter, -Substrate.CurrentSideLength / 2, Ax.X);
                 await _machine.MoveAxInPosAsync(Ax.X, x);
+                _machine.SetVelocity(velocity);
             }
             if (key.Key == Key.K) 
             {
+                var velocity = VelocityRegime != Velocity.Step ? VelocityRegime : Velocity.Slow;
+                _machine.SetVelocity(Velocity.Service);
                 var x = _machine.TranslateSpecCoor(Place.CameraChuckCenter, 0, Ax.X);
                 await _machine.MoveAxInPosAsync(Ax.X, x);
+                _machine.SetVelocity(velocity);
             }
             if (key.Key == Key.L) 
             {
+                var velocity = VelocityRegime != Velocity.Step ? VelocityRegime : Velocity.Slow;
+                _machine.SetVelocity(Velocity.Service);
                 var x = _machine.TranslateSpecCoor(Place.CameraChuckCenter, Substrate.CurrentSideLength / 2, Ax.X);
                 await _machine.MoveAxInPosAsync(Ax.X, x);
+                _machine.SetVelocity(velocity);
             }
             if (key.Key == Key.I)
             {
                 if (MessageBox.Show("Завершить процесс?", "Процесс", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
-                {
-                    //if (Process.WaitProcDoneAsync().Wait(5000))
-                    //{
+                {                    
                     await Process.WaitProcDoneAsync();   
                     Process = null;
-                    AjustWaferTechnology();
-                    //}
-                    //else
-                    //{
-                    //    MessageBox.Show("Невозможно отменить процесс. Не все задаи завершены. Подождите и попробуйте ещё раз.", "Процесс");
-                    //}
+                    AjustWaferTechnology();                   
                 }
             }
             if (key.Key == Key.Home)
@@ -1018,8 +1029,17 @@ namespace DicingBlade.ViewModels
                 }
                 else
                 {
-                    Wafer = new Wafer(new Vector2(0, 0), waf.Thickness, (0, waf.Height, waf.Width, waf.IndexH), (90, waf.Width, waf.Height, waf.IndexW));
-                    Substrate = new Substrate2D(waf.IndexH, waf.IndexW, waf.Thickness, new Rectangle2D(waf.Height, waf.Width));
+                    Wafer = new Wafer(new Vector2(0, 0), waf.Thickness, (0, waf.Height, waf.Width, waf.IndexH), (90, waf.Width, waf.Height, waf.IndexW));                   
+
+                    if (Substrate is null)
+                    {
+                        Substrate = new Substrate2D(waf.IndexH, waf.IndexW, waf.Thickness, new Rectangle2D(waf.Height, waf.Width));
+                    }
+                    else
+                    {
+                        side = Substrate.CurrentSide;
+                        Substrate.SetChanges(waf.IndexH, waf.IndexW, waf.Thickness, new Rectangle2D(waf.Height, waf.Width));
+                    }
                     if (side>0)
                     {
                         Substrate.SetSide(side);
@@ -1048,6 +1068,7 @@ namespace DicingBlade.ViewModels
 
             technologySettingsView.ShowDialog();
             _technology = new Technology().DeSerializeObjectJson(Settings.Default.TechnologyLastFile);
+            Process?.RefresfTechnology(_technology);
             Wafer?.SetPassCount(PropContainer.Technology.PassCount);
         }
         private void Change()

@@ -76,17 +76,20 @@ namespace DicingBlade.Classes
         int startCut;
         int checkInterval;
         int currentCut;
-        public bool addToCurrentCut()
+        public bool Check;
+        public void addToCurrentCut()
         {
             int res = 0;
             currentCut++;
             if (currentCut >= startCut)
             {
                 Math.DivRem(currentCut - startCut, checkInterval, out res);
-                if (res == 0) return true;
-                else return false;
+                Check = res == 0;                
             }
-            else return false;
+            else
+            {
+                Check = false;
+            }           
         }
         public void Reset()
         {
@@ -384,7 +387,8 @@ namespace DicingBlade.Classes
                     {
                         NextLine();
                     }
-                    if (_checkCut.addToCurrentCut()) await TakeThePhotoAsync();
+                    _checkCut.addToCurrentCut();
+                    if (_checkCut.Check) await TakeThePhotoAsync();
                     break;
                 case Diagram.GoCameraPointXyz:
                     _machine.SetVelocity(Velocity.Service);
