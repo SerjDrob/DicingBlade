@@ -4,12 +4,10 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <AssemblyTitle>DicingBlade</AssemblyTitle>
     <Product>DicingBlade</Product>
-    <CodeAnalysisRuleSet>DicingBlade.ruleset</CodeAnalysisRuleSet>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <LangVersion>9.0</LangVersion>
     <Nullable>disable</Nullable>
-    <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Views\cutshift.png" />
@@ -27,9 +25,6 @@
       <HintPath>.\AdvMotAPI.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="DicingBlade.ruleset" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Notes.txt" />
@@ -54,6 +49,8 @@
     <PackageReference Include="Expression.Blend.Sdk.WPF" Version="1.0.1" />
     <PackageReference Include="FluentModbus" Version="3.0.1" />
     <PackageReference Include="FluentValidation" Version="10.0.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Workspace" Version="16.3.43" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.31" />
     <PackageReference Include="netDXF" Version="2.2.0.1" />

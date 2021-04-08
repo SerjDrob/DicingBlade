@@ -5,7 +5,12 @@ VisualStudioVersion = 16.0.30413.136
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DicingBlade", "DicingBlade\DicingBlade.csproj", "{ADB02AFF-239E-4B37-B9F3-282D1503104E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DicingBladeTests", "DicingBladeTests\DicingBladeTests.csproj", "{D5A0B6F2-F1BF-4C85-B7CD-9105A8198057}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DicingBladeTests", "DicingBladeTests\DicingBladeTests.csproj", "{D5A0B6F2-F1BF-4C85-B7CD-9105A8198057}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A50488E4-D249-4857-B543-37FB703780D7}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

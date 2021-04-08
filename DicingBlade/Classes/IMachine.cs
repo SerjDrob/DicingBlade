@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DicingBlade.Classes
@@ -10,6 +8,7 @@ namespace DicingBlade.Classes
     {
         XY
     }
+
     public enum Valves
     {
         Blowing,
@@ -17,6 +16,7 @@ namespace DicingBlade.Classes
         ChuckVacuum,
         SpindleContact
     }
+
     public enum Sensors
     {
         ChuckVacuum,
@@ -24,8 +24,9 @@ namespace DicingBlade.Classes
         Coolant,
         SpindleCoolant
     }
+
     public struct MotionDeviceConfigs
-    {        
+    {
         public double maxAcc;
         public double maxDec;
         public double maxVel;
@@ -46,8 +47,9 @@ namespace DicingBlade.Classes
         public double homeVelLow;
         public double homeVelHigh;
     }
+
     public struct AxisState
-    {        
+    {
         public double cmdPos;
         public double actPos;
         public int sensors;
@@ -58,18 +60,24 @@ namespace DicingBlade.Classes
         public bool homeDone;
         public bool vhStart;
     }
+
     public delegate void AxisStateHandler(int axisNum, AxisState state);
+
     public delegate void SensorStateHandler(Sensors sensor, bool state);
+
     public delegate void ValveStateHandler(Valves valve, bool state);
-    public delegate void AxisMotioStateHandler(Ax axis, double position, bool nLmt, bool pLmt, bool motionDone, bool motionStart);
-    interface IMachine
+
+    public delegate void AxisMotioStateHandler(Ax axis, double position, bool nLmt, bool pLmt, bool motionDone,
+        bool motionStart);
+
+    internal interface IMachine
     {
         public bool MachineInit { get; set; }
-        public MotionDevice MotionDevice { get; set; }        
+        public MotionDevice MotionDevice { get; set; }
         public Velocity VelocityRegime { get; set; }
         public event SensorStateHandler OnSensorStateChanged;
         public event ValveStateHandler OnValveStateChanged;
-        public event AxisMotioStateHandler OnAxisMotionStateChanged;        
+        public event AxisMotioStateHandler OnAxisMotionStateChanged;
         public event BitmapHandler OnVideoSourceBmpChanged;
         public void StartVideoCapture(int ind);
         public void SetBridgeOnSensors(Sensors sensor, bool setBridge);
@@ -79,7 +87,7 @@ namespace DicingBlade.Classes
         public void ConfigureAxes((Ax axis, double linecoefficient)[] ax);
         public void ConfigureVelRegimes(Dictionary<Ax, Dictionary<Velocity, double>> velRegimes);
         public void AddGroup(Groups group, IAxis[] axes);
-        public void ConfigureGeometry(Dictionary<Place,(Ax, double)[]> places);
+        public void ConfigureGeometry(Dictionary<Place, (Ax, double)[]> places);
         public void ConfigureGeometry(Dictionary<Place, double> places);
         public void ConfigureAxesGroups(Dictionary<Groups, Ax[]> groups);
         public void ConfigureDoubleFeatures(Dictionary<MFeatures, double> doubleFeatures);
@@ -90,7 +98,9 @@ namespace DicingBlade.Classes
         public double GetGeometry(Place place, int arrNum);
         public double GetGeometry(Place place, Ax axis);
         public double GetAxisSetVelocity(Ax axis);
+
         #region Motions
+
         public void Stop(Ax axis);
         public Task WaitUntilAxisStopAsync(Ax axis);
         public void GoWhile(Ax axis, AxDir direction);
@@ -98,14 +108,16 @@ namespace DicingBlade.Classes
         public Task GoThereAsync(Place place, bool precisely = false);
         public Task MoveGpInPosAsync(Groups group, double[] position, bool precisely = false);
         public Task MoveGpInPlaceAsync(Groups group, Place place, bool precisely = false);
-        public Task MoveAxInPosAsync(Ax axis, double position, bool precisely = false);        
-        public Task MoveAxesInPlaceAsync(Place place);       
+        public Task MoveAxInPosAsync(Ax axis, double position, bool precisely = false);
+        public Task MoveAxesInPlaceAsync(Place place);
         public (Ax, double)[] TranslateActualCoors(Place place);
         public double TranslateActualCoors(Place place, Ax axis);
-        public (Ax, double)[] TranslateActualCoors(Place place, (Ax axis,double pos)[] position);        
+        public (Ax, double)[] TranslateActualCoors(Place place, (Ax axis, double pos)[] position);
         public double TranslateSpecCoor(Place place, double position, Ax axis);
         public void EmgScenario( /*DIEventArgs eventArgs*/);
+
         #endregion
+
         #region Settings
 
         public void SetConfigs((Ax axis, MotionDeviceConfigs configs)[] axesConfigs);
@@ -114,11 +126,14 @@ namespace DicingBlade.Classes
         public void ResetErrors(Ax axis);
 
         #endregion
+
         #region Spindle
+
         public void SetSpindleFreq(int frequency);
         public void StartSpindle();
         public void StopSpindle();
         public event Action<int, double, bool> OnSpindleStateChanging;
+
         #endregion
     }
 }

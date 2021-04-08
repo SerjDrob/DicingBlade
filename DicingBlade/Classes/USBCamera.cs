@@ -1,25 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using AForge.Imaging.Filters;
 using AForge.Video;
 using AForge.Video.DirectShow;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
-
 
 namespace DicingBlade.Classes
-{    
-    class USBCamera : IVideoCapture
-    {  
+{
+    internal class USBCamera : IVideoCapture
+    {
+        private VideoCaptureDevice _localWebCam;
+
         public void FreezeCameraImage()
         {
-            _localWebCam.SignalToStop();            
+            _localWebCam.SignalToStop();
         }
+
         public void StartCamera(int ind)
         {
             if (_localWebCam is null)
@@ -41,34 +40,38 @@ namespace DicingBlade.Classes
                 {
                     throw;
                 }
-                catch (Exception)
-                {
-                    throw;
-                }
             }
 
             _localWebCam.Start();
         }
+
         public void StopCamera()
         {
             _localWebCam.Stop();
         }
-        
-        private VideoCaptureDevice _localWebCam;
 
         public event BitmapHandler OnBitmapChanged;
+
+        public int GetDevicesCount()
+        {
+            return new FilterInfoCollection(FilterCategory.VideoInputDevice).Count;
+        }
+
         private static VideoCaptureDevice GetCamera(int ind)
         {
             var webCams = new FilterInfoCollection(FilterCategory.VideoInputDevice);
 
-            return (webCams.Count != 0)&(ind<=webCams.Count) ? new VideoCaptureDevice(webCams[ind].MonikerString) : default;
+            return (webCams.Count != 0) & (ind <= webCams.Count)
+                ? new VideoCaptureDevice(webCams[ind].MonikerString)
+                : default;
         }
+
         public async void HandleNewFrame(object sender, NewFrameEventArgs eventArgs)
         {
             try
             {
                 var filter = new Mirror(false, false);
-                using var img = (Bitmap)eventArgs.Frame.Clone();
+                using var img = (Bitmap) eventArgs.Frame.Clone();
                 filter.ApplyInPlace(img);
 
                 var ms = new MemoryStream();
@@ -81,17 +84,13 @@ namespace DicingBlade.Classes
                 bitmap.StreamSource = ms;
                 bitmap.EndInit();
                 bitmap.Freeze();
-                OnBitmapChanged?.Invoke(bitmap);                
+                OnBitmapChanged?.Invoke(bitmap);
             }
             catch (Exception ex)
             {
             }
 
             await Task.Delay(40).ConfigureAwait(false);
-        }
-        public int GetDevicesCount()
-        {
-            return new FilterInfoCollection(FilterCategory.VideoInputDevice).Count;
         }
     }
 }

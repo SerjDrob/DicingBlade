@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using DicingBlade.ViewModels;
 
 namespace DicingBlade.Views
 {
@@ -7,9 +8,11 @@ namespace DicingBlade.Views
     /// </summary>
     public partial class MainWindowView : Window
     {
-        public MainWindowView()
+        public MainWindowView(IMainViewModel viewModel)
         {
             InitializeComponent();
+
+            DataContext = viewModel;
         }
 
     }

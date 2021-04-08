@@ -5,7 +5,9 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:d1p1="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:DicingBlade"
-    d1p1:Ignorable="d">
+    d1p1:Ignorable="d"
+    Startup="HandleOnStartup"
+    Exit="HandleOnExit">
     <Application.Resources>
         <ResourceDictionary>
             <Style x:Key="Rec1" TargetType="Rectangle">

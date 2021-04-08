@@ -112,7 +112,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
-            <RowDefinition/>            
+            <RowDefinition/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto"/>
@@ -205,7 +205,7 @@
                 <!--<RowDefinition Height="*" />-->
             </Grid.RowDefinitions>
             <GroupBox
-            Grid.Row="1"            
+            Grid.Row="1"
             Grid.Column="1">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -237,7 +237,7 @@
                                     Margin="3"
                                     HorizontalAlignment="Center"
                                     Maximum="12"
-                                    Minimum="0"                                      
+                                    Minimum="0"
                                     Value="{Binding SpindleCurrentView}" />
                                     <TextBlock Text="{Binding StringFormat={}{0} A,Path=SpindleCurrentView}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Grid>
@@ -252,7 +252,7 @@
                                     Margin="3"
                                     HorizontalAlignment="Center"
                                     Maximum="12"
-                                    Minimum="0"                                      
+                                    Minimum="0"
                                     Value="{Binding SpindleCurrentView}" />
                                 <TextBlock Text="{Binding StringFormat={}{0} л/мин, Path=CoolantRateView}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Grid>
@@ -466,7 +466,7 @@
                                 </Rectangle>
                             </StackPanel>
                             <StackPanel
-                    Grid.Row="1"                    
+                    Grid.Row="1"
                     Orientation="Horizontal">
                                 <Rectangle>
                                     <Rectangle.Style>
@@ -512,7 +512,7 @@
                                 </Rectangle>
                             </StackPanel>
                             <StackPanel
-                    Grid.Row="2"                   
+                    Grid.Row="2"
                     Orientation="Horizontal">
                                 <Rectangle>
                                     <Rectangle.Style>
@@ -558,7 +558,7 @@
                                 </Rectangle>
                             </StackPanel>
                             <StackPanel
-                    Grid.Row="3"                    
+                    Grid.Row="3"
                     Orientation="Horizontal">
                                 <Rectangle>
                                     <Rectangle.Style>
@@ -702,7 +702,7 @@
             Grid.Column="1"
             BorderBrush="LightGray"
             BorderThickness="3" />
-            <DockPanel Grid.RowSpan="{Binding Rows[0]}" Grid.Column="{Binding Cols[0]}">                
+            <DockPanel Grid.RowSpan="{Binding Rows[0]}" Grid.Column="{Binding Cols[0]}">
                 <Canvas
                 Margin="3"
                 VerticalAlignment="Stretch"
@@ -823,7 +823,7 @@
                             </Storyboard>
                             <Storyboard x:Key="ResetWafer">
                                 <DoubleAnimation
-                                To="0"                                
+                                To="0"
                                 Storyboard.Target="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Rectangle}}"
                                 Storyboard.TargetProperty="RenderTransform.Children[1].Angle"
                                 Duration="0"
@@ -834,7 +834,7 @@
                             <i:PropertyChangedTrigger Binding="{Binding WvRotate}">
                                 <i:ControlStoryboardAction Storyboard="{StaticResource WaferAnimation}" />
                             </i:PropertyChangedTrigger>
-                            <i:PropertyChangedTrigger Binding="{Binding ResetView}">                                
+                            <i:PropertyChangedTrigger Binding="{Binding ResetView}">
                                 <i:ControlStoryboardAction Storyboard="{StaticResource ResetWafer}" />
                             </i:PropertyChangedTrigger>
                         </i:Interaction.Triggers>-->
@@ -860,7 +860,7 @@
                                         </MultiBinding>
                                     </TranslateTransform.Y>
                                 </TranslateTransform>
-                                <RotateTransform />                                
+                                <RotateTransform />
                                 <ScaleTransform>
                                     <ScaleTransform.ScaleX>
                                         <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
@@ -985,7 +985,7 @@
                                 <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
                                 <Binding Path="DataContext.WaferCurrentShiftView" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
                             </MultiBinding>
-                        </Path.Data>                        
+                        </Path.Data>
                     </Path>
                     <Path
                     Name="BladeTrace"
@@ -1057,7 +1057,7 @@
                                 </TranslateTransform>
                             </TransformGroup>
                         </Path.RenderTransform>
-                    </Path>  
+                    </Path>
                     <Line
                     Name="AnglePosition"
                     RenderTransformOrigin="0.5,1"
@@ -1084,7 +1084,7 @@
                         <ItemsControl.RenderTransform>
                             <TransformGroup>
                                 <RotateTransform />
-                                                                
+
                                 <ScaleTransform>
                                     <ScaleTransform.ScaleX>
                                         <MultiBinding Converter="{StaticResource ScaleCoverterScheme}">
@@ -1124,9 +1124,9 @@
                                           Y2="{Binding Path=YEnd}"
                                           StrokeThickness="0.3"
                                           Stroke="{Binding Path=Brush}"
-                                          StrokeEndLineCap="Round"                                          
+                                          StrokeEndLineCap="Round"
                                           >
-                                        
+
                                     </Line>
                                 </Canvas>
                             </DataTemplate>
@@ -1135,7 +1135,7 @@
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="MouseLeftButtonDown">
                             <i:InvokeCommandAction PassEventArgsToCommand="True" EventArgsConverter="{Binding Source={StaticResource MouseArgsCanvasConverter}}" EventArgsConverterParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}" Command="{Binding LeftClickOnWaferCmd, Mode=OneWay}"/>
-                        </i:EventTrigger>                    
+                        </i:EventTrigger>
                         <i:EventTrigger EventName="MouseRightButtonDown">
                             <i:InvokeCommandAction PassEventArgsToCommand="True" EventArgsConverter="{Binding Source={StaticResource MouseArgsCanvasConverter}}" EventArgsConverterParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}" Command="{Binding RightClickOnWaferCmd, Mode=OneWay}"/>
                         </i:EventTrigger>
@@ -1143,13 +1143,13 @@
                     <Canvas.RenderTransformOrigin>
                         <Point X="0.5"/>
                     </Canvas.RenderTransformOrigin>
-                    <Canvas.RenderTransform>                        
+                    <Canvas.RenderTransform>
                         <ScaleTransform ScaleX="-1"/>
                     </Canvas.RenderTransform>
                 </Canvas>
             </DockPanel>
-            
-            
+
+
 
             <Image
             Name="VideoImg"
