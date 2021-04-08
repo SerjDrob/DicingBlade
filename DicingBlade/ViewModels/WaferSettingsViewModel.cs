@@ -49,22 +49,22 @@ namespace DicingBlade.ViewModels
             }
             else
             {
-                ((IWafer)new TempWafer().DeSerializeObjectJson(FileName)).CopyPropertiesTo(this);
+                ((IWafer)StatMethods.DeSerializeObjectJson<TempWafer>(FileName)).CopyPropertiesTo(this);
             }
         }
         public ICommand CloseCmd { get; set; }
         public ICommand OpenFileCmd { get; set; }
         public ICommand SaveFileAsCmd { get; set; }
         public ICommand ChangeShapeCmd { get; set; }
-        public void SetCurrentIndex(double index) 
+        public void SetCurrentIndex(double index)
         {
             switch (CurrentSide)
             {
                 case 0:
-                    IndexH = index;                    
+                    IndexH = index;
                     break;
                 case 1:
-                    IndexW = index;                    
+                    IndexW = index;
                     break;
                 default:
                     break;
@@ -95,7 +95,7 @@ namespace DicingBlade.ViewModels
             if (result.HasValue && result.Value)
             {
                 FileName = dialog.FileName;
-                ((IWafer)new TempWafer().DeSerializeObjectJson(FileName)).CopyPropertiesTo(this);
+                ((IWafer)StatMethods.DeSerializeObjectJson<TempWafer>(FileName)).CopyPropertiesTo(this);
             }
         }
         private void SaveFileAs()

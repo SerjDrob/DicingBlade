@@ -35,7 +35,7 @@ namespace DicingBlade.ViewModels
             }
             else
             {
-                ((ITechnology)new Technology().DeSerializeObjectJson(FileName)).CopyPropertiesTo(this);
+                ((ITechnology)StatMethods.DeSerializeObjectJson<Technology>(FileName)).CopyPropertiesTo(this);
             }
 
         }
@@ -71,7 +71,7 @@ namespace DicingBlade.ViewModels
             if (result.HasValue && result.Value)
             {
                 FileName = dialog.FileName;
-                ((ITechnology)new Technology().DeSerializeObjectJson(FileName)).CopyPropertiesTo(this);
+                ((ITechnology)StatMethods.DeSerializeObjectJson<Technology>(FileName)).CopyPropertiesTo(this);
             }
         }
 

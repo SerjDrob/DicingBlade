@@ -1,10 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
-    <ProjectGuid>{ADB02AFF-239E-4B37-B9F3-282D1503104E}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net5.0-windows</TargetFramework>
-    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <AssemblyTitle>DicingBlade</AssemblyTitle>
     <Product>DicingBlade</Product>
     <CodeAnalysisRuleSet>DicingBlade.ruleset</CodeAnalysisRuleSet>
@@ -12,7 +9,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <LangVersion>9.0</LangVersion>
     <Nullable>disable</Nullable>
-    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Views\cutshift.png" />
@@ -52,19 +49,18 @@
   <ItemGroup>
     <PackageReference Include="AForge.Imaging" Version="2.2.5" />
     <PackageReference Include="AForge.Video.DirectShow" Version="2.2.5" />
-    <PackageReference Include="AMWD.Modbus.Common" Version="1.0.2" />
-    <PackageReference Include="AMWD.Modbus.Serial" Version="1.0.2" />
+    <PackageReference Include="AMWD.Modbus.Serial" Version="1.0.3" />
     <PackageReference Include="EasyModbusTCP" Version="5.6.0" />
     <PackageReference Include="Expression.Blend.Sdk.WPF" Version="1.0.1" />
-    <PackageReference Include="FluentModbus" Version="2.4.2" />
-    <PackageReference Include="FluentValidation" Version="9.3.0" />
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="FluentModbus" Version="3.0.1" />
+    <PackageReference Include="FluentValidation" Version="10.0.1" />
     <PackageReference Include="Microsoft.VisualStudio.Workspace" Version="16.3.43" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.31" />
     <PackageReference Include="netDXF" Version="2.2.0.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="NModbus4" Version="2.1.0" />
-    <PackageReference Include="PropertyChanged.Fody" Version="3.3.1" />
+    <PackageReference Include="PropertyChanged.Fody" Version="3.3.3" />
+    <PackageReference Include="System.Security.AccessControl" Version="5.0.0" />
+    <PackageReference Include="System.Security.Principal.Windows" Version="5.0.0" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Settings.Designer.cs">

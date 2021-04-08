@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Serialization;
 using System.IO;
-using System.Reflection;
+using System.Text.Json;
+using System.Threading.Tasks;
 using netDxf;
-using Newtonsoft.Json;
 
 namespace DicingBlade.Classes
 {
@@ -38,24 +38,37 @@ namespace DicingBlade.Classes
         {
             var plist = from prop in typeof(T).GetProperties() where prop.CanRead && prop.CanWrite select prop;
 
-            foreach (PropertyInfo prop in plist)
+            foreach (var prop in plist)
             {
                 prop.SetValue(dest, prop.GetValue(source, null), null);
             }
         }
 
+        public static async Task SerializeObjectJsonAsync(this object obj, string filename)
+        {
+            await using var file = File.Create(filename);
+            await JsonSerializer.SerializeAsync(file, obj).ConfigureAwait(false);
+        }
+
         public static void SerializeObjectJson(this object obj, string filename)
         {
-            using StreamWriter file = File.CreateText(filename);
-            JsonSerializer serializer = new JsonSerializer();
-            serializer.Serialize(file, obj);
+            var json = JsonSerializer.Serialize( obj);
+            File.WriteAllText(filename, json);
         }
-        public static T DeSerializeObjectJson<T>(this T _, string filename)
+
+        public static async Task<T> DeSerializeObjectJsonAsync<T>(string filename)
         {
-            using StreamReader file = File.OpenText(filename);
-            JsonSerializer serializer = new JsonSerializer();
-            return (T)serializer.Deserialize(file, typeof(T));
+            await using var file = File.OpenRead(filename);
+            return await JsonSerializer.DeserializeAsync<T>(file).ConfigureAwait(false);
         }
+
+        public static T DeSerializeObjectJson<T>(string filename)
+        {
+            var file = File.ReadAllText(filename);
+
+            return JsonSerializer.Deserialize<T>(file);
+        }
+
         /// <summary>
         /// Преобразует Vector3 в Vector2 отсекая Z
         /// </summary>
@@ -85,11 +98,11 @@ namespace DicingBlade.Classes
         {
             if (items is null)
             {
-                throw new ArgumentNullException("items");
+                throw new ArgumentNullException(nameof(items));
             }
             if (predicate is null)
             {
-                throw new ArgumentNullException("predicate");
+                throw new ArgumentNullException(nameof(predicate));
             }
             var n = 0;
             foreach (var item in items)

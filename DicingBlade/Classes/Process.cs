@@ -84,12 +84,12 @@ namespace DicingBlade.Classes
             if (currentCut >= startCut)
             {
                 Math.DivRem(currentCut - startCut, checkInterval, out res);
-                Check = res == 0;                
+                Check = res == 0;
             }
             else
             {
                 Check = false;
-            }           
+            }
         }
         public void Reset()
         {
@@ -359,8 +359,8 @@ namespace DicingBlade.Classes
                     tracingThread.Start();
                     await _machine.X.MoveAxisInPosAsync(target.X);
                     IsCutting = false;
-                   
-                   
+
+
                     //traces.Add(TracingLine);
 
                     RotateTransform rotateTransform = new RotateTransform(
@@ -382,7 +382,7 @@ namespace DicingBlade.Classes
                     TracesView.RawLines = new ObservableCollection<Line>(TracesView.RawLines);
                     TracingLine = null;
                     _machine.SwitchOnCoolantWater = false;
-                    
+
                     if (!_wafer.CurrentCutIncrement(CurrentLine))
                     {
                         NextLine();

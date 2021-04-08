@@ -142,7 +142,7 @@ namespace DicingBlade.ViewModels
             Test = false;
             Cols = new int[] { 0, 1 };
             Rows = new int[] { 2, 1 };
-            
+
             OpenFileCmd           = new Command(args => OpenFile());
             ChangeCmd             = new Command(args => Change());
             KeyDownCmd            = new Command(args => KeyDownAsync(args));
@@ -166,10 +166,10 @@ namespace DicingBlade.ViewModels
             _exceptionsAgregator.SetShowMethod(s => { MessageBox.Show(s); });
             _exceptionsAgregator.SetShowMethod(s => { ProcessMessage = s; });
             _cameraScale = Settings.Default.CameraScale;
-                        
+
             try
             {
-                _technology = new Technology().DeSerializeObjectJson(Settings.Default.TechnologyLastFile);
+                _technology = StatMethods.DeSerializeObjectJson<Technology>(Settings.Default.TechnologyLastFile);
 
 
                 _machine = new Machine4X();
@@ -226,7 +226,7 @@ namespace DicingBlade.ViewModels
                 Diagram.CuttingX,
                 Diagram.GoTransferingHeightZ,
                 Diagram.GoNextDirection
-            };            
+            };
 
             AjustWaferTechnology();
         }
@@ -237,13 +237,10 @@ namespace DicingBlade.ViewModels
             {
                 ProcessMessage = "Совместите горизонтальный визир с центром последнего реза и нажмите *";
                 await WaitForConfirmationAsync();
-                if (Process is not null)
-                {
-                    Process.TeachDiskShift();                    
-                }
+                Process?.TeachDiskShift();
                 _machine.ConfigureGeometry(new Dictionary<Place, (Ax, double)[]>
                 {
-                    {Place.BladeChuckCenter, new (Ax,double)[]{ (Ax.X, Settings.Default.XDisk), (Ax.Y, Settings.Default.YObjective + Settings.Default.DiskShift)} },                    
+                    {Place.BladeChuckCenter, new (Ax,double)[]{ (Ax.X, Settings.Default.XDisk), (Ax.Y, Settings.Default.YObjective + Settings.Default.DiskShift)} },
                 });
                 ProcessMessage = "";
             }
@@ -262,7 +259,7 @@ namespace DicingBlade.ViewModels
             //if (tmp?.StreamSource != null)
             //{
             //    await tmp.StreamSource.DisposeAsync().ConfigureAwait(false);
-            //}            
+            //}
         }
         private void _machine_OnAxisValveStateChanged(Valves valve, bool state)
         {
@@ -310,7 +307,7 @@ namespace DicingBlade.ViewModels
                     XView = position;
                     XpLmtView = pLmt;
                     XnLmtView = nLmt;
-                    XMotDoneView = motionStart ? true : motionDone ? false : XMotDoneView;                   
+                    XMotDoneView = motionStart ? true : motionDone ? false : XMotDoneView;
                     break;
                 case Ax.Y:
                     YView = position;
@@ -379,7 +376,7 @@ namespace DicingBlade.ViewModels
                 PointX = points[1].X * 1.4 * WaferView.ShapeSize[1];
                 PointY = points[1].Y * 1.4 * WaferView.ShapeSize[1];
             }
-            
+
             PointX = _machine.TranslateSpecCoor(Place.CameraChuckCenter, -PointX, Ax.X);
             PointY = _machine.TranslateSpecCoor(Place.CameraChuckCenter, -Substrate.GetNearestY(PointY), Ax.Y);
 
@@ -408,9 +405,9 @@ namespace DicingBlade.ViewModels
         private async Task ToTeachChipSizeAsync()
         {
             var i = Substrate.CurrentSide;
-            
+
             if (MessageBox.Show("Обучить размер кристалла?", "Обучение", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
-            {                
+            {
                 ProcessMessage = "Подведите ориентир к перекрестию и нажмите *";
                 await WaitForConfirmationAsync();
                 var y = YView;
@@ -418,23 +415,23 @@ namespace DicingBlade.ViewModels
                 await WaitForConfirmationAsync();
                 var size = Math.Round(Math.Abs(y - YView), 3);
                 ProcessMessage = "";
-               
+
                 if (MessageBox.Show($"\rНовый размер кристалла {size} мм.\n Запомнить?", "Обучение", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
                 {
-                    var tempwafer = new TempWafer().DeSerializeObjectJson(Settings.Default.WaferLastFile);
+                    var tempwafer = await StatMethods.DeSerializeObjectJsonAsync<TempWafer>(Settings.Default.WaferLastFile).ConfigureAwait(false);
                     //PropContainer.WaferTemp.CurrentSide = Substrate.CurrentSide;
                     //PropContainer.WaferTemp.SetCurrentIndex(size);//currentIndex?
                     Substrate.SetCurrentIndex(size);
                     tempwafer.CurrentSide = Substrate.CurrentSide;
                     tempwafer.SetCurrentIndex(size);
                     //new TempWafer(PropContainer.WaferTemp).SerializeObjectJson(Settings.Default.WaferLastFile);
-                    tempwafer.SerializeObjectJson(Settings.Default.WaferLastFile);
+                    await tempwafer.SerializeObjectJsonAsync(Settings.Default.WaferLastFile).ConfigureAwait(false);
                     Wafer = new Wafer(new Vector2(0, 0), tempwafer.Thickness, (0, tempwafer.Height, tempwafer.Width, tempwafer.IndexH), (90, tempwafer.Width, tempwafer.Height, tempwafer.IndexW));
                     WaferView = Wafer.MakeWaferView();
                     //AjustWaferTechnology(Substrate.CurrentSide);
                 }
             }
-        }        
+        }
         private async Task KeyDownAsync(object args)
         {
             KeyEventArgs key = (KeyEventArgs)args;
@@ -515,12 +512,12 @@ namespace DicingBlade.ViewModels
                     {
                         MessageBox.Show(ex.Message,"Запуск шпинделя");
                     }
-                    
-                }                
+
+                }
             }
             if (key.Key == Key.F3)
             {
-                
+
             }
             if (key.Key == Key.T) Change();
             if (key.Key == Key.Divide)
@@ -644,7 +641,7 @@ namespace DicingBlade.ViewModels
                 await _machine.MoveAxInPosAsync(Ax.X, x);
                 _machine.SetVelocity(velocity);
             }
-            if (key.Key == Key.K) 
+            if (key.Key == Key.K)
             {
                 var velocity = VelocityRegime != Velocity.Step ? VelocityRegime : Velocity.Slow;
                 _machine.SetVelocity(Velocity.Service);
@@ -652,7 +649,7 @@ namespace DicingBlade.ViewModels
                 await _machine.MoveAxInPosAsync(Ax.X, x);
                 _machine.SetVelocity(velocity);
             }
-            if (key.Key == Key.L) 
+            if (key.Key == Key.L)
             {
                 var velocity = VelocityRegime != Velocity.Step ? VelocityRegime : Velocity.Slow;
                 _machine.SetVelocity(Velocity.Service);
@@ -663,10 +660,10 @@ namespace DicingBlade.ViewModels
             if (key.Key == Key.I)
             {
                 if (MessageBox.Show("Завершить процесс?", "Процесс", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
-                {                    
-                    await Process.WaitProcDoneAsync();   
+                {
+                    await Process.WaitProcDoneAsync();
                     Process = null;
-                    AjustWaferTechnology();                   
+                    AjustWaferTechnology();
                 }
             }
             if (key.Key == Key.Home)
@@ -681,11 +678,11 @@ namespace DicingBlade.ViewModels
                 catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message, ex.StackTrace);
-                }                
+                }
             }
             if (key.Key == Key.OemMinus)
             {
-               await Process?.AlignWafer();                
+               await Process?.AlignWafer();
             }
             if (key.Key == Key.Subtract)
             {
@@ -719,7 +716,7 @@ namespace DicingBlade.ViewModels
 
             if (key.Key == Key.N)
             {
-                
+
                 if (Process.ProcessStatus==Status.Correcting) Process.CutOffset += 0.001;
             }
 
@@ -734,19 +731,19 @@ namespace DicingBlade.ViewModels
                     if (MessageBox.Show("Сделать одиночный рез?", "Резка", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
                     {
                         await Process.DoSingleCut();
-                    } 
+                    }
                 }
             }
             //key.Handled = true;
         }
         private void Process_OnControlPointAppeared()
         {
-            RotateTransform rotateTransform = new RotateTransform(-Substrate.CurrentSideAngle);           
-            
+            RotateTransform rotateTransform = new RotateTransform(-Substrate.CurrentSideAngle);
+
             var point = new TranslateTransform(-CCCenterXView, -CCCenterYView).Transform(new(XView, YView));
             var point1 = rotateTransform.Transform(new(point.X - 1,point.Y + WaferCurrentShiftView));
             var point2 = rotateTransform.Transform(new(point.X + 1, point.Y + WaferCurrentShiftView));
-            List<TraceLine> temp = new(ControlPointsView);            
+            List<TraceLine> temp = new(ControlPointsView);
             temp.ForEach(br => br.Brush = Brushes.Blue);
             temp.Add(new() { XStart=point1.X,XEnd=point2.X,YStart=point1.Y,YEnd=point2.Y, Brush = Brushes.OrangeRed});
             ControlPointsView = new(temp);
@@ -771,7 +768,7 @@ namespace DicingBlade.ViewModels
             }
             else
             {
-                _tracingTaskCancellationTokenSource.Cancel();                
+                _tracingTaskCancellationTokenSource.Cancel();
 
                     RotateTransform rotateTransform = new RotateTransform(
                        //-Wafer.GetCurrentDiretionAngle,
@@ -797,7 +794,7 @@ namespace DicingBlade.ViewModels
                     XTrace = new double();
                     YTrace = new double();
                     XTraceEnd = new double();
-               
+
                 try
                 {
                     await _tracingTask;
@@ -1022,14 +1019,15 @@ namespace DicingBlade.ViewModels
 
             if (File.Exists(fileName))
             {
-                ((IWafer)new TempWafer().DeSerializeObjectJson(fileName)).CopyPropertiesTo(waf);
+                // TODO ASYNC
+                ((IWafer)StatMethods.DeSerializeObjectJson<TempWafer>(fileName)).CopyPropertiesTo(waf);
                 if (waf.IsRound)
                 {
                     Wafer = new Wafer(new Vector2(0, 0), waf.Thickness, waf.Diameter, (0, waf.IndexW), (90, waf.IndexH));
                 }
                 else
                 {
-                    Wafer = new Wafer(new Vector2(0, 0), waf.Thickness, (0, waf.Height, waf.Width, waf.IndexH), (90, waf.Width, waf.Height, waf.IndexW));                   
+                    Wafer = new Wafer(new Vector2(0, 0), waf.Thickness, (0, waf.Height, waf.Width, waf.IndexH), (90, waf.Width, waf.Height, waf.IndexW));
 
                     if (Substrate is null)
                     {
@@ -1049,7 +1047,8 @@ namespace DicingBlade.ViewModels
             fileName = Settings.Default.TechnologyLastFile;
             if (File.Exists(fileName))
             {
-                ((ITechnology)new Technology().DeSerializeObjectJson(fileName)).CopyPropertiesTo(tech);
+                // TODO ASYNC
+                ((ITechnology)StatMethods.DeSerializeObjectJson<Technology>(fileName)).CopyPropertiesTo(tech);
                 PropContainer.Technology = tech;
                 Wafer.SetPassCount(PropContainer.Technology.PassCount);
                 WaferView = Wafer.MakeWaferView();
@@ -1067,7 +1066,9 @@ namespace DicingBlade.ViewModels
             };
 
             technologySettingsView.ShowDialog();
-            _technology = new Technology().DeSerializeObjectJson(Settings.Default.TechnologyLastFile);
+
+            // TODO ASYNC
+            _technology = StatMethods.DeSerializeObjectJson<Technology>(Settings.Default.TechnologyLastFile);
             Process?.RefresfTechnology(_technology);
             Wafer?.SetPassCount(PropContainer.Technology.PassCount);
         }

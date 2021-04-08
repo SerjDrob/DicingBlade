@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 using System.Windows;
 
 namespace DicingBlade.Classes
-{    
+{
     internal class MotionDevice : IDisposable, IMessager
     {
         public MotionDevice()
         {
             _bridges = new Dictionary<int, int>();
             var device = GetAvailableDevs().First();
-            DeviceHandle = OpenDevice(device);            
+            DeviceHandle = OpenDevice(device);
         }
         public int AxisCount { get; set; }
         private IntPtr[] _mAxishand;// = new IntPtr[32];
@@ -25,11 +25,11 @@ namespace DicingBlade.Classes
         public event Action<string,int> ThrowMessage;
 
         public bool DevicesConnection()
-        {            
+        {
             try
-            {                
+            {
                 AxisCount = GetAxisCount();
-            }            
+            }
             //catch (MotionException e)
             //{
             //    MessageBox.Show(e.Message);
@@ -47,26 +47,26 @@ namespace DicingBlade.Classes
             {
                 result = Motion.mAcm_AxOpen(DeviceHandle, (ushort)i, ref _mAxishand[i]);
                 if (!Success(result))
-                {                    
-                    throw new MotionException($"Open Axis Failed With Error Code: [0x{result:X}]");                   
+                {
+                    throw new MotionException($"Open Axis Failed With Error Code: [0x{result:X}]");
                 }
 
                 double cmdPosition = 0;
-               
+
                 result = Motion.mAcm_AxSetCmdPosition(_mAxishand[i], cmdPosition);
-                
+
                 result = Motion.mAcm_AxSetActualPosition(_mAxishand[i], cmdPosition);
 
                 axisEnableEvent[i] |= (uint)EventType.EVT_AX_MOTION_DONE;
                 axisEnableEvent[i] |= (uint)EventType.EVT_AX_VH_START;
                 axisEnableEvent[i] |= (uint)EventType.EVT_AX_HOME_DONE;
-                axisEnableEvent[i] |= (uint)EventType.EVT_AX_VH_START;                
+                axisEnableEvent[i] |= (uint)EventType.EVT_AX_VH_START;
             }
 
             result = Motion.mAcm_EnableMotionEvent(MotionDevice.DeviceHandle, axisEnableEvent, gpEnableEvent, (uint)AxisCount, 1);
             if (!Success(result))
-            {                
-                throw new MotionException($"Enable motion events Failed With Error Code: [0x{result:X}]");                
+            {
+                throw new MotionException($"Enable motion events Failed With Error Code: [0x{result:X}]");
             }
 
             //X = new Axis(0, MAxishand[0], 0);
@@ -79,7 +79,7 @@ namespace DicingBlade.Classes
             //_axes[Z.AxisNum] = Z;
             //_axes[U.AxisNum] = U;
 
-            
+
 
             // _spindleModbus.Connect();
 
@@ -98,13 +98,13 @@ namespace DicingBlade.Classes
             var ioStatus = new uint();
             var position = new double();
             var bitData = new byte();
-           
-            
+
+
             while (true)
-            {    
-                eventResult = Motion.mAcm_CheckMotionEvent(MotionDevice.DeviceHandle, axEvtStatusArray, gpEvtStatusArray, (uint)AxisCount, 0, 10);                           
+            {
+                eventResult = Motion.mAcm_CheckMotionEvent(MotionDevice.DeviceHandle, axEvtStatusArray, gpEvtStatusArray, (uint)AxisCount, 0, 10);
                 for (int num = 0; num < _mAxishand.Length; num++)
-                { 
+                {
                     var axState = new AxisState();
                     IntPtr ax = _mAxishand[num];
                     result = Motion.mAcm_AxGetMotionIO(ax, ref ioStatus);
@@ -120,7 +120,7 @@ namespace DicingBlade.Classes
                         result = Motion.mAcm_AxDiGetBit(ax, (ushort)channel, ref bitData);
                         if (Success(result))
                         {
-                            axState.sensors = bitData != 0 ?  axState.sensors.SetBit(channel) : axState.sensors.ResetBit(channel);                            
+                            axState.sensors = bitData != 0 ?  axState.sensors.SetBit(channel) : axState.sensors.ResetBit(channel);
                         }
                     }
                     var bridge = 0;
@@ -129,7 +129,7 @@ namespace DicingBlade.Classes
                         bridge = _bridges[num];
                     }
                     var sensors = axState.sensors;
-                    axState.sensors |= bridge; 
+                    axState.sensors |= bridge;
 
                     if (Success(Motion.mAcm_AxDoGetByte(ax, 0, ref bitData))) axState.outs = bitData;
 
@@ -145,35 +145,35 @@ namespace DicingBlade.Classes
                         axState.homeDone = (axEvtStatusArray[num] & (uint)EventType.EVT_AX_HOME_DONE) > 0;
                         axState.vhStart = (axEvtStatusArray[num] & (uint)EventType.EVT_AX_VH_START) > 0;
                     }
-                    
+
                     TransmitAxState(num, axState);
                 }
-                 Task.Delay(1).Wait();                
+                 Task.Delay(1).Wait();
             }
         }
         public int FormAxesGroup(int[] axisNums)
-        {            
+        {
             if (_mGpHand == null)
             {
                 _mGpHand = new List<IntPtr>();
             }
             var hand = new IntPtr();
             for (int i = 0; i < axisNums.Length; i++)
-            {                
+            {
                 var result = Motion.mAcm_GpAddAxis(ref hand, _mAxishand[axisNums[i]]);
                 if (!Success(result))
                 {
-                    throw new MotionException($"Open Axis Failed With Error Code: [0x{result:X}]");                    
-                }               
+                    throw new MotionException($"Open Axis Failed With Error Code: [0x{result:X}]");
+                }
             }
             _mGpHand.Add(hand);
             return _mGpHand.IndexOf(hand);
         }
         public async Task MoveAxisContiniouslyAsync(int axisNum, AxDir dir)
-        {            
+        {
             Motion.mAcm_AxMoveVel(_mAxishand[axisNum], (ushort)dir);
         }
-        public async Task MoveAxesByCoorsAsync((int axisNum, double position)[] ax) 
+        public async Task MoveAxesByCoorsAsync((int axisNum, double position)[] ax)
         {
             if (ax.Where(ind => ind.axisNum > _mAxishand.Length - 1).Count() != 0)
             {
@@ -182,7 +182,7 @@ namespace DicingBlade.Classes
             foreach (var item in ax)
             {
                 Motion.mAcm_AxMoveAbs(_mAxishand[item.axisNum], item.position);
-            }            
+            }
         }
         public async Task MoveAxesByCoorsPrecAsync((int axisNum, double position, double lineCoefficient)[] ax)
         {
@@ -194,9 +194,9 @@ namespace DicingBlade.Classes
             foreach (var item in ax)
             {
                 MoveAxisPreciselyAsync(item.axisNum, item.lineCoefficient, item.position);
-            }            
+            }
         }
-        private double CalcActualPosition(int axisNum, double lineCoefficient) 
+        private double CalcActualPosition(int axisNum, double lineCoefficient)
         {
             var result = new uint();
             var position = new double();
@@ -212,10 +212,10 @@ namespace DicingBlade.Classes
                 if (Success(result)) { throw new MotionException($"Get command position Failed With Error Code: [0x{result:X}]"); }
             }
 
-            return position;           
-        }               
+            return position;
+        }
         public void SetAxisVelocity(int axisNum,double vel)
-        {            
+        {
             var velHigh = vel;
             var velLow = vel/ 2;
 
@@ -272,7 +272,7 @@ namespace DicingBlade.Classes
             }
         }
         public void SetGroupVelocity(int groupNum, double velocity)
-        {           
+        {
             double velHigh = velocity;
             var velLow = velHigh / 2;
             var result = Motion.mAcm_SetProperty(_mGpHand[groupNum], (uint)PropertyID.PAR_GpVelLow, ref velLow, 8);
@@ -324,8 +324,7 @@ namespace DicingBlade.Classes
         }
         public void SetAxisDout(int axisNum, ushort dOut, bool val)
         {
-            var b = new byte();
-            b = val ? 1 : 0;
+            var b = val ? (byte)1 : (byte)0;
             var result  = Motion.mAcm_AxDoSetBit(_mAxishand[axisNum], dOut, b);
             if (!Success(result))
             {
@@ -336,7 +335,7 @@ namespace DicingBlade.Classes
         {
             var data = new byte();
             Motion.mAcm_AxDoGetBit(_mAxishand[axisNum], dOut, ref data);
-            return data != 0 ? true : false;
+            return data != 0;
         }
         public void SetAxisConfig(int axisNum, MotionDeviceConfigs configs)
         {
@@ -374,11 +373,11 @@ namespace DicingBlade.Classes
 
             //res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.CFG_AxDirLogic, ref configs.axDirLogic, 4); errors.Add(PropertyID.CFG_AxDirLogic, res);
             //res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.CFG_AxGenDoEnable, ref configs.plsOutMde, 4); errors.Add(PropertyID.CFG_AxGenDoEnable, res);
-            res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.CFG_AxHomeResetEnable, ref configs.reset, 4); errors.Add(PropertyID.CFG_AxHomeResetEnable, res);            
-            res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.CFG_AxPPU, ref ppu, 4); errors.Add(PropertyID.CFG_AxPPU, res);     
+            res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.CFG_AxHomeResetEnable, ref configs.reset, 4); errors.Add(PropertyID.CFG_AxHomeResetEnable, res);
+            res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.CFG_AxPPU, ref ppu, 4); errors.Add(PropertyID.CFG_AxPPU, res);
             res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.CFG_AxMaxAcc, ref axMaxAcc, 8); errors.Add(PropertyID.CFG_AxMaxAcc, res);
             res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.CFG_AxMaxDec, ref axMaxDec, 8); errors.Add(PropertyID.CFG_AxMaxDec, res);
-            res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.CFG_AxMaxVel, ref axMaxVel, 8); errors.Add(PropertyID.CFG_AxMaxVel, res);            
+            res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.CFG_AxMaxVel, ref axMaxVel, 8); errors.Add(PropertyID.CFG_AxMaxVel, res);
             res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.CFG_AxPulseInLogic, ref configs.plsInLogic, 4); errors.Add(PropertyID.CFG_AxPulseInLogic, res);
             res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.CFG_AxPulseInMode, ref configs.plsInMde, 4); errors.Add(PropertyID.CFG_AxPulseInMode, res);
             //res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.CFG_AxPulseInSource, ref configs.plsInSrc, 4); errors.Add(PropertyID.CFG_AxPulseInSource, res);
@@ -387,7 +386,7 @@ namespace DicingBlade.Classes
             res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.PAR_AxDec, ref dec, 8); errors.Add(PropertyID.PAR_AxDec, res);
             res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.PAR_AxJerk, ref jerk, 8); errors.Add(PropertyID.PAR_AxJerk, res);
             res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.PAR_AxHomeVelLow, ref homeVelLow,8); errors.Add(PropertyID.PAR_AxHomeVelLow, res);
-            res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.PAR_AxHomeVelHigh, ref homeVelHigh,8); errors.Add(PropertyID.PAR_AxHomeVelHigh, res);            
+            res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.PAR_AxHomeVelHigh, ref homeVelHigh,8); errors.Add(PropertyID.PAR_AxHomeVelHigh, res);
             res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.CFG_AxSwPelEnable, ref buf, 4); errors.Add(PropertyID.CFG_AxPelEnable, res);
 
             var errorText = new string("");
@@ -395,7 +394,7 @@ namespace DicingBlade.Classes
             {
                 errorText+= $"Axis №{axisNum} In {error.Key} has {(ErrorCode)error.Value}\n";
             }
-            if(errorText.Count()!=0) throw new MotionException(errorText);
+            if(errorText.Length != 0) throw new MotionException(errorText);
         }
         public void SetGroupConfig(int gpNum, MotionDeviceConfigs configs)
         {
@@ -414,8 +413,7 @@ namespace DicingBlade.Classes
             res = Motion.mAcm_SetProperty(_mGpHand[gpNum], (uint)PropertyID.CFG_GpPPU, ref ppu, 4);
             res = Motion.mAcm_SetProperty(_mGpHand[gpNum], (uint)PropertyID.PAR_GpAcc, ref acc, 8);
             res = Motion.mAcm_SetProperty(_mGpHand[gpNum], (uint)PropertyID.PAR_GpDec, ref dec, 8);
-            res = Motion.mAcm_SetProperty(_mGpHand[gpNum], (uint)PropertyID.PAR_GpJerk, ref jerk, 8);                    
-            
+            res = Motion.mAcm_SetProperty(_mGpHand[gpNum], (uint)PropertyID.PAR_GpJerk, ref jerk, 8);
         }
         private double GetAxisVelocity(int axisNum)
         {
@@ -434,7 +432,7 @@ namespace DicingBlade.Classes
             uint ppu = 0;
             uint res = 0;
             var tolerance = 0.003;
-            
+
             ushort direction = 0;
 
             Motion.mAcm_GetProperty(_mAxishand[axisNum], (uint)PropertyID.CFG_AxPPU, ref ppu, ref bufLength);
@@ -446,7 +444,7 @@ namespace DicingBlade.Classes
             {
                 var diff = position - CalcActualPosition(axisNum, lineCoefficient);
                 if (Math.Abs(diff) > tolerance)
-                {                    
+                {
                     Motion.mAcm_AxResetError(_mAxishand[axisNum]);
                     buf = (uint)SwLmtReact.SLMT_IMMED_STOP;
                     res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.CFG_AxSwPelReact, ref buf, 4);
@@ -490,7 +488,7 @@ namespace DicingBlade.Classes
                             slmtn = status & (uint)Ax_Motion_IO.AX_MOTION_IO_SLMTN;
                         } while ((slmtp == 0) & (slmtn == 0));
                     }
-                    );                    
+                    );
                     SetAxisVelocity(axisNum, 1);
                     Motion.mAcm_AxSetCmdPosition(_mAxishand[axisNum], CalcActualPosition(axisNum, lineCoefficient));
                     await MoveAxisPreciselyAsync(axisNum,lineCoefficient, position, ++rec);
@@ -518,7 +516,7 @@ namespace DicingBlade.Classes
         }
         public void ResetAxisCounter(int axisNum)
         {
-            var result = Motion.mAcm_AxSetCmdPosition(_mAxishand[axisNum], 0);            
+            var result = Motion.mAcm_AxSetCmdPosition(_mAxishand[axisNum], 0);
             result = Motion.mAcm_AxSetActualPosition(_mAxishand[axisNum], 0);
         }
         public async Task HomeMoving((int axisNum, double vel, uint mode)[] axVels)
@@ -532,7 +530,7 @@ namespace DicingBlade.Classes
                    return;
                 }
             }
-            
+
             ResetErrors();
             var result = new uint();
             foreach (var axvel in axVels)
@@ -543,16 +541,16 @@ namespace DicingBlade.Classes
                 }
                 catch (Exception ex)
                 {
-                    ThrowMessage?.Invoke($"{ex.StackTrace} :\n {ex.Message}",0);                    
+                    ThrowMessage?.Invoke($"{ex.StackTrace} :\n {ex.Message}",0);
                     break;
-                }                
+                }
 
                 result = Motion.mAcm_AxHome(_mAxishand[axvel.axisNum], axvel.mode, (uint)HomeDir.NegDir);
-                
+
                 if (!Success(result))
                 {
-                  ThrowMessage?.Invoke($"Ось № {axvel.axisNum} прервало движение домой с ошибкой {(ErrorCode)result}",0);  
-                }                                
+                  ThrowMessage?.Invoke($"Ось № {axvel.axisNum} прервало движение домой с ошибкой {(ErrorCode)result}",0);
+                }
             }
         }
         public async Task MoveGroupAsync(int groupNum, double[] position)
@@ -564,7 +562,7 @@ namespace DicingBlade.Classes
             uint bufLength = 8;
 
 
-            Motion.mAcm_GpResetError(_mGpHand[groupNum]);            
+            Motion.mAcm_GpResetError(_mGpHand[groupNum]);
             Motion.mAcm_GpMoveLinearAbs(_mGpHand[groupNum], position, ref elements);
             await Task.Run(() =>
             {
@@ -593,7 +591,7 @@ namespace DicingBlade.Classes
 
             //X.MotionDone = true;
             //Y.MotionDone = true;
-            
+
 
             for (int i = 0; i < gpAxes.Length; i++)
             {
@@ -602,14 +600,14 @@ namespace DicingBlade.Classes
 
         }
         public async Task MoveAxisAsync(int axisNum, double position)
-        {           
-            Motion.mAcm_AxMoveAbs(_mAxishand[axisNum], position);           
+        {
+            Motion.mAcm_AxMoveAbs(_mAxishand[axisNum], position);
         }
         private static IntPtr OpenDevice(in DEV_LIST device)
         {
             var deviceHandle = IntPtr.Zero;
             var result = Motion.mAcm_DevOpen(device.DeviceNum, ref deviceHandle);
-            
+
             if (!Success(result))
             {
                 throw new MotionException($"Open Device Failed With Error Code: [0x{result:X}]");
