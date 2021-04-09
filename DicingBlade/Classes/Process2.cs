@@ -156,7 +156,7 @@ namespace DicingBlade.Classes
             }
         }
 
-        public static int procCount = 0;
+        public static int ProcCount = 0;
         private void _machine_OnSensorStateChanged(Sensors sensor, bool state)
         {
             switch (sensor)
@@ -287,7 +287,7 @@ namespace DicingBlade.Classes
         }
         public async Task DoProcessAsync(Diagram[] diagrams)
         {
-            procCount++;
+            ProcCount++;
             if (!InProcess)
             {
                 PauseProcess = false;
@@ -498,7 +498,7 @@ namespace DicingBlade.Classes
                     {
                         NextLine();
                     }
-                    _checkCut.addToCurrentCut();
+                    _checkCut.AddToCurrentCut();
                     if (_checkCut.Check) await TakeThePhotoAsync();
                     break;
 
@@ -510,7 +510,7 @@ namespace DicingBlade.Classes
                     x = _machine.GetGeometry(Place.CameraChuckCenter, Ax.X);
                     y = _wafer.GetCurrentLine(CurrentLine != 0 ? CurrentLine - 1 : 0).start.Y - _machine.GetFeature(MFeatures.CameraBladeOffset);
                     y = _machine.TranslateSpecCoor(Place.BladeChuckCenter,-y,Ax.Y);
-                    await _machine.MoveGpInPosAsync(Groups.XY, new double[] { x, y }, true);
+                    await _machine.MoveGpInPosAsync(Groups.Xy, new double[] { x, y }, true);
 
 
                     await _machine.MoveAxInPosAsync(Ax.Z, _machine.GetFeature(MFeatures.CameraFocus));
@@ -530,7 +530,7 @@ namespace DicingBlade.Classes
                 case Diagram.GoWaferCenterXy:
                     if (BladeInWafer) break;
                     _machine.SetVelocity(Velocity.Service);
-                    await _machine.MoveGpInPlaceAsync(Groups.XY, Place.CameraChuckCenter);                    
+                    await _machine.MoveGpInPlaceAsync(Groups.Xy, Place.CameraChuckCenter);                    
                     break;
                 case Diagram.GoNextCutY:
                     if (BladeInWafer) break;
@@ -545,7 +545,7 @@ namespace DicingBlade.Classes
                     y = _wafer.GetCurrentLine(CurrentLine).start.Y;
                     var arr = _machine.TranslateActualCoors(Place.BladeChuckCenter, new (Ax,double)[] {(Ax.X, -x),(Ax.Y, -y) });                    
                     var xy = new double[] { arr.GetVal(Ax.X), arr.GetVal(Ax.Y) };                                                        
-                    await _machine.MoveGpInPosAsync(Groups.XY, xy, true);
+                    await _machine.MoveGpInPosAsync(Groups.Xy, xy, true);
                     break;
                 case Diagram.GoTransferingHeightZ:
                     _machine.SetVelocity(Velocity.Service);
@@ -577,7 +577,7 @@ namespace DicingBlade.Classes
                     y = _wafer.GetNearestCut(0).StartPoint.Y;                    
                     arr = _machine.TranslateActualCoors(Place.CameraChuckCenter, new (Ax,double)[] { (Ax.X, 0), (Ax.Y,-y) });
                     var point = new double[] { arr.GetVal(Ax.X), arr.GetVal(Ax.Y) };
-                    await _machine.MoveGpInPosAsync(Groups.XY, point);                    
+                    await _machine.MoveGpInPosAsync(Groups.Xy, point);                    
                     await _machine.MoveAxInPosAsync( Ax.Z, /*Machine.CameraFocus*/3.5);
                     break;
                 default:

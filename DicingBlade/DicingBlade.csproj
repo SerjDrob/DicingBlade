@@ -58,6 +58,7 @@
     <PackageReference Include="Expression.Blend.Sdk.WPF" Version="1.0.1" />
     <PackageReference Include="FluentModbus" Version="2.4.2" />
     <PackageReference Include="FluentValidation" Version="9.3.0" />
+    <PackageReference Include="JetBrains.Annotations" Version="2021.1.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Microsoft.VisualStudio.Workspace" Version="16.3.43" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.31" />

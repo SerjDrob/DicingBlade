@@ -11,9 +11,9 @@ namespace DicingBlade.Classes
     {
         public BehaviourTree(Sequence root)
         {
-            this.root = root;
+            this._root = root;
         }
-        private Sequence root;
+        private Sequence _root;
     }
     
     class Sequence : DoMyWork
@@ -39,11 +39,11 @@ namespace DicingBlade.Classes
         {
             _withinCollection = false;
             _success = true;
-            _imWorking = false;
+            ImWorking = false;
         }
         public override async Task<bool> DoWork()
         {
-            if (!_imWorking)
+            if (!ImWorking)
             {
                 if (!_withinCollection)
                 {
@@ -62,9 +62,9 @@ namespace DicingBlade.Classes
                 if (_withinCollection)
                 {
                     var worker = _enumerator.Current;
-                    _imWorking = true;
+                    ImWorking = true;
                     _success = await worker.DoWork();
-                    _imWorking = false;
+                    ImWorking = false;
                 }
                 CheckMyCondition?.Invoke();
                 if (!_withinCollection & !_myCondition.State)
@@ -280,17 +280,17 @@ namespace DicingBlade.Classes
     }
     public abstract class DoMyWork
     {
-        protected string _myName;
-        protected bool _imWorking = false;
+        protected string MyName;
+        protected bool ImWorking = false;
         public void SetMyName(string name)
         {
-            _myName = name;
+            MyName = name;
         }
         public event Action<string> KnowMyName;
         public abstract event Action CheckMyCondition;
         public virtual async Task<bool> DoWork() 
         {
-            KnowMyName?.Invoke(_myName);    
+            KnowMyName?.Invoke(MyName);    
             return true;
         }
     }

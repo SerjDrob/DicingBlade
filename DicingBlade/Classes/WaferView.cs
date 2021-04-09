@@ -10,10 +10,9 @@ namespace DicingBlade.Classes
     [AddINotifyPropertyChangedInterface]
     public class WaferView
     {
-        public WaferView(ICollection<Line> rawLines, Vector2 center)
+        public WaferView(ICollection<Line> rawLines)
         {
             RawLines = new ObservableCollection<Line>(rawLines);
-            GridCenter = new Vector2(center.X, center.Y);
             ShapeSize = GetSize();
             Angle = 0;
         }
@@ -33,6 +32,5 @@ namespace DicingBlade.Classes
             };
         }
         public double[] ShapeSize { get; private set; }
-        private Vector2 GridCenter { get; set; }
     }
 }

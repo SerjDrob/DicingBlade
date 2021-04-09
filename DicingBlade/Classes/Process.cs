@@ -37,16 +37,17 @@ namespace DicingBlade.Classes
         GoCurPositionCutXy
     }
 
+    [Flags]
     internal enum Status
     {
-        None,
-        StartLearning,
-        Learning,
-        Working,
-        Correcting,
-        Done,
-        MovingNextDir,
-        Ending
+        None = 1,
+        StartLearning = 2,
+        Learning = 4,
+        Working = 8,
+        Correcting = 16,
+        Done = 32,
+        MovingNextDir = 64,
+        Ending = 128
     }
     /// <summary>
     /// Структура параметров процесса
@@ -73,17 +74,17 @@ namespace DicingBlade.Classes
     }
     struct CheckCutControl
     {
-        int startCut;
-        int checkInterval;
-        int currentCut;
+        int _startCut;
+        int _checkInterval;
+        int _currentCut;
         public bool Check;
-        public void addToCurrentCut()
+        public void AddToCurrentCut()
         {
             int res = 0;
-            currentCut++;
-            if (currentCut >= startCut)
+            _currentCut++;
+            if (_currentCut >= _startCut)
             {
-                Math.DivRem(currentCut - startCut, checkInterval, out res);
+                Math.DivRem(_currentCut - _startCut, _checkInterval, out res);
                 Check = res == 0;                
             }
             else
@@ -93,13 +94,13 @@ namespace DicingBlade.Classes
         }
         public void Reset()
         {
-            currentCut = 0;
+            _currentCut = 0;
         }
         public void Set(int start, int interval)
         {
-            currentCut = 0;
-            checkInterval = interval;
-            startCut = start;
+            _currentCut = 0;
+            _checkInterval = interval;
+            _startCut = start;
         }
     }
     //public delegate void SetPause(bool pause);
@@ -387,7 +388,7 @@ namespace DicingBlade.Classes
                     {
                         NextLine();
                     }
-                    _checkCut.addToCurrentCut();
+                    _checkCut.AddToCurrentCut();
                     if (_checkCut.Check) await TakeThePhotoAsync();
                     break;
                 case Diagram.GoCameraPointXyz:

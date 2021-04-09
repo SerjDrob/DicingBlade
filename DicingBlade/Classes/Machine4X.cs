@@ -14,12 +14,12 @@ namespace DicingBlade.Classes
     {
         public Machine4X() 
         {
-            _videoCamera = new USBCamera();            
-            _videoCamera.OnBitmapChanged += GetBitmap;
+            VideoCamera = new UsbCamera();            
+            VideoCamera.OnBitmapChanged += GetBitmap;
             try
             {
-                _spindle = new Spindle3();
-                _spindle.GetSpindleState += _spindle_GetSpindleState;
+                Spindle = new Spindle3();
+                Spindle.GetSpindleState += _spindle_GetSpindleState;
             }
             catch (SpindleException ex)
             {
@@ -47,21 +47,21 @@ namespace DicingBlade.Classes
             if (_axes != null)
             {
                 var axis = _axes.Where(a => a.Value.AxisNum == axisNum).First().Key;
-                _axes[axis].ActualPosition = state.actPos * _axes[axis].LineCoefficient;
-                _axes[axis].CmdPosition = state.cmdPos;
-                _axes[axis].DIs = state.sensors;
-                _axes[axis].DOs = state.outs;
-                _axes[axis].LmtN = state.nLmt;
-                _axes[axis].LmtP = state.pLmt;
-                _axes[axis].HomeDone = state.homeDone;
-                _axes[axis].MotionDone = state.motionDone;
+                _axes[axis].ActualPosition = state.ActPos * _axes[axis].LineCoefficient;
+                _axes[axis].CmdPosition = state.CmdPos;
+                _axes[axis].DIs = state.Sensors;
+                _axes[axis].DOs = state.Outs;
+                _axes[axis].LmtN = state.NLmt;
+                _axes[axis].LmtP = state.PLmt;
+                _axes[axis].HomeDone = state.HomeDone;
+                _axes[axis].MotionDone = state.MotionDone;
                 var position = _axes[axis].ActualPosition;
                 if (_axes[axis].LineCoefficient == 0)
                 {
-                    position = state.cmdPos;
+                    position = state.CmdPos;
                 }
                 
-                OnAxisMotionStateChanged?.Invoke(axis, position, state.nLmt, state.pLmt, state.motionDone, state.vhStart);
+                OnAxisMotionStateChanged?.Invoke(axis, position, state.NLmt, state.PLmt, state.MotionDone, state.VhStart);
 
                 foreach (var sensor in Enum.GetValues(typeof(Sensors)))
                 {
@@ -99,8 +99,8 @@ namespace DicingBlade.Classes
         public Velocity VelocityRegime { get; set; } = default;
         public bool MachineInit { get; set; }
         public MotionDevice MotionDevice { get; set; }
-        private ISpindle _spindle { get; set; }
-        private IVideoCapture _videoCamera { get; set; }
+        private ISpindle Spindle { get; set; }
+        private IVideoCapture VideoCamera { get; set; }
         
         public event SensorStateHandler OnSensorStateChanged;
         public event ValveStateHandler OnValveStateChanged;
@@ -466,12 +466,12 @@ namespace DicingBlade.Classes
 
         public void StartVideoCapture(int ind)
         {
-            _videoCamera.StartCamera(ind);
+            VideoCamera.StartCamera(ind);
         }
 
         public void FreezeVideoCapture()
         {
-            _videoCamera.FreezeCameraImage();
+            VideoCamera.FreezeCameraImage();
         }
 
         public void ConfigureGeometry(Dictionary<Place, double> places)
@@ -585,17 +585,17 @@ namespace DicingBlade.Classes
 
         public void SetSpindleFreq(int frequency)
         {
-            _spindle.SetSpeed((ushort)frequency);
+            Spindle.SetSpeed((ushort)frequency);
         }
 
         public void StartSpindle()
         {
-            _spindle.Start();
+            Spindle.Start();
         }
 
         public void StopSpindle()
         {
-            _spindle.Stop();
+            Spindle.Stop();
         }
     }
 }

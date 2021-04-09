@@ -957,8 +957,8 @@
                                 <Binding Path="YView" />
                                 <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Canvas}" />
                                 <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Canvas}" />
-                                <Binding Path="BCCenterXView" />
-                                <Binding Path="BCCenterYView" />
+                                <Binding Path="BcCenterXView" />
+                                <Binding Path="BcCenterYView" />
                                 <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
                                 <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
                                 <Binding Path="DataContext.WaferCurrentShiftView"  RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
@@ -979,8 +979,8 @@
                                 <Binding Path="YView" />
                                 <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Canvas}" />
                                 <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Canvas}" />
-                                <Binding Path="CCCenterXView" />
-                                <Binding Path="CCCenterYView" />
+                                <Binding Path="CcCenterXView" />
+                                <Binding Path="CcCenterYView" />
                                 <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
                                 <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
                                 <Binding Path="DataContext.WaferCurrentShiftView" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
@@ -1000,8 +1000,8 @@
                                 <Binding Path="XTraceEnd" />
                                 <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Canvas}" />
                                 <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Canvas}" />
-                                <Binding Path="DataContext.BCCenterXView" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
-                                <Binding Path="DataContext.BCCenterYView" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                <Binding Path="DataContext.BcCenterXView" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
+                                <Binding Path="DataContext.BcCenterYView" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
                                 <Binding Path="DataContext.WaferView.ShapeSize[0]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
                                 <Binding Path="DataContext.WaferView.ShapeSize[1]" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
                                 <Binding Path="DataContext.WaferCurrentShiftView" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />

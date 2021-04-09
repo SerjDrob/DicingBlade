@@ -110,8 +110,8 @@ namespace DicingBlade.Classes
                     result = Motion.mAcm_AxGetMotionIO(ax, ref ioStatus);
                     if (Success(result))
                     {
-                        axState.nLmt = (ioStatus & (uint)Ax_Motion_IO.AX_MOTION_IO_LMTN) > 0;
-                        axState.pLmt = (ioStatus & (uint)Ax_Motion_IO.AX_MOTION_IO_LMTP) > 0;
+                        axState.NLmt = (ioStatus & (uint)Ax_Motion_IO.AX_MOTION_IO_LMTN) > 0;
+                        axState.PLmt = (ioStatus & (uint)Ax_Motion_IO.AX_MOTION_IO_LMTP) > 0;
                     }
 
                     var data = 0;
@@ -120,7 +120,7 @@ namespace DicingBlade.Classes
                         result = Motion.mAcm_AxDiGetBit(ax, (ushort)channel, ref bitData);
                         if (Success(result))
                         {
-                            axState.sensors = bitData != 0 ?  axState.sensors.SetBit(channel) : axState.sensors.ResetBit(channel);                            
+                            axState.Sensors = bitData != 0 ?  axState.Sensors.SetBit(channel) : axState.Sensors.ResetBit(channel);                            
                         }
                     }
                     var bridge = 0;
@@ -128,22 +128,22 @@ namespace DicingBlade.Classes
                     {
                         bridge = _bridges[num];
                     }
-                    var sensors = axState.sensors;
-                    axState.sensors |= bridge; 
+                    var sensors = axState.Sensors;
+                    axState.Sensors |= bridge; 
 
-                    if (Success(Motion.mAcm_AxDoGetByte(ax, 0, ref bitData))) axState.outs = bitData;
+                    if (Success(Motion.mAcm_AxDoGetByte(ax, 0, ref bitData))) axState.Outs = bitData;
 
                     result = Motion.mAcm_AxGetCmdPosition(ax, ref position);
-                    if (Success(result)) axState.cmdPos = position;
+                    if (Success(result)) axState.CmdPos = position;
 
                     result = Motion.mAcm_AxGetActualPosition(ax, ref position);
-                    if (Success(result)) axState.actPos = position;
+                    if (Success(result)) axState.ActPos = position;
 
                     if (Success(eventResult))
                     {
-                        axState.motionDone = (axEvtStatusArray[num] & (uint)EventType.EVT_AX_MOTION_DONE) > 0;
-                        axState.homeDone = (axEvtStatusArray[num] & (uint)EventType.EVT_AX_HOME_DONE) > 0;
-                        axState.vhStart = (axEvtStatusArray[num] & (uint)EventType.EVT_AX_VH_START) > 0;
+                        axState.MotionDone = (axEvtStatusArray[num] & (uint)EventType.EVT_AX_MOTION_DONE) > 0;
+                        axState.HomeDone = (axEvtStatusArray[num] & (uint)EventType.EVT_AX_HOME_DONE) > 0;
+                        axState.VhStart = (axEvtStatusArray[num] & (uint)EventType.EVT_AX_VH_START) > 0;
                     }
                     
                     TransmitAxState(num, axState);
@@ -357,32 +357,32 @@ namespace DicingBlade.Classes
             //uint buf = 0;
             //WaferLoadCenter = new Vector2(Settings.Default.XLoad, Settings.Default.YLoad);
             uint res;
-            var acc = configs.acc;
-            var dec = configs.dec;
-            var jerk = configs.jerk;
-            var ppu = configs.ppu;
-            double axMaxAcc = configs.maxAcc;
-            double axMaxDec = configs.maxDec;
+            var acc = configs.Acc;
+            var dec = configs.Dec;
+            var jerk = configs.Jerk;
+            var ppu = configs.Ppu;
+            double axMaxAcc = configs.MaxAcc;
+            double axMaxDec = configs.MaxDec;
             var axisMaxVel = 4000000;
             double axMaxVel = axisMaxVel / ppu;//configs.maxVel*ppu;
             var buf = (uint)SwLmtEnable.SLMT_DIS;
             var errors = new Dictionary<PropertyID, uint>();
 
-            double homeVelLow = configs.homeVelLow;
-            double homeVelHigh = configs.homeVelHigh;
+            double homeVelLow = configs.HomeVelLow;
+            double homeVelHigh = configs.HomeVelHigh;
 
 
             //res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.CFG_AxDirLogic, ref configs.axDirLogic, 4); errors.Add(PropertyID.CFG_AxDirLogic, res);
             //res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.CFG_AxGenDoEnable, ref configs.plsOutMde, 4); errors.Add(PropertyID.CFG_AxGenDoEnable, res);
-            res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.CFG_AxHomeResetEnable, ref configs.reset, 4); errors.Add(PropertyID.CFG_AxHomeResetEnable, res);            
+            res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.CFG_AxHomeResetEnable, ref configs.Reset, 4); errors.Add(PropertyID.CFG_AxHomeResetEnable, res);            
             res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.CFG_AxPPU, ref ppu, 4); errors.Add(PropertyID.CFG_AxPPU, res);     
             res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.CFG_AxMaxAcc, ref axMaxAcc, 8); errors.Add(PropertyID.CFG_AxMaxAcc, res);
             res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.CFG_AxMaxDec, ref axMaxDec, 8); errors.Add(PropertyID.CFG_AxMaxDec, res);
             res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.CFG_AxMaxVel, ref axMaxVel, 8); errors.Add(PropertyID.CFG_AxMaxVel, res);            
-            res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.CFG_AxPulseInLogic, ref configs.plsInLogic, 4); errors.Add(PropertyID.CFG_AxPulseInLogic, res);
-            res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.CFG_AxPulseInMode, ref configs.plsInMde, 4); errors.Add(PropertyID.CFG_AxPulseInMode, res);
+            res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.CFG_AxPulseInLogic, ref configs.PlsInLogic, 4); errors.Add(PropertyID.CFG_AxPulseInLogic, res);
+            res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.CFG_AxPulseInMode, ref configs.PlsInMde, 4); errors.Add(PropertyID.CFG_AxPulseInMode, res);
             //res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.CFG_AxPulseInSource, ref configs.plsInSrc, 4); errors.Add(PropertyID.CFG_AxPulseInSource, res);
-            res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.CFG_AxPulseOutMode, ref configs.plsOutMde, 4); errors.Add(PropertyID.CFG_AxPulseOutMode, res);
+            res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.CFG_AxPulseOutMode, ref configs.PlsOutMde, 4); errors.Add(PropertyID.CFG_AxPulseOutMode, res);
             res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.PAR_AxAcc, ref acc, 8); errors.Add(PropertyID.PAR_AxAcc, res);
             res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.PAR_AxDec, ref dec, 8); errors.Add(PropertyID.PAR_AxDec, res);
             res = Motion.mAcm_SetProperty(_mAxishand[axisNum], (uint)PropertyID.PAR_AxJerk, ref jerk, 8); errors.Add(PropertyID.PAR_AxJerk, res);
@@ -400,10 +400,10 @@ namespace DicingBlade.Classes
         public void SetGroupConfig(int gpNum, MotionDeviceConfigs configs)
         {
             var res = new uint();
-            var acc = configs.acc;
-            var dec = configs.dec;
-            var jerk = configs.jerk;
-            var ppu = configs.ppu;
+            var acc = configs.Acc;
+            var dec = configs.Dec;
+            var jerk = configs.Jerk;
+            var ppu = configs.Ppu;
             double axMaxAcc = 180;
             double axMaxDec = 180;
             double axMaxVel = 50;

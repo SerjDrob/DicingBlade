@@ -149,7 +149,7 @@ namespace DicingBlade.Classes
                     tempRaws.Add(new Line(startPoint, endPoint));
                 }
             }
-            return new WaferView(tempRaws, GridCenter);
+            return new WaferView(tempRaws);
         }
         private void GenerateLinesD()
         {

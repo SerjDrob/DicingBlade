@@ -12,6 +12,7 @@ namespace DicingBlade.ViewModels
     internal class WaferSettingsViewModel : IWafer
     {
         private bool _isRound;
+        private readonly SettingsChangeService _settingsChanged;
         public bool IsRound
         {
             get => _isRound;
@@ -30,8 +31,10 @@ namespace DicingBlade.ViewModels
         public string FileName { get; set; }
         public Visibility SquareVisibility { get; set; }
         public Wafer Wafer { get; set; }
-        public WaferSettingsViewModel()
+
+        public WaferSettingsViewModel(SettingsChangeService settingsChangeService)
         {
+            _settingsChanged = settingsChangeService;
             CloseCmd = new Command(args => ClosingWnd());
             OpenFileCmd = new Command(args => OpenFile());
             SaveFileAsCmd = new Command(args => SaveFileAs());
@@ -71,13 +74,13 @@ namespace DicingBlade.ViewModels
             };
         }
         public int CurrentSide { get; set; }
-
         private void ClosingWnd()
         {
             PropContainer.WaferTemp = this;
             new TempWafer(PropContainer.WaferTemp).SerializeObjectJson(FileName);
             Settings.Default.WaferLastFile = FileName;
             Settings.Default.Save();
+            _settingsChanged.SetChangedObject(this);
         }
 
         private void ChangeShape()

@@ -7,6 +7,7 @@ namespace DicingBlade
 {
     public struct ProcParams
     {
-        public double currentShift;
+        public double CurrentShift;
+        public int CurrentSide;
     }
 }

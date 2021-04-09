@@ -12,15 +12,15 @@ namespace DicingBlade.Classes
     }
     public class ExceptionsAgregator
     {
-        private static readonly ExceptionsAgregator instance = new ExceptionsAgregator();
+        private static readonly ExceptionsAgregator Instance = new ExceptionsAgregator();
         private ExceptionsAgregator()
         {            
         }
-        private List<Action<string>> _MessagesActions = new();
+        private List<Action<string>> _messagesActions = new();
 
         public static ExceptionsAgregator GetExceptionsAgregator()
         {            
-            return instance;
+            return Instance;
         }
         public void RegisterMessager(IMessager messager)
         {
@@ -28,17 +28,17 @@ namespace DicingBlade.Classes
         }
         public void SetShowMethod(Action<string> method)
         {
-            _MessagesActions.Add(method);
+            _messagesActions.Add(method);
             //ShowMessage = method;
         }
         //private Action<string> ShowMessage;
         private void Messager_ThrowMessage(string message, int methodNum)
         {
-            if (methodNum<0 | methodNum > _MessagesActions.Count-1)
+            if (methodNum<0 | methodNum > _messagesActions.Count-1)
             {
                 throw new Exception();
             }
-            _MessagesActions[methodNum]?.Invoke(message);
+            _messagesActions[methodNum]?.Invoke(message);
             //ShowMessage?.Invoke(message);
         }
     }

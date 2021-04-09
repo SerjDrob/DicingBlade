@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace DicingBlade.Classes.Tests
 {
     [TestClass()]
-    public class USBCameraTests
+    public class UsbCameraTests
     {
         [TestMethod()]
         public void StartCameraTest()

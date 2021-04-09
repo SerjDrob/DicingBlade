@@ -22,31 +22,31 @@ namespace DicingBlade.Classes
             }
         }
         private ModbusSerialMaster _client;
-        private SerialPort serialPort;
-        private readonly object modbusLock = new object();
+        private SerialPort _serialPort;
+        private readonly object _modbusLock = new object();
         /// <summary>
         /// 300 Hz = 18000 rpm
         /// </summary>
-        private const ushort _lowFreqLimit = 3000;
+        private const ushort LowFreqLimit = 3000;
         /// <summary>
         /// 550 Hz = 33000 rpm
         /// </summary>
-        private const ushort _highFreqLimit = 5500;
+        private const ushort HighFreqLimit = 5500;
         private bool EstablishConnection(string com)
         {
-            serialPort = new SerialPort();
+            _serialPort = new SerialPort();
 
-            serialPort.PortName = com;
-            serialPort.BaudRate = 9600;
+            _serialPort.PortName = com;
+            _serialPort.BaudRate = 9600;
             //serialPort.DataBits = 8;
-            serialPort.Parity = Parity.Even;
+            _serialPort.Parity = Parity.Even;
             //serialPort.StopBits = StopBits.One;
-            serialPort.WriteTimeout = 1000;
-            serialPort.ReadTimeout = 1000;            
-            serialPort.Open();           
-            if (serialPort.IsOpen)
+            _serialPort.WriteTimeout = 1000;
+            _serialPort.ReadTimeout = 1000;            
+            _serialPort.Open();           
+            if (_serialPort.IsOpen)
             {
-                _client = ModbusSerialMaster.CreateRtu(serialPort);
+                _client = ModbusSerialMaster.CreateRtu(_serialPort);
             }
             else
             {
@@ -64,7 +64,7 @@ namespace DicingBlade.Classes
                 {
                     try
                     {
-                        lock (modbusLock)
+                        lock (_modbusLock)
                         {
                             var data = _client.ReadHoldingRegisters(1, 0xD000, 2);
                             int current = data[1];
@@ -87,15 +87,15 @@ namespace DicingBlade.Classes
 
         private bool SetParams()
         {
-            lock (modbusLock)
+            lock (_modbusLock)
             {
                 _client.WriteMultipleRegisters(1, 0xF000, new ushort[]
                 {
                     0,
                     5000,
                     2,
-                    _lowFreqLimit,//500,//lower limiting frequency/10
-                    _highFreqLimit,//upper limiting frequency/10
+                    LowFreqLimit,//500,//lower limiting frequency/10
+                    HighFreqLimit,//upper limiting frequency/10
                     900//acceleration time/10                
                 });
                 
@@ -128,19 +128,19 @@ namespace DicingBlade.Classes
         }
         public void SetSpeed(ushort rpm)
         {
-            if (!((rpm / 6 > _lowFreqLimit) && (rpm / 6 < _highFreqLimit)))
+            if (!((rpm / 6 > LowFreqLimit) && (rpm / 6 < HighFreqLimit)))
             {
-                throw new SpindleException($"{rpm}rpm is out of ({_lowFreqLimit*6},{_highFreqLimit*6}) rpm range");
+                throw new SpindleException($"{rpm}rpm is out of ({LowFreqLimit*6},{HighFreqLimit*6}) rpm range");
             }
             rpm = (ushort)Math.Abs(rpm / 6);
-            lock (modbusLock)
+            lock (_modbusLock)
             {
                 _client.WriteSingleRegister(1, 0xF001, rpm);
             }            
         }
         public void Start()
         {
-            lock (modbusLock)
+            lock (_modbusLock)
             {
                 _client.WriteSingleRegister(1, 0x1001, 0x0001);                
             }
@@ -148,7 +148,7 @@ namespace DicingBlade.Classes
 
         public void Stop()
         {
-            lock (modbusLock)
+            lock (_modbusLock)
             {                
                 _client.WriteSingleRegister(1, 0x1001, 0x0003);
             }
@@ -156,7 +156,7 @@ namespace DicingBlade.Classes
 
         ~Spindle3()
         {
-            serialPort.Dispose();
+            _serialPort.Dispose();
             _client.Dispose();
         }
     }

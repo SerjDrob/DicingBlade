@@ -14,7 +14,7 @@ using System.IO;
 
 namespace DicingBlade.Classes
 {    
-    class USBCamera : IVideoCapture
+    class UsbCamera : IVideoCapture
     {  
         public void FreezeCameraImage()
         {

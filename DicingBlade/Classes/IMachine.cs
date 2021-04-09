@@ -8,7 +8,7 @@ namespace DicingBlade.Classes
 {
     public enum Groups
     {
-        XY
+        Xy
     }
     public enum Valves
     {
@@ -26,37 +26,37 @@ namespace DicingBlade.Classes
     }
     public struct MotionDeviceConfigs
     {        
-        public double maxAcc;
-        public double maxDec;
-        public double maxVel;
-        public int axDirLogic; // (int)DirLogic.DIR_ACT_HIGH;
-        public int plsInLogic; // (int)PulseInLogic.NOT_SUPPORT;
-        public int plsInMde; // (int)PulseInMode.AB_4X;
-        public int plsInSrc; // (int)PulseInSource.NOT_SUPPORT;
-        public int plsOutMde; // (int)PulseOutMode.OUT_DIR;
-        public int reset; // (int)HomeReset.HOME_RESET_EN;
-        public double acc;
-        public double dec;
-        public int jerk;
-        public int ppu;
-        public uint cmpEna; // (uint)CmpEnable.CMP_EN;
-        public uint cmpMethod; // (uint)CmpMethod.MTD_GREATER_POSITION;
-        public uint cmpSrcAct; // (uint)CmpSource.SRC_ACTUAL_POSITION;
-        public uint cmpSrcCmd; // (uint)CmpSource.SRC_COMMAND_POSITION;
-        public double homeVelLow;
-        public double homeVelHigh;
+        public double MaxAcc;
+        public double MaxDec;
+        public double MaxVel;
+        public int AxDirLogic; // (int)DirLogic.DIR_ACT_HIGH;
+        public int PlsInLogic; // (int)PulseInLogic.NOT_SUPPORT;
+        public int PlsInMde; // (int)PulseInMode.AB_4X;
+        public int PlsInSrc; // (int)PulseInSource.NOT_SUPPORT;
+        public int PlsOutMde; // (int)PulseOutMode.OUT_DIR;
+        public int Reset; // (int)HomeReset.HOME_RESET_EN;
+        public double Acc;
+        public double Dec;
+        public int Jerk;
+        public int Ppu;
+        public uint CmpEna; // (uint)CmpEnable.CMP_EN;
+        public uint CmpMethod; // (uint)CmpMethod.MTD_GREATER_POSITION;
+        public uint CmpSrcAct; // (uint)CmpSource.SRC_ACTUAL_POSITION;
+        public uint CmpSrcCmd; // (uint)CmpSource.SRC_COMMAND_POSITION;
+        public double HomeVelLow;
+        public double HomeVelHigh;
     }
     public struct AxisState
     {        
-        public double cmdPos;
-        public double actPos;
-        public int sensors;
-        public int outs;
-        public bool pLmt;
-        public bool nLmt;
-        public bool motionDone;
-        public bool homeDone;
-        public bool vhStart;
+        public double CmdPos;
+        public double ActPos;
+        public int Sensors;
+        public int Outs;
+        public bool PLmt;
+        public bool NLmt;
+        public bool MotionDone;
+        public bool HomeDone;
+        public bool VhStart;
     }
     public delegate void AxisStateHandler(int axisNum, AxisState state);
     public delegate void SensorStateHandler(Sensors sensor, bool state);

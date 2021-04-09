@@ -49,7 +49,7 @@ namespace DicingBlade.Classes
             {
                 _spindleModbus = new ModbusClient("COM1");
                 //StartCamera();
-                VideoCamera = new USBCamera();
+                VideoCamera = new UsbCamera();
                 VideoCamera.StartCamera(0);
                 DevicesConnection();
                 SetConfigs();

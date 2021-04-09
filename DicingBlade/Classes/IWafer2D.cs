@@ -33,43 +33,43 @@ namespace DicingBlade.Classes
         W,
         H
     }
-    public abstract class Wafer2D
+    public abstract class Wafer2D: ICloneable
     {          
-        protected IShape _shape;
+        protected IShape Shape;
         public double Thickness { get; protected set; }
-        protected Dictionary<int, (double angle, double index, double sideshift, double realangle)> _directions;
+        protected Dictionary<int, (double angle, double index, double sideshift, double realangle)> Directions;
         public int CurrentSide { get; private set; }
         public void SetChanges(double indexH, double indexW, double thickness, IShape shape)
         {
             Thickness = thickness;
-            _shape = shape;
-            _directions = new();
-            _directions.Add(0, (0, indexH, 0, 0));
-            _directions.Add(1, (90, indexW, 0, 90));
+            Shape = shape;
+            Directions = new();
+            Directions.Add(0, (0, indexH, 0, 0));
+            Directions.Add(1, (90, indexW, 0, 90));
         }
         public bool XMirror { get; set; } = true;
         public int CurrentLinesCount
         {
             get
             {
-                return (int)Math.Floor(_shape.GetIndexSide(CurrentSide) / CurrentIndex);
+                return (int)Math.Floor(Shape.GetIndexSide(CurrentSide) / CurrentIndex);
             }
         }
         public double CurrentIndex 
         {
-            get => _directions[CurrentSide].index;            
+            get => Directions[CurrentSide].index;            
         }
         public int SidesCount
         {
-            get => _directions.Count;
+            get => Directions.Count;
         }
         public double CurrentSideAngle
         {
-            get => _directions[CurrentSide].angle;
+            get => Directions[CurrentSide].angle;
         }
         public double CurrentSideActualAngle
         {
-            get => _directions[CurrentSide].realangle;
+            get => Directions[CurrentSide].realangle;
         }
         private double _prevSideAngle = 0;
         public double PrevSideAngle { get => _prevSideAngle; }
@@ -77,44 +77,44 @@ namespace DicingBlade.Classes
         public double PrevSideActualAngle { get => _prevSideActualAngle; }
         public void SetSide(int side)
         {
-            if (side < 0 | side > _directions.Count - 1)
+            if (side < 0 | side > Directions.Count - 1)
             {
                 throw new Exception("");
             }
             else
             {
-                _prevSideAngle = _directions[CurrentSide].angle;
-                _prevSideActualAngle = _directions[CurrentSide].realangle;
+                _prevSideAngle = Directions[CurrentSide].angle;
+                _prevSideActualAngle = Directions[CurrentSide].realangle;
                 CurrentSide = side;
             }
         }
         public void SetCurrentIndex(double index)
         {
-            var tuple = _directions[CurrentSide];
-            _directions[CurrentSide] = (tuple.angle, index, tuple.sideshift, tuple.realangle);
+            var tuple = Directions[CurrentSide];
+            Directions[CurrentSide] = (tuple.angle, index, tuple.sideshift, tuple.realangle);
         }
         public double CurrentSideLength 
         { 
             get 
             {
-                return _shape.GetLengthSide(CurrentSide);
+                return Shape.GetLengthSide(CurrentSide);
             }
         }
         public double CurrentShift
         {
             get
             {
-                return _directions[CurrentSide].sideshift;
+                return Directions[CurrentSide].sideshift;
             }
         }
         public void SetShape(IShape shape)
         {
-            _shape = shape;
+            Shape = shape;
         }
         public double GetNearestY(double y)
         {
-            var side = _shape.GetIndexSide(CurrentSide);
-            var index = _directions[CurrentSide].index;
+            var side = Shape.GetIndexSide(CurrentSide);
+            var index = Directions[CurrentSide].index;
             var bias = (side - Math.Floor(side / index) * index) / 2;
 
             var num = 0;
@@ -129,8 +129,8 @@ namespace DicingBlade.Classes
         }
         public Line2D GetNearestCut(double y)
         {
-            var side = _shape.GetLengthSide(CurrentSide);
-            var index = _directions[CurrentSide].index;
+            var side = Shape.GetLengthSide(CurrentSide);
+            var index = Directions[CurrentSide].index;
             var num = 0;
             if ((num = GetNearestNum(y)) != -1)
             {
@@ -143,8 +143,8 @@ namespace DicingBlade.Classes
         }
         private int GetNearestNum(double y)
         {
-            var side = _shape.GetIndexSide(CurrentSide);
-            var index = _directions[CurrentSide].index;
+            var side = Shape.GetIndexSide(CurrentSide);
+            var index = Directions[CurrentSide].index;
             var bias = (side - Math.Floor(side / index) * index) / 2;
 
             var ypos = y + side / 2;
@@ -163,22 +163,22 @@ namespace DicingBlade.Classes
         }
         public void TeachSideShift(double y)
         {
-            _directions[CurrentSide] = (_directions[CurrentSide].angle, _directions[CurrentSide].index, -y + GetNearestY(y), _directions[CurrentSide].realangle);
+            Directions[CurrentSide] = (Directions[CurrentSide].angle, Directions[CurrentSide].index, -y + GetNearestY(y), Directions[CurrentSide].realangle);
         }
         public void AddToSideShift(double delta)
         {
-            _directions[CurrentSide] = (_directions[CurrentSide].angle, _directions[CurrentSide].index, _directions[CurrentSide].sideshift + delta, _directions[CurrentSide].realangle);
+            Directions[CurrentSide] = (Directions[CurrentSide].angle, Directions[CurrentSide].index, Directions[CurrentSide].sideshift + delta, Directions[CurrentSide].realangle);
         }
         public void TeachSideAngle(double angle)
         {
-            _directions[CurrentSide] = (_directions[CurrentSide].angle, _directions[CurrentSide].index, _directions[CurrentSide].sideshift, angle);
+            Directions[CurrentSide] = (Directions[CurrentSide].angle, Directions[CurrentSide].index, Directions[CurrentSide].sideshift, angle);
         }
         public Line2D this[int cutNum]
         {
             get 
             {   
-                var angle = _directions[CurrentSide].angle;
-                var line = _shape.GetLine2D(CurrentIndex, cutNum, angle);
+                var angle = Directions[CurrentSide].angle;
+                var line = Shape.GetLine2D(CurrentIndex, cutNum, angle);
                 var sign = XMirror ? -1 : 1;
                 line.Start.X *= sign;
                 line.End.X *= sign;
@@ -191,6 +191,11 @@ namespace DicingBlade.Classes
             {
                 return zratio * Thickness;
             }
+        }
+
+        public object Clone()
+        {
+            return this.MemberwiseClone();
         }
     }
     public class Rectangle2D : IShape

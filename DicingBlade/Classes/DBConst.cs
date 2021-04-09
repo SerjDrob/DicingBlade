@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace DicingBlade.Classes
 {
-    public static class DBConst
+    public static class DbConst
     {
-        public const double ANYPLACE = double.MaxValue;
+        public const double Anyplace = double.MaxValue;
     }
 }

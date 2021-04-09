@@ -18,7 +18,7 @@ namespace DicingBlade.Classes
             }
         }
         private ModbusRtuClient _client;
-        private readonly object modbusLock = new object();
+        private readonly object _modbusLock = new object();
         private bool EstablishConnection(string com)
         {
             _client = new ModbusRtuClient()
@@ -39,7 +39,7 @@ namespace DicingBlade.Classes
                 {
                     try
                     {
-                        lock (modbusLock)
+                        lock (_modbusLock)
                         {
                             var data = _client.ReadHoldingRegisters(1, 0xD000, 2);
                             //int current = (data[2] << 8) | data[3];
@@ -67,7 +67,7 @@ namespace DicingBlade.Classes
 
         public void Start()
         {
-            lock (modbusLock)
+            lock (_modbusLock)
             {
                 _client.WriteSingleRegister(1, 0x1001, 0x0001);
                // _client.WriteMultipleRegisters(1, 0x1001, new short[] { 0x0001 });
@@ -77,7 +77,7 @@ namespace DicingBlade.Classes
 
         public void Stop()
         {
-            lock (modbusLock)
+            lock (_modbusLock)
             {
                 _client.WriteSingleRegister(1, 0x1001, 0x0003);
             }
