@@ -13,7 +13,6 @@ namespace DicingBlade.Classes
         public WaferView(ICollection<Line> rawLines, Vector2 center)
         {
             RawLines = new ObservableCollection<Line>(rawLines);
-            GridCenter = new Vector2(center.X, center.Y);
             ShapeSize = GetSize();
             Angle = 0;
         }
@@ -32,7 +31,11 @@ namespace DicingBlade.Classes
                 RawLines.Max(l=>l.StartPoint.Y>l.EndPoint.Y?l.StartPoint.Y:l.EndPoint.Y)-RawLines.Min(l=>l.StartPoint.Y<l.EndPoint.Y?l.StartPoint.Y:l.EndPoint.Y)
             };
         }
-        public double[] ShapeSize { get; private set; }
-        private Vector2 GridCenter { get; set; }
+
+        public double[] ShapeSize
+        {
+            get => GetSize();
+            private set { throw new System.NotImplementedException(); }
+        }
     }
 }

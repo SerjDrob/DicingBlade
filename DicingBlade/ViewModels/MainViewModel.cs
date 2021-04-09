@@ -14,7 +14,9 @@ using DicingBlade.Classes;
 using DicingBlade.Properties;
 using DicingBlade.Views;
 using netDxf;
+using netDxf.Entities;
 using PropertyChanged;
+using Point = System.Windows.Point;
 
 namespace DicingBlade.ViewModels
 {
@@ -31,6 +33,7 @@ namespace DicingBlade.ViewModels
         private CancellationToken _tracingTaskCancellationToken;
 
         private CancellationTokenSource _tracingTaskCancellationTokenSource;
+        private WatchSettingsService _settingsService;
 
         [Obsolete("Only for design data", true)]
         public MainViewModel()
@@ -135,8 +138,39 @@ namespace DicingBlade.ViewModels
                 Diagram.GoTransferingHeightZ,
                 Diagram.GoNextDirection
             };
-
+            _settingsService = new();
+            _settingsService.OnSettingsChangedEvent += _settingsService_OnSettingsChangedEvent;
             AjustWaferTechnology();
+        }
+
+        private void _settingsService_OnSettingsChangedEvent(object sender, SettingsChangedEventArgs eventArgs)
+        {
+
+            if (eventArgs.Settings is IWafer)
+            {
+                var wf = (IWafer)eventArgs.Settings;
+                Substrate2D substrate = new(wf.IndexH, wf.IndexW, wf.Thickness, new Rectangle2D(wf.Width, wf.Height));
+                substrate.SetSide(Process?.CurrentDirection ?? 0);
+                var shift = 0;
+                WaferView = new();
+                for (int i = 0; i < substrate.SidesCount; i++)
+                {
+                    substrate.SetSide(substrate.CurrentSide + i + shift);
+                    for (int j = 0; j < substrate.CurrentLinesCount; j++)
+                    {
+                        
+                        WaferView.RawLines.Add(new Line(new Vector2(substrate[j].Start.X, substrate[j].Start.Y), new Vector2(substrate[j].End.X, substrate[j].End.Y)));
+                    }
+
+                    if (substrate.CurrentSide == substrate.SidesCount - 1)
+                    {
+                        shift = -(i + 1);
+                    }
+                }
+
+                var size = WaferView.ShapeSize;
+            }
+
         }
 
         public Velocity VelocityRegime { get; set; } = Velocity.Fast;
@@ -536,6 +570,7 @@ namespace DicingBlade.ViewModels
                             Process.OnProcessStatusChanged += Process_OnProcessStatusChanged;
                             Process.OnProcParamsChanged += Process_OnProcParamsChanged;
                             Process.OnControlPointAppeared += Process_OnControlPointAppeared;
+                            _settingsService.OnSettingsChangedEvent += Process.SubstrateChanged;
                         }
                         catch (Exception ex)
                         {
@@ -803,7 +838,7 @@ namespace DicingBlade.ViewModels
         {
             var waferSettingsView = new WaferSettingsView
             {
-                DataContext = new WaferSettingsViewModel()
+                DataContext = new WaferSettingsViewModel(_settingsService)
             };
 
             waferSettingsView.ShowDialog();
@@ -1004,14 +1039,14 @@ namespace DicingBlade.ViewModels
                         Substrate = new Substrate2D(waf.IndexH, waf.IndexW, waf.Thickness,
                             new Rectangle2D(waf.Height, waf.Width));
                     }
-                    else
-                    {
-                        side = Substrate.CurrentSide;
-                        Substrate.SetChanges(waf.IndexH, waf.IndexW, waf.Thickness,
-                            new Rectangle2D(waf.Height, waf.Width));
-                    }
+                    //else
+                    //{
+                    //    side = Substrate.CurrentSide;
+                    //    Substrate.SetChanges(waf.IndexH, waf.IndexW, waf.Thickness,
+                    //        new Rectangle2D(waf.Height, waf.Width));
+                    //}
 
-                    if (side > 0) Substrate.SetSide(side);
+                    //if (side > 0) Substrate.SetSide(side);
                 }
             }
 
@@ -1021,8 +1056,8 @@ namespace DicingBlade.ViewModels
                 // TODO ASYNC
                 ((ITechnology) StatMethods.DeSerializeObjectJson<Technology>(fileName)).CopyPropertiesTo(tech);
                 PropContainer.Technology = tech;
-                Wafer.SetPassCount(PropContainer.Technology.PassCount);
-                WaferView = Wafer.MakeWaferView();
+                //Wafer.SetPassCount(PropContainer.Technology.PassCount);
+                //WaferView = Wafer.MakeWaferView();
                 Thickness = waf.Thickness;
             }
 

@@ -36,17 +36,17 @@ namespace DicingBlade.Classes
         GoCameraPointLearningXyz,
         GoCurPositionCutXy
     }
-
+    [Flags]
     internal enum Status
     {
-        None,
-        StartLearning,
-        Learning,
-        Working,
-        Correcting,
-        Done,
-        MovingNextDir,
-        Ending
+        None = 1,
+        StartLearning = 2,
+        Learning = 4,
+        Working = 8,
+        Correcting = 16,
+        Done = 32,
+        MovingNextDir = 64,
+        Ending = 128
     }
     /// <summary>
     /// Структура параметров процесса

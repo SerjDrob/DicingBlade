@@ -13,6 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
+using DicingBlade.ViewModels;
 
 namespace DicingBlade.Classes
 {
@@ -142,9 +143,9 @@ namespace DicingBlade.Classes
         }
         private async Task IncrementDir()
         {
-            if (_currentDirection < _wafer.SidesCount - 1)
+            if (CurrentDirection < _wafer.SidesCount - 1)
             {
-                _wafer.SetSide(++_currentDirection);
+                _wafer.SetSide(++CurrentDirection);
                 if (_wafer.SidesCount - 1 == _wafer.CurrentSide)
                 {
                     _learningNextDir = false;
@@ -152,7 +153,7 @@ namespace DicingBlade.Classes
             }
             else
             {
-                _wafer.SetSide(_currentDirection = 0);
+                _wafer.SetSide(CurrentDirection = 0);
             }
         }
         private async Task IncrementLine()
@@ -176,7 +177,7 @@ namespace DicingBlade.Classes
             }
         }
         #region NewFields
-        private int _currentDirection;
+        public int CurrentDirection { get; private set; }
         private double _zRatio = 0;
         #endregion
 
@@ -817,6 +818,14 @@ namespace DicingBlade.Classes
             }
         }
 
+        public void SubstrateChanged(object obj, SettingsChangedEventArgs eventArgs)
+        {
+            if (eventArgs.Settings is IWafer & (int)(ProcessStatus & (Status.Working | Status.Correcting | Status.MovingNextDir | Status.Ending)) == 0)
+            {
+                var wf = (IWafer)eventArgs.Settings;
+                _wafer.SetChanges(wf.IndexH, wf.IndexW, wf.Thickness, new Rectangle2D(wf.Width, wf.Height));
+            }
+        }
         public void Dispose()
         {
             _cancellationToken?.Dispose();

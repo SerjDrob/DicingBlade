@@ -5,9 +5,42 @@ using System.Windows;
 using DicingBlade.Properties;
 using System.IO;
 using Microsoft.Win32;
+using System;
 
 namespace DicingBlade.ViewModels
 {
+    public class WatchSettingsService
+    {
+        private object _settings;
+        public object Settings
+        {
+            set
+            {
+                if (value!=_settings)
+                {
+                    _settings = value;
+                    OnSettingsChangedEvent?.Invoke(this,new SettingsChangedEventArgs(_settings));
+                }
+
+            }
+        }
+
+        public event EventHandler<SettingsChangedEventArgs> OnSettingsChangedEvent;
+    }
+
+    public class SettingsChangedEventArgs : EventArgs
+    {
+        private object _settings;
+        public object Settings
+        {
+            get => _settings;
+        }
+        public SettingsChangedEventArgs(object settings)
+        {
+            _settings = settings;
+        }
+    }
+
     [AddINotifyPropertyChangedInterface]
     internal class WaferSettingsViewModel : IWafer
     {
@@ -30,8 +63,10 @@ namespace DicingBlade.ViewModels
         public string FileName { get; set; }
         public Visibility SquareVisibility { get; set; }
         public Wafer Wafer { get; set; }
-        public WaferSettingsViewModel()
+        private readonly WatchSettingsService settingsService;
+        public WaferSettingsViewModel(WatchSettingsService settingsService)
         {
+            this.settingsService = settingsService;
             CloseCmd = new Command(args => ClosingWnd());
             OpenFileCmd = new Command(args => OpenFile());
             SaveFileAsCmd = new Command(args => SaveFileAs());
@@ -52,6 +87,9 @@ namespace DicingBlade.ViewModels
                 ((IWafer)StatMethods.DeSerializeObjectJson<TempWafer>(FileName)).CopyPropertiesTo(this);
             }
         }
+
+        
+
         public ICommand CloseCmd { get; set; }
         public ICommand OpenFileCmd { get; set; }
         public ICommand SaveFileAsCmd { get; set; }
@@ -78,6 +116,7 @@ namespace DicingBlade.ViewModels
             new TempWafer(PropContainer.WaferTemp).SerializeObjectJson(FileName);
             Settings.Default.WaferLastFile = FileName;
             Settings.Default.Save();
+            settingsService.Settings = this;
         }
 
         private void ChangeShape()
