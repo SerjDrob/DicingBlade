@@ -14,7 +14,7 @@ namespace DicingBlade.Classes
         private Dictionary<Groups, (int groupNum, Ax[] axes)> _axesGroups;
         private Dictionary<MFeatures, double> _doubleFeatures;
         private Dictionary<Place, (Ax axis, double pos)[]> _places; // { get; set; }
-        private Dictionary<Sensors, (Ax axis, Di dIn)> _sensors; // { get; set; }
+        private Dictionary<Sensors, (Ax axis, Di dIn, bool invertion)> _sensors; // { get; set; }
         private Dictionary<Place, double> _singlePlaces;
         private Dictionary<Valves, (Ax axis, Do dOut)> _valves; // { get; set; }
         private Dictionary<Ax, Dictionary<Velocity, double>> _velRegimes;
@@ -71,7 +71,6 @@ namespace DicingBlade.Classes
             }
         }
 
-
         public void ConfigureGeometry(Dictionary<Place, (Ax, double)[]> places)
         {
             if (_places is not null)
@@ -86,9 +85,9 @@ namespace DicingBlade.Classes
                 _places = new Dictionary<Place, (Ax, double)[]>(places);
         }
 
-        public void ConfigureSensors(Dictionary<Sensors, (Ax, Di)> sensors)
+        public void ConfigureSensors(Dictionary<Sensors, (Ax, Di, bool)> sensors)
         {
-            _sensors = new Dictionary<Sensors, (Ax, Di)>(sensors);
+            _sensors = new Dictionary<Sensors, (Ax, Di, bool)>(sensors);
         }
 
         public void ConfigureValves(Dictionary<Valves, (Ax, Do)> valves)
@@ -98,8 +97,6 @@ namespace DicingBlade.Classes
 
         public void SetBridgeOnSensors(Sensors sensor, bool setBridge)
         {
-            ////var dis = _axes[_sensors[sensor].axis].DIs;
-            //var bridge = setBridge ? dis.SetBit((int)_sensors[sensor].dIn) : dis.ResetBit((int)_sensors[sensor].dIn);
             var num = _axes[_sensors[sensor].axis].AxisNum;
             MotionDevice.SetBridgeOnAxisDin(num, (int) _sensors[sensor].dIn, setBridge);
         }
@@ -531,7 +528,7 @@ namespace DicingBlade.Classes
                     if (_sensors != null)
                     {
                         var ax = _sensors[(Sensors) sensor].axis;
-                        OnSensorStateChanged?.Invoke((Sensors) sensor, _axes[ax].GetDi(_sensors[(Sensors) sensor].dIn));
+                        OnSensorStateChanged?.Invoke((Sensors) sensor, _axes[ax].GetDi(_sensors[(Sensors) sensor].dIn) ^ _sensors[(Sensors)sensor].invertion);
                     }
 
                 foreach (var valve in Enum.GetValues(typeof(Valves)))

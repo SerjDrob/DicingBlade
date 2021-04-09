@@ -103,12 +103,12 @@ namespace DicingBlade.ViewModels
                 _machine.SwitchOffValve(Valves.Coolant);
                 _machine.SwitchOffValve(Valves.SpindleContact);
 
-                _machine.ConfigureSensors(new Dictionary<Sensors, (Ax, Di)>
+                _machine.ConfigureSensors(new Dictionary<Sensors, (Ax, Di, Boolean)>
                 {
-                    {Sensors.Air, (Ax.Z, Di.In1)},
-                    {Sensors.ChuckVacuum, (Ax.X, Di.In2)},
-                    {Sensors.Coolant, (Ax.X, Di.In3)},
-                    {Sensors.SpindleCoolant, (Ax.X, Di.In1)}
+                    {Sensors.Air, (Ax.Z, Di.In1, false)},
+                    {Sensors.ChuckVacuum, (Ax.X, Di.In2, false)},
+                    {Sensors.Coolant, (Ax.X, Di.In3, false)},
+                    {Sensors.SpindleCoolant, (Ax.Y, Di.In2, true)}
                 });
 
 

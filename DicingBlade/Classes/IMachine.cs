@@ -83,7 +83,7 @@ namespace DicingBlade.Classes
         public void SetBridgeOnSensors(Sensors sensor, bool setBridge);
         public void FreezeVideoCapture();
         public void ConfigureValves(Dictionary<Valves, (Ax, Do)> valves);
-        public void ConfigureSensors(Dictionary<Sensors, (Ax, Di)> sensors);
+        public void ConfigureSensors(Dictionary<Sensors, (Ax, Di, bool)> sensors);
         public void ConfigureAxes((Ax axis, double linecoefficient)[] ax);
         public void ConfigureVelRegimes(Dictionary<Ax, Dictionary<Velocity, double>> velRegimes);
         public void AddGroup(Groups group, IAxis[] axes);
