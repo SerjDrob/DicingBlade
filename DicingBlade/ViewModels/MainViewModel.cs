@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,6 +31,16 @@ namespace DicingBlade.ViewModels
         private CancellationToken _tracingTaskCancellationToken;
 
         private CancellationTokenSource _tracingTaskCancellationTokenSource;
+
+        [Obsolete("Only for design data", true)]
+        public MainViewModel()
+            : this(null, null)
+        {
+            if ((bool)DesignerProperties.IsInDesignModeProperty.GetMetadata(typeof(DependencyObject)).DefaultValue)
+            {
+                throw new Exception("Use only for design mode");
+            }
+        }
 
         public MainViewModel(ExceptionsAgregator exceptionsAgregator, IMachine machine)
         {

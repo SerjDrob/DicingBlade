@@ -12,7 +12,7 @@
     Title="MainWindowView"
     Width="1280"
     Height="1024"
-    d:DataContext="{d:DesignInstance model:MainViewModel, IsDesignTimeCreatable=False}"
+    d:DataContext="{d:DesignInstance model:MainViewModel, IsDesignTimeCreatable=True}"
     Background="#FFE8E8EC"
     WindowStartupLocation="CenterScreen"
     WindowState="Maximized"
