@@ -375,11 +375,11 @@ namespace DicingBlade.Classes
                     point2 = new TranslateTransform(-_machine.BladeChuckCenter.X, -_machine.BladeChuckCenter.Y).Transform(point2);
 
 
-                    TracesView.RawLines.Add(new Line(
-                        new Vector2(point1.X, point1.Y),
-                        new Vector2(point2.X, point2.Y)
+                    TracesView.RawLines.Add(new Line2D(
+                        new System.Windows.Point(point1.X, point1.Y),
+                        new System.Windows.Point(point2.X, point2.Y)
                         ));
-                    TracesView.RawLines = new ObservableCollection<Line>(TracesView.RawLines);
+                    TracesView.RawLines = new ObservableCollection<Line2D>(TracesView.RawLines);
                     TracingLine = null;
                     _machine.SwitchOnCoolantWater = false;
 

@@ -149,28 +149,14 @@ namespace DicingBlade.ViewModels
             if (eventArgs.Settings is IWafer)
             {
                 var wf = (IWafer)eventArgs.Settings;
-                Substrate2D substrate = new(wf.IndexH, wf.IndexW, wf.Thickness, new Rectangle2D(wf.Width, wf.Height));
+                var substrate = new Substrate2D(wf.IndexH, wf.IndexW, wf.Thickness, new Rectangle2D(wf.Height, wf.Width));
                 substrate.SetSide(Process?.CurrentDirection ?? 0);
-                var shift = 0;
+
+                var wfViewFactory = new WaferViewFactory(substrate);
+                ResetView ^= true;
                 WaferView = new();
-                for (int i = 0; i < substrate.SidesCount; i++)
-                {
-                    substrate.SetSide(substrate.CurrentSide + i + shift);
-                    for (int j = 0; j < substrate.CurrentLinesCount; j++)
-                    {
-                        
-                        WaferView.RawLines.Add(new Line(new Vector2(substrate[j].Start.X, substrate[j].Start.Y), new Vector2(substrate[j].End.X, substrate[j].End.Y)));
-                    }
-
-                    if (substrate.CurrentSide == substrate.SidesCount - 1)
-                    {
-                        shift = -(i + 1);
-                    }
-                }
-
-                var size = WaferView.ShapeSize;
+                WaferView.SetView(wfViewFactory);
             }
-
         }
 
         public Velocity VelocityRegime { get; set; } = Velocity.Fast;
@@ -748,7 +734,10 @@ namespace DicingBlade.ViewModels
         private void Process_OnProcParamsChanged(object arg1, ProcParams procParamsEventArgs)
         {
             WaferCurrentShiftView = procParamsEventArgs.currentShift;
+            WaferCurrentSideAngle = procParamsEventArgs.currentSideAngle;
         }
+
+        public double WaferCurrentSideAngle { get; set; }
 
         private void Process_OnProcessStatusChanged(string status)
         {
@@ -770,16 +759,15 @@ namespace DicingBlade.ViewModels
                 _tracingTaskCancellationTokenSource.Cancel();
 
                 var rotateTransform = new RotateTransform(
-                    //-Wafer.GetCurrentDiretionAngle,
-                    -Substrate.CurrentSideAngle,
+                    
+                    //-Substrate.CurrentSideAngle,
+                    -WaferCurrentSideAngle,
                     BCCenterXView,
                     BCCenterYView
                 );
 
-                var point1 = rotateTransform.Transform(new Point(XTrace,
-                    YTrace + WaferCurrentShiftView /*+ /*Wafer.GetCurrentDirectionIndexShift+Substrate.CurrentShift*/));
-                var point2 = rotateTransform.Transform(new Point(XTraceEnd,
-                    YTrace + WaferCurrentShiftView /*+ /*Wafer.GetCurrentDirectionIndexShift+Substrate.CurrentShift*/));
+                var point1 = rotateTransform.Transform(new Point(XTrace,YTrace + WaferCurrentShiftView));
+                var point2 = rotateTransform.Transform(new Point(XTraceEnd, YTrace + WaferCurrentShiftView));
                 point1 = new TranslateTransform(-BCCenterXView, -BCCenterYView).Transform(point1);
                 point2 = new TranslateTransform(-BCCenterXView, -BCCenterYView).Transform(point2);
 

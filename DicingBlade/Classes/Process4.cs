@@ -380,6 +380,7 @@ namespace DicingBlade.Classes
                         await AwaitTaskAsync(MoveNextDirAsync());
 
                         _procParamsEventArgs.currentShift = _wafer.CurrentShift;
+                        _procParamsEventArgs.currentSideAngle = _wafer.CurrentSideAngle;
                         OnProcParamsChanged(this, _procParamsEventArgs);
 
                         SideDone = false;
@@ -451,6 +452,7 @@ namespace DicingBlade.Classes
                         await AwaitTaskAsync(MoveNextDirAsync(false));
 
                         _procParamsEventArgs.currentShift = _wafer.CurrentShift;
+                        _procParamsEventArgs.currentSideAngle = _wafer.CurrentSideAngle;
                         OnProcParamsChanged(this, _procParamsEventArgs);
                     }),
 
@@ -823,7 +825,7 @@ namespace DicingBlade.Classes
             if (eventArgs.Settings is IWafer & (int)(ProcessStatus & (Status.Working | Status.Correcting | Status.MovingNextDir | Status.Ending)) == 0)
             {
                 var wf = (IWafer)eventArgs.Settings;
-                _wafer.SetChanges(wf.IndexH, wf.IndexW, wf.Thickness, new Rectangle2D(wf.Width, wf.Height));
+                _wafer.SetChanges(wf.IndexH, wf.IndexW, wf.Thickness, new Rectangle2D(wf.Height, wf.Width));
             }
         }
         public void Dispose()

@@ -2,40 +2,76 @@
 using System.Linq;
 using PropertyChanged;
 using System.Collections.ObjectModel;
-using netDxf.Entities;
-using netDxf;
+using System.Windows.Media;
 
 namespace DicingBlade.Classes
 {
     [AddINotifyPropertyChangedInterface]
     public class WaferView
     {
-        public WaferView(ICollection<Line> rawLines, Vector2 center)
+        public WaferView(ICollection<Line2D> rawLines)
         {
-            RawLines = new ObservableCollection<Line>(rawLines);
+            RawLines = new ObservableCollection<Line2D>(rawLines);
             ShapeSize = GetSize();
-            Angle = 0;
         }
         public WaferView()
         {
-            RawLines = new ObservableCollection<Line>();
+            RawLines = new ObservableCollection<Line2D>();
         }
         public bool IsRound { get; set; }
-        public double Angle { get; set; }
-        public ObservableCollection<Line> RawLines { get; set; }
+        public ObservableCollection<Line2D> RawLines { get; set; }
         private double[] GetSize()
         {
             return new double[]
             {
-                RawLines.Max(l=>l.StartPoint.X>l.EndPoint.X?l.StartPoint.X:l.EndPoint.X)-RawLines.Min(l=>l.StartPoint.X<l.EndPoint.X?l.StartPoint.X:l.EndPoint.X),
-                RawLines.Max(l=>l.StartPoint.Y>l.EndPoint.Y?l.StartPoint.Y:l.EndPoint.Y)-RawLines.Min(l=>l.StartPoint.Y<l.EndPoint.Y?l.StartPoint.Y:l.EndPoint.Y)
+                RawLines.Max(l=>l.Start.X>l.End.X?l.Start.X:l.End.X)-RawLines.Min(l=>l.Start.X<l.End.X?l.Start.X:l.End.X),
+                RawLines.Max(l=>l.Start.Y>l.End.Y?l.Start.Y:l.End.Y)-RawLines.Min(l=>l.Start.Y<l.End.Y?l.Start.Y:l.End.Y)
             };
         }
 
-        public double[] ShapeSize
+        public double[] ShapeSize { get; set; }
+        public void SetView(IWaferViewFactory concreteFactory)
         {
-            get => GetSize();
-            private set { throw new System.NotImplementedException(); }
+            RawLines = concreteFactory.GetWaferView();
+            ShapeSize = GetSize();
+        }
+    }
+
+    public interface IWaferViewFactory
+    {
+        public ObservableCollection<Line2D> GetWaferView();
+    }
+    public class WaferViewFactory : IWaferViewFactory
+    {
+        private Wafer2D _substrate;
+
+        public WaferViewFactory(Wafer2D wafer)
+        {
+            _substrate = wafer;
+        }
+        public ObservableCollection<Line2D> GetWaferView()
+        {
+
+            var rotation = new RotateTransform(0);
+            var shift = 0;
+            var tempLines = new List<Line2D>();
+            for (int i = 0; i < _substrate.SidesCount; i++)
+            {
+                _substrate.SetSide(_substrate.CurrentSide + i + shift);
+                for (int j = 0; j < _substrate.CurrentLinesCount + 1; j++)
+                {
+                    var pointStart = rotation.Transform(_substrate[j].Start);
+                    var pointEnd = rotation.Transform(_substrate[j].End);
+                    tempLines.Add(new Line2D() { Start = pointStart, End = pointEnd });
+                }
+
+                rotation.Angle += 90;
+                if (_substrate.CurrentSide == _substrate.SidesCount - 1)
+                {
+                    shift = -(i + 2);
+                }
+            }
+            return new(tempLines);
         }
     }
 }

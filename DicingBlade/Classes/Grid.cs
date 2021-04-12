@@ -138,18 +138,18 @@ namespace DicingBlade.Classes
         }
         public WaferView MakeGridView()
         {
-            var tempRaws = new List<Line>();
+            var tempRaws = new List<Line2D>();
             foreach (var (degree, list) in Lines)
             {
                 foreach (var cut in list)
                 {
                     var tempLine = RotateLine(degree * PI / 180, new Line(cut.StartPoint, cut.EndPoint), GridCenter);
-                    Vector2 startPoint = new Vector2(tempLine.StartPoint.X - GridCenter.X, tempLine.StartPoint.Y - GridCenter.Y);
-                    Vector2 endPoint = new Vector2(tempLine.EndPoint.X - GridCenter.X, tempLine.EndPoint.Y - GridCenter.Y);
-                    tempRaws.Add(new Line(startPoint, endPoint));
+                    var startPoint = new System.Windows.Point(tempLine.StartPoint.X - GridCenter.X, tempLine.StartPoint.Y - GridCenter.Y);
+                    var endPoint = new System.Windows.Point(tempLine.EndPoint.X - GridCenter.X, tempLine.EndPoint.Y - GridCenter.Y);
+                    tempRaws.Add(new Line2D(){ Start = startPoint, End = endPoint});
                 }
             }
-            return new WaferView(tempRaws, GridCenter);
+            return new WaferView(tempRaws);
         }
         private void GenerateLinesD()
         {

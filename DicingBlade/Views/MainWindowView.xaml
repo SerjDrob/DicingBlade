@@ -76,12 +76,12 @@
                 Storyboard.TargetProperty="RenderTransform.Children[0].Angle"
                 Duration="0" />
             <DoubleAnimation
-                To="0"
+                To="{Binding WvAngle}"
                 Storyboard.Target="{Binding ElementName=TracesView}"
                 Storyboard.TargetProperty="RenderTransform.Children[0].Angle"
                 Duration="0"/>
             <DoubleAnimation
-                To="0"
+                To="{Binding WvAngle}"
                 Storyboard.Target="{Binding ElementName=ControlPoints}"
                 Storyboard.TargetProperty="RenderTransform.Children[0].Angle"
                 Duration="0"/>
@@ -964,9 +964,6 @@
                                 <Binding Path="DataContext.WaferCurrentShiftView"  RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}" />
                             </MultiBinding>
                         </Path.Data>
-                        <!--<Path.RenderTransform>
-                            <ScaleTransform X="-1"/>
-                        </Path.RenderTransform>-->
                     </Path>
                     <Path
                     x:Name="CameraCursor"
