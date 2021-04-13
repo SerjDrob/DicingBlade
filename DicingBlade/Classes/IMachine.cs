@@ -83,7 +83,7 @@ namespace DicingBlade.Classes
         public void SetBridgeOnSensors(Sensors sensor, bool setBridge);
         public void FreezeVideoCapture();
         public void ConfigureValves(Dictionary<Valves, (Ax, Do)> valves);
-        public void ConfigureSensors(Dictionary<Sensors, (Ax, Di, bool)> sensors);
+        public void ConfigureSensors(Dictionary<Sensors, (Ax, Di, bool, string)> sensors);
         public void ConfigureAxes((Ax axis, double linecoefficient)[] ax);
         public void ConfigureVelRegimes(Dictionary<Ax, Dictionary<Velocity, double>> velRegimes);
         public void AddGroup(Groups group, IAxis[] axes);
@@ -130,7 +130,7 @@ namespace DicingBlade.Classes
         #region Spindle
 
         public void SetSpindleFreq(int frequency);
-        public void StartSpindle();
+        public void StartSpindle(params Sensors[]  blockers);
         public void StopSpindle();
         public event Action<int, double, bool> OnSpindleStateChanging;
 

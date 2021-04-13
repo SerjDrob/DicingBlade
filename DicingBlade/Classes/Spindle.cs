@@ -42,6 +42,7 @@ namespace DicingBlade.Classes
         private double SpindleFreq { get; set; }
         private double SpindleCurrent { get; set; }
         private bool IsConnected { get; set; }
+        bool ISpindle.IsConnected { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public event Action<int, double, bool> GetSpindleState;
 

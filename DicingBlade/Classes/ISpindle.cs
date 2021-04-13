@@ -6,6 +6,7 @@ namespace DicingBlade.Classes
 
     public interface ISpindle : IDisposable
     {
+        public bool IsConnected { get; set; }          
         public void SetSpeed(ushort rpm);
         public void Start();
         public void Stop();

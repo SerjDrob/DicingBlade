@@ -17,6 +17,8 @@ namespace DicingBlade.Classes
 
         public event Action<int, double, bool> GetSpindleState;
 
+        public bool IsConnected { get; set; }
+
         public void SetSpeed(ushort rpm)
         {
             throw new NotImplementedException();

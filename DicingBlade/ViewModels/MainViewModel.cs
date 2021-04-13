@@ -106,12 +106,12 @@ namespace DicingBlade.ViewModels
                 _machine.SwitchOffValve(Valves.Coolant);
                 _machine.SwitchOffValve(Valves.SpindleContact);
 
-                _machine.ConfigureSensors(new Dictionary<Sensors, (Ax, Di, Boolean)>
+                _machine.ConfigureSensors(new Dictionary<Sensors, (Ax, Di, Boolean, string)>
                 {
-                    {Sensors.Air, (Ax.Z, Di.In1, false)},
-                    {Sensors.ChuckVacuum, (Ax.X, Di.In2, false)},
-                    {Sensors.Coolant, (Ax.X, Di.In3, false)},
-                    {Sensors.SpindleCoolant, (Ax.Y, Di.In2, true)}
+                    {Sensors.Air, (Ax.Z, Di.In1, false, "Воздух")},
+                    {Sensors.ChuckVacuum, (Ax.X, Di.In2, false, "Вакуум")},
+                    {Sensors.Coolant, (Ax.X, Di.In3, false, "СОЖ")},
+                    {Sensors.SpindleCoolant, (Ax.Y, Di.In2, true, "Охлаждение шпинделя")}
                 });
 
 
@@ -203,7 +203,7 @@ namespace DicingBlade.ViewModels
         public double PointX { get; set; }
         public double PointY { get; set; }
         public double CutWidthView { get; set; } = 0.05;
-        public Machine Machine { get; set; }
+        public double RealCutWidthView { get; set; } = 0.1;    
         public Process4 Process { get; set; }
         public Wafer Wafer { get; set; }
         public Wafer2D Substrate { get; private set; }
@@ -525,7 +525,7 @@ namespace DicingBlade.ViewModels
                         _machine.SetSpindleFreq(_technology.SpindleFreq);
                         // TODO await
                         Task.Delay(100).Wait();
-                        _machine.StartSpindle();
+                        _machine.StartSpindle(Sensors.Air,Sensors.SpindleCoolant);
                     }
                     catch (Exception ex)
                     {

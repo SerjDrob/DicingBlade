@@ -14,7 +14,7 @@ namespace DicingBlade.Classes
         private Dictionary<Groups, (int groupNum, Ax[] axes)> _axesGroups;
         private Dictionary<MFeatures, double> _doubleFeatures;
         private Dictionary<Place, (Ax axis, double pos)[]> _places; // { get; set; }
-        private Dictionary<Sensors, (Ax axis, Di dIn, bool invertion)> _sensors; // { get; set; }
+        private Dictionary<Sensors, (Ax axis, Di dIn, bool invertion, string name)> _sensors; // { get; set; }
         private Dictionary<Place, double> _singlePlaces;
         private Dictionary<Valves, (Ax axis, Do dOut)> _valves; // { get; set; }
         private Dictionary<Ax, Dictionary<Velocity, double>> _velRegimes;
@@ -85,9 +85,9 @@ namespace DicingBlade.Classes
                 _places = new Dictionary<Place, (Ax, double)[]>(places);
         }
 
-        public void ConfigureSensors(Dictionary<Sensors, (Ax, Di, bool)> sensors)
+        public void ConfigureSensors(Dictionary<Sensors, (Ax, Di, bool, string)> sensors)
         {
-            _sensors = new Dictionary<Sensors, (Ax, Di, bool)>(sensors);
+            _sensors = new Dictionary<Sensors, (Ax, Di, bool, string)>(sensors);
         }
 
         public void ConfigureValves(Dictionary<Valves, (Ax, Do)> valves)
@@ -490,8 +490,19 @@ namespace DicingBlade.Classes
             Spindle.SetSpeed((ushort) frequency);
         }
 
-        public void StartSpindle()
+        public void StartSpindle(params Sensors[] blockers)
         {
+            foreach (var blocker in blockers)
+            {
+                var axis = _axes[_sensors[blocker].axis];
+                var di = _sensors[blocker].dIn;
+                if (!axis.GetDi(di)^_sensors[blocker].invertion)
+                {
+                    throw new MachineException($"Отсутствует {_sensors[blocker].name}");
+                    return;
+                }
+            }
+
             Spindle.Start();
         }
 

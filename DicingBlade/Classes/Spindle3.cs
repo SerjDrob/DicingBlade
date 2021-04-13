@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO.Ports;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using FluentModbus;
 using Modbus.Device;
 
@@ -30,11 +31,26 @@ namespace DicingBlade.Classes
             if (EstablishConnection("COM1"))
             {
                 _watchingStateTask = WatchingStateAsync();
+                if (CheckSpindleWorking())
+                {
+                    return;
+                }
                 if (!SetParams()) throw new SpindleException("SetParams is failed");
             }
         }
 
+        private bool CheckSpindleWorking()
+        {
+            lock (_modbusLock)
+            {
+                var data = _client.ReadHoldingRegisters(1, 0xD000, 1);
+                
+                return data[0]!=0;
+            }
+        }
         public event Action<int, double, bool> GetSpindleState;
+
+        public bool IsConnected { get; set; } = false;
 
         public void SetSpeed(ushort rpm)
         {
@@ -53,6 +69,7 @@ namespace DicingBlade.Classes
         {
             lock (_modbusLock)
             {
+               // _client.WriteSingleRegister(1, 0x1001, 0x0020);
                 _client.WriteSingleRegister(1, 0x1001, 0x0001);
             }
         }
@@ -75,16 +92,18 @@ namespace DicingBlade.Classes
                 WriteTimeout = 1000,
                 ReadTimeout = 1000
             };
-
-            //serialPort.DataBits = 8;
-            //serialPort.StopBits = StopBits.One;
+            
             _serialPort.Open();
             if (_serialPort.IsOpen)
+            {
                 _client = ModbusSerialMaster.CreateRtu(_serialPort);
+            }
             else
+            {
                 return false;
+            }
 
-            return true;
+            return IsConnected = true;
         }
 
         private async Task WatchingStateAsync()
