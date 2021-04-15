@@ -217,6 +217,11 @@ namespace DicingBlade.Classes
             MotionDevice.SetAxisVelocity(_axes[axis].AxisNum, feed);
         }
 
+        public void EmergencyStop()
+        {
+            throw new NotImplementedException();
+        }
+
         public void Stop(Ax axis)
         {
             MotionDevice.StopAxis(_axes[axis].AxisNum);

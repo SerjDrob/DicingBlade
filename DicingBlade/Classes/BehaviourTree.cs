@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.Workspace;
 
 namespace DicingBlade.Classes
 {
@@ -43,6 +44,7 @@ namespace DicingBlade.Classes
         }
         public override async Task<bool> DoWork()
         {
+            await base.DoWork();
             if (!_imWorking)
             {
                 if (!_withinCollection)
@@ -74,15 +76,21 @@ namespace DicingBlade.Classes
             }
             return false;
         }
-        
-        private void AddMembers(params DoMyWork[] members)
+
+        public override void SetPauseToken(PauseTokenSource pauseTokenSource)
         {
-            foreach (var member in members)
-            {
-                _myWorkers.Add(member);
-            }
-            _enumerator = _myWorkers.GetEnumerator();
-        }       
+            _pauseTokenSource = pauseTokenSource;
+            _myWorkers.ForEach((w) => { w?.SetPauseToken(pauseTokenSource); });
+        }
+
+        //private void AddMembers(params DoMyWork[] members)
+        //{
+        //    foreach (var member in members)
+        //    {
+        //        _myWorkers.Add(member);
+        //    }
+        //    _enumerator = _myWorkers.GetEnumerator();
+        //}       
     }
     class Leaf : DoMyWork
     {
@@ -127,6 +135,7 @@ namespace DicingBlade.Classes
         public bool IsRunning { get; private set; } = false;       
         public override async Task<bool> DoWork()
         {
+            await base.DoWork();
             CheckMyCondition?.Invoke();
 
             if (CheckBlocks())
@@ -143,6 +152,13 @@ namespace DicingBlade.Classes
 
             return true;
         }
+
+        public override void SetPauseToken(PauseTokenSource pauseTokenSource)
+        {
+            _pauseTokenSource = pauseTokenSource;
+            _myWorker?.SetPauseToken(pauseTokenSource);
+        }
+
         private bool CheckBlocks()
         {
             if (_blockConditions.Count==0)
@@ -219,6 +235,7 @@ namespace DicingBlade.Classes
 
         public override async Task<bool> DoWork()
         {
+            await base.DoWork();
             var worker = SelectByCondition();
             if(worker is not null)
             {
@@ -226,6 +243,12 @@ namespace DicingBlade.Classes
                 await worker.DoWork();
             }            
             return true;
+        }
+
+        public override void SetPauseToken(PauseTokenSource pauseTokenSource)
+        {
+            _pauseTokenSource = pauseTokenSource;
+            _myWorkers.ForEach((w)=>{w.worker?.SetPauseToken(pauseTokenSource);});
         }
     }
     class Condition
@@ -262,36 +285,59 @@ namespace DicingBlade.Classes
         }
         public override async Task<bool> DoWork()
         {
+            await base.DoWork();
             if (_imWorking)
             {
                 _mySlave?.DoWork();
             }
             else
             {
-                base.DoWork();
+                //base.DoWork();
                 while (_myCondition.State)
                 {
+                    await base.DoWork();
                     await _myWorker.DoWork();
                 }
                 return true;
             }
             return false;            
         }
+
+        public override void SetPauseToken(PauseTokenSource pauseTokenSource)
+        {
+            _pauseTokenSource = pauseTokenSource;
+            _mySlave?.SetPauseToken(pauseTokenSource);
+            _myWorker?.SetPauseToken(pauseTokenSource);
+        }
     }
     public abstract class DoMyWork
     {
         protected string _myName;
         protected bool _imWorking = false;
+        protected PauseTokenSource _pauseTokenSource;
         public void SetMyName(string name)
         {
             _myName = name;
         }
         public event Action<string> KnowMyName;
         public abstract event Action CheckMyCondition;
-        public virtual async Task<bool> DoWork() 
+        public virtual async Task<bool> DoWork()
         {
-            KnowMyName?.Invoke(_myName);    
+            await _pauseTokenSource?.Token.WaitWhilePausedAsync();
+            //KnowMyName?.Invoke(_myName);    
             return true;
         }
+
+        public abstract void SetPauseToken(PauseTokenSource pauseTokenSource);
+        public void PauseMe()
+        {
+            _pauseTokenSource?.Pause();
+        }
+
+        public void ResumeMe()
+        {
+            _pauseTokenSource?.Resume();
+        }
+
     }
 }

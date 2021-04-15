@@ -101,6 +101,7 @@ namespace DicingBlade.Classes
 
         #region Motions
 
+        public void EmergencyStop();
         public void Stop(Ax axis);
         public Task WaitUntilAxisStopAsync(Ax axis);
         public void GoWhile(Ax axis, AxDir direction);

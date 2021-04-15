@@ -67,7 +67,7 @@ namespace DicingBlade.Classes
 
             var _singleCutTicker = new Ticker(_singleCutSequence, singleCutCondition);
             _singleCutLeaf = new Leaf(async () => { singleCutCondition.SetState(true); }, _singleCutTicker);
-
+            _singleCutLeaf.SetPauseToken(new PauseTokenSource());
             _workingCondition = new(true);
             var InspectLeaf = new Leaf(TakeThePhotoAsync);//.SetBlock(_cutInspectCondition);
             var nextSideLeaf = new Leaf(GetFunc(Diagram.GoNextDirection)).SetBlock(_sideDoneCondition);
@@ -112,6 +112,7 @@ namespace DicingBlade.Classes
 
             _inspectX = _machine.GetGeometry(Place.CameraChuckCenter, Ax.X);
             _learningDone = false;
+            _rootSequence.SetPauseToken(_pauseProcTokenSource);
             _rootSequence.DoWork();
             procCount++;
         }
@@ -128,6 +129,7 @@ namespace DicingBlade.Classes
             ThrowMessage("Всё!",0);
         }
         private ITechnology _technology;
+        
         private async Task SetProcessStatus()
         {
             ProcessStatus = Status.Working;
@@ -180,7 +182,7 @@ namespace DicingBlade.Classes
         public int CurrentDirection { get; private set; }
         private double _zRatio = 0;
         #endregion
-
+        private PauseTokenSource _pauseProcTokenSource = new();
         private bool _learningNextDir              = true;
         private Condition _bladeInWaferCond        = new();
         private Condition _learningCondition       = new();
@@ -202,7 +204,7 @@ namespace DicingBlade.Classes
         private async Task AwaitTaskAsync(Task task)
         {
             _localTasks.Add(task);
-            await task.ConfigureAwait(true);
+            await task.ConfigureAwait(false);
         }
 
         public async Task WaitProcDoneAsync()
@@ -820,6 +822,13 @@ namespace DicingBlade.Classes
             }
         }
 
+        public void EmergencyScript()
+        {
+            _pauseProcTokenSource.Pause();
+            _machine.Stop(Ax.X);
+            _machine.MoveAxInPosAsync(Ax.Z, 0);
+            _machine.StopSpindle();
+        }
         public void SubstrateChanged(object obj, SettingsChangedEventArgs eventArgs)
         {
             if (eventArgs.Settings is IWafer & (int)(ProcessStatus & (Status.Working | Status.Correcting | Status.MovingNextDir | Status.Ending)) == 0)

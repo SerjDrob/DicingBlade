@@ -44,10 +44,11 @@ namespace DicingBlade.Classes
     public class WaferViewFactory : IWaferViewFactory
     {
         private Wafer2D _substrate;
-
+        private int _side;
         public WaferViewFactory(Wafer2D wafer)
         {
             _substrate = wafer;
+            _side = wafer.CurrentSide;
         }
         public ObservableCollection<Line2D> GetWaferView()
         {
@@ -71,6 +72,7 @@ namespace DicingBlade.Classes
                     shift = -(i + 2);
                 }
             }
+            _substrate.SetSide(_side);
             return new(tempLines);
         }
     }

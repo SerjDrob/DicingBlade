@@ -150,8 +150,15 @@ namespace DicingBlade.ViewModels
             {
                 var wf = (IWafer)eventArgs.Settings;
                 var substrate = new Substrate2D(wf.IndexH, wf.IndexW, wf.Thickness, new Rectangle2D(wf.Height, wf.Width));
-                substrate.SetSide(Process?.CurrentDirection ?? 0);
-
+                if (Process is null)
+                {
+                    Substrate = substrate;
+                }
+                else
+                {
+                    substrate.SetSide(Process.CurrentDirection);
+                }
+                
                 var wfViewFactory = new WaferViewFactory(substrate);
                 ResetView ^= true;
                 WaferView = new();
@@ -159,6 +166,7 @@ namespace DicingBlade.ViewModels
             }
         }
 
+        
         public Velocity VelocityRegime { get; set; } = Velocity.Fast;
         public ObservableCollection<TraceLine> TracesCollectionView { get; set; } = new();
         public double XTrace { get; set; }
@@ -476,12 +484,7 @@ namespace DicingBlade.ViewModels
             //test key
             if (key.Key == Key.Tab)
             {
-                var s = Substrate.CurrentSide;
-                //Machine.SpindleModbus();
-                //WVRotate ^= true;
-                //Machine.GoTest();
-                //if (process == null) process = new Process(Machine, Wafer, new Blade());
-                //await process.ProcElementDispatcherAsync(Diagram.goCameraPointLearningXYZ);
+               
             }
 
             if (key.Key == Key.Multiply)
@@ -568,6 +571,7 @@ namespace DicingBlade.ViewModels
                     {
                         if (Process.ProcessStatus == Status.Done)
                         {
+                            await Process.WaitProcDoneAsync();
                             Process = null;
                             AjustWaferTechnology();
                         }
@@ -662,8 +666,10 @@ namespace DicingBlade.ViewModels
             if (key.Key == Key.I)
                 if (MessageBox.Show("Завершить процесс?", "Процесс", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
                 {
-                    await Process.WaitProcDoneAsync();
+                    
+                    await Process?.WaitProcDoneAsync();
                     Process = null;
+                    ResetView ^= true;
                     AjustWaferTechnology();
                 }
 
@@ -696,24 +702,53 @@ namespace DicingBlade.ViewModels
                 }
             }
 
-            if (key.Key == Key.G) _machine?.GoThereAsync(Place.Loading);
-            if (Keyboard.IsKeyDown(Key.RightCtrl) && Keyboard.IsKeyDown(Key.Oem6)) //}
+            if (key.Key == Key.G)
+            {
+                _machine?.GoThereAsync(Place.Loading);
+            }
+
+            if (Keyboard.IsKeyDown(Key.RightCtrl) && Keyboard.IsKeyDown(Key.Oem6))
+            {
                 await _machine?.GoThereAsync(Place.CameraChuckCenter);
-            if (Keyboard.IsKeyDown(Key.RightCtrl) && Keyboard.IsKeyDown(Key.Oem4)) //{
+            }
+
+            if (Keyboard.IsKeyDown(Key.RightCtrl) && Keyboard.IsKeyDown(Key.Oem4))
+            {
                 await _machine?.GoThereAsync(Place.BladeChuckCenter);
+            }
 
             if (key.Key == Key.N)
+            {
                 if (Process.ProcessStatus == Status.Correcting)
+                {
                     Process.CutOffset += 0.001;
+                }
+            }
 
             if (key.Key == Key.M)
+            {
                 if (Process.ProcessStatus == Status.Correcting)
-                    Process.CutOffset -= 0.001;
+                { Process.CutOffset -= 0.001; }
+            }
             if (key.Key == Key.F)
+            {
                 if (Process is not null)
+                {
                     if (MessageBox.Show("Сделать одиночный рез?", "Резка", MessageBoxButton.OKCancel) ==
                         MessageBoxResult.OK)
+                    {
                         await Process.DoSingleCut();
+                    }
+                }
+            }
+
+            if (key.Key == Key.F12)
+            {
+                Process?.EmergencyScript();
+                MessageBox.Show("Процесс экстренно прерван оператором");
+                await Process.WaitProcDoneAsync();
+                Process = null;
+            }
             //key.Handled = true;
         }
 
@@ -831,7 +866,7 @@ namespace DicingBlade.ViewModels
 
             waferSettingsView.ShowDialog();
 
-            AjustWaferTechnology();
+           // AjustWaferTechnology();
         }
 
         private void MachineSettings()
@@ -1014,29 +1049,23 @@ namespace DicingBlade.ViewModels
                 ((IWafer) StatMethods.DeSerializeObjectJson<TempWafer>(fileName)).CopyPropertiesTo(waf);
                 if (waf.IsRound)
                 {
-                    Wafer = new Wafer(new Vector2(0, 0), waf.Thickness, waf.Diameter, (0, waf.IndexW),
-                        (90, waf.IndexH));
+                    Wafer = new Wafer(new Vector2(0, 0), waf.Thickness, waf.Diameter, (0, waf.IndexW), (90, waf.IndexH));
                 }
                 else
                 {
-                    Wafer = new Wafer(new Vector2(0, 0), waf.Thickness, (0, waf.Height, waf.Width, waf.IndexH),
-                        (90, waf.Width, waf.Height, waf.IndexW));
-
                     if (Substrate is null)
                     {
-                        Substrate = new Substrate2D(waf.IndexH, waf.IndexW, waf.Thickness,
-                            new Rectangle2D(waf.Height, waf.Width));
+                        Substrate = new Substrate2D(waf.IndexH, waf.IndexW, waf.Thickness,new Rectangle2D(waf.Height, waf.Width));
                     }
-                    //else
-                    //{
-                    //    side = Substrate.CurrentSide;
-                    //    Substrate.SetChanges(waf.IndexH, waf.IndexW, waf.Thickness,
-                    //        new Rectangle2D(waf.Height, waf.Width));
-                    //}
-
-                    //if (side > 0) Substrate.SetSide(side);
                 }
             }
+            TracesCollectionView = new ObservableCollection<TraceLine>();
+            ControlPointsView = new ObservableCollection<TraceLine>();
+            //ResetView ^= true;
+            var wfViewFactory = new WaferViewFactory(Substrate);
+            //ResetView ^= true;
+            WaferView = new();
+            WaferView.SetView(wfViewFactory);
 
             fileName = Settings.Default.TechnologyLastFile;
             if (File.Exists(fileName))
@@ -1044,14 +1073,10 @@ namespace DicingBlade.ViewModels
                 // TODO ASYNC
                 ((ITechnology) StatMethods.DeSerializeObjectJson<Technology>(fileName)).CopyPropertiesTo(tech);
                 PropContainer.Technology = tech;
-                //Wafer.SetPassCount(PropContainer.Technology.PassCount);
-                //WaferView = Wafer.MakeWaferView();
                 Thickness = waf.Thickness;
             }
 
-            TracesCollectionView = new ObservableCollection<TraceLine>();
-            ControlPointsView = new ObservableCollection<TraceLine>();
-            ResetView ^= true;
+            
         }
 
         private void TechnologySettings()
