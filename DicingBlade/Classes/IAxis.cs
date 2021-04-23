@@ -24,6 +24,7 @@ namespace DicingBlade.Classes
         public int DOs { get; set; }
         public bool GetDi(Di din);
         public bool GetDo(Do dout);
-        
+        public bool Busy { get; set; }
+
     }
 }

@@ -38,5 +38,7 @@ namespace DicingBlade.Classes
         {
             return (DOs & (1 << (int)dout)) != 0;
         }
+
+        public bool Busy { get; set; } = false;
     }
 }

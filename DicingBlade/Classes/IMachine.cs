@@ -17,12 +17,13 @@ namespace DicingBlade.Classes
         SpindleContact
     }
 
+    [Flags]
     public enum Sensors
     {
-        ChuckVacuum,
-        Air,
-        Coolant,
-        SpindleCoolant
+        ChuckVacuum = 4,
+        Air = 2,
+        Coolant = 8,
+        SpindleCoolant = 16
     }
 
     public struct MotionDeviceConfigs
@@ -79,6 +80,7 @@ namespace DicingBlade.Classes
         public event ValveStateHandler OnValveStateChanged;
         public event AxisMotioStateHandler OnAxisMotionStateChanged;
         public event BitmapHandler OnVideoSourceBmpChanged;
+        public string GetSensorName(Sensors sensor);
         public void StartVideoCapture(int ind);
         public void SetBridgeOnSensors(Sensors sensor, bool setBridge);
         public void FreezeVideoCapture();
@@ -133,7 +135,7 @@ namespace DicingBlade.Classes
         public void SetSpindleFreq(int frequency);
         public void StartSpindle(params Sensors[]  blockers);
         public void StopSpindle();
-        public event Action<int, double, bool> OnSpindleStateChanging;
+        public event EventHandler<SpindleEventArgs> OnSpindleStateChanging;
 
         #endregion
     }

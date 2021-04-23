@@ -146,7 +146,7 @@ namespace DicingBlade.Classes
                 throw new Exception("");
             }
         }
-        private int GetNearestNum(double y)
+        public int GetNearestNum(double y)
         {
             var side = _shape.GetIndexSide(CurrentSide);
             var index = _directions[CurrentSide].index;

@@ -211,6 +211,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition />
                         <RowDefinition />
+                        <RowDefinition />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
@@ -218,31 +219,110 @@
                     </Grid.ColumnDefinitions>
                     <StackPanel>
                         <GroupBox Header="Шпиндель">
-                            <StackPanel>
-                                <Grid>
-                                    <ProgressBar
-                                    Width="150"
-                                    Height="30"
-                                    Margin="3"
-                                    HorizontalAlignment="Center"
-                                    Maximum="40000"
-                                    Minimum="0"
-                                    Value="{Binding SpindleFreqView}" />
-                                    <TextBlock Text="{Binding StringFormat={}{0} Об/мин,Path=SpindleFreqView}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Grid>
-                                <Grid>
-                                    <ProgressBar
-                                    Width="150"
-                                    Height="30"
-                                    Margin="3"
-                                    HorizontalAlignment="Center"
-                                    Maximum="12"
-                                    Minimum="0"
-                                    Value="{Binding SpindleCurrentView}" />
-                                    <TextBlock Text="{Binding StringFormat={}{0} A,Path=SpindleCurrentView}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Grid>
+                            <DockPanel>
+                                <UniformGrid Columns="1" DockPanel.Dock="Left" >
+                                    <Rectangle
+                                        Width="5"
+                                        Margin="3"
+                                        
+                                        >
+                                        <Rectangle.Style>
+                                            <Style TargetType="Rectangle">
+                                                <Setter Property="Fill" Value="{StaticResource SignalRed}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Value="True">
+                                                        <DataTrigger.Binding>
+                                                            <Binding Path="SpindleOnFreq" />
+                                                        </DataTrigger.Binding>
+                                                        <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Rectangle.Style>
+                                    </Rectangle>
+                                    <Rectangle
+                                        Width="5"
+                                        Margin="3"
+                                        >
+                                        <Rectangle.Style>
+                                            <Style TargetType="Rectangle">
+                                                <Setter Property="Fill" Value="{StaticResource SignalRed}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Value="True">
+                                                        <DataTrigger.Binding>
+                                                            <Binding Path="SpindleAccelarating" />
+                                                        </DataTrigger.Binding>
+                                                        <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Rectangle.Style>
+                                    </Rectangle>
+                                    <Rectangle
+                                        Width="5"
+                                        Margin="3"
+                                       >
+                                        <Rectangle.Style>
+                                            <Style TargetType="Rectangle">
+                                                <Setter Property="Fill" Value="{StaticResource SignalRed}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Value="True">
+                                                        <DataTrigger.Binding>
+                                                            <Binding Path="SpindleDeccelarating" />
+                                                        </DataTrigger.Binding>
+                                                        <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Rectangle.Style>
+                                    </Rectangle>
+                                    <Rectangle
+                                        Width="5"
+                                        Margin="3"
+                                        DockPanel.Dock="Top">
+                                        <Rectangle.Style>
+                                            <Style TargetType="Rectangle">
+                                                <Setter Property="Fill" Value="{StaticResource SignalRed}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Value="True">
+                                                        <DataTrigger.Binding>
+                                                            <Binding Path="SpindleStops" />
+                                                        </DataTrigger.Binding>
+                                                        <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Rectangle.Style>
+                                    </Rectangle>
+                                </UniformGrid>
+                                <StackPanel>
+                                    <Grid>
+                                        <ProgressBar
+                                            Width="150"
+                                            Height="30"
+                                            Margin="3"
+                                            HorizontalAlignment="Center"
+                                            Maximum="40000"
+                                            Minimum="0"
+                                            Value="{Binding SpindleFreqView}" />
+                                        <TextBlock Text="{Binding StringFormat={}{0} Об/мин,Path=SpindleFreqView}"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Grid>
+                                    <Grid>
+                                        <ProgressBar
+                                            Width="150"
+                                            Height="30"
+                                            Margin="3"
+                                            HorizontalAlignment="Center"
+                                            Maximum="12"
+                                            Minimum="0"
+                                            Value="{Binding SpindleCurrentView}" />
+                                        <TextBlock Text="{Binding StringFormat={}{0} A,Path=SpindleCurrentView}"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Grid>
 
-                            </StackPanel>
+                                </StackPanel>
+                            </DockPanel>
                         </GroupBox>
                         <GroupBox Header="СОЖ">
                             <Grid>
@@ -251,15 +331,22 @@
                                     Height="30"
                                     Margin="3"
                                     HorizontalAlignment="Center"
-                                    Maximum="12"
+                                    Maximum="2"
                                     Minimum="0"
-                                    Value="{Binding SpindleCurrentView}" />
-                                <TextBlock Text="{Binding StringFormat={}{0} л/мин, Path=CoolantRateView}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    Value="{Binding Flow}" />
+                                <TextBlock Text="{Binding StringFormat={}{0} л/мин, Path=Flow}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Grid>
                         </GroupBox>
                     </StackPanel>
+                    <GroupBox Header="Процесс"  Grid.Row="1" Grid.ColumnSpan="2">
+                        <StackPanel>
+                            <TextBlock Text="{Binding ProcessStatus}" TextAlignment="Center"  Background="AliceBlue" FontStretch="Normal" FontStyle="Normal" FontSize="22" FontFamily="Arial Black" Foreground="#FFF11616"/>
+                            <Label Content="Скорость резки: "></Label>
+                            <Label Content="Количество проходов: "></Label>
+                            <Label Content="Изделие: "></Label>
+                        </StackPanel>
+                    </GroupBox>
                     <StackPanel Grid.Column="1">
-                        <Label Content="{Binding WaferCurrentShiftView}"/>
                         <Border BorderBrush="Transparent" BorderThickness="3">
                             <DockPanel LastChildFill="False">
                                 <Label Content="Охл. шпинделя" DockPanel.Dock="Left" />
@@ -419,8 +506,6 @@
                             <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding StringFormat=Y: {0}, Path=YView}" Background="AliceBlue"/>
                             <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding StringFormat=Z: {0}, Path=ZView}" Background="AliceBlue"/>
                             <TextBlock Grid.Column="1" Grid.Row="3" Text="{Binding StringFormat=U: {0}, Path=UView}" Background="AliceBlue"/>
-                            <TextBlock Grid.Column="2" Grid.Row="2" Grid.RowSpan="3" Text="{Binding ProcessStatus}" TextAlignment="Center"  Background="AliceBlue" FontStretch="Normal" FontStyle="Normal" FontSize="22" FontFamily="Arial Black" Foreground="#FFF11616"/>
-
                             <StackPanel Orientation="Horizontal">
                                 <Rectangle>
                                     <Rectangle.Style>
@@ -617,81 +702,6 @@
                     Visibility="{Binding VelocityRegime, Converter={StaticResource MatchEnumConverter}, ConverterParameter={x:Static local:Velocity.Step}}" />
                         </Grid>
                     </GroupBox>
-                    <!--<GroupBox Header="Наладка">
-                        <Grid>
-                            <StackPanel>
-                                <StackPanel>
-                                    <StackPanel Orientation="Horizontal">
-                                        <Label Content="ProcessStatus" />
-                                        <Label Content="{Binding Process.ProcessStatus}" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal">
-                                        <Label Content="SideDone" />
-                                        <Label Content="{Binding Process.SideDone}" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal">
-                                        <Label Content="SideCounter" />
-                                        <Label Content="{Binding Process.SideCounter}" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal">
-                                        <Label Content="CurrentLine" />
-                                        <Label Content="{Binding Process.CurrentLine}" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal">
-                                        <Label Content="SpindleFreq" />
-                                        <Label Content="{Binding Machine.SpindleFreq}" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal">
-                                        <Label Content="SpindleCurrent" />
-                                        <Label Content="{Binding Machine.SpindleCurrent}" />
-                                    </StackPanel>
-                                </StackPanel>
-                                <Border
-                                Width="30"
-                                BorderBrush="Black"
-                                BorderThickness="2">
-                                    <Canvas
-                                    Width="30"
-                                    Height="150"
-                                    Background="White">
-                                        <Rectangle
-                                        Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType={x:Type Canvas}}}"
-                                        Height="50"
-                                        Fill="LightCyan">
-                                            <Rectangle.RenderTransform>
-                                                <TransformGroup>
-                                                    <ScaleTransform ScaleY="-1" />
-                                                    <TranslateTransform Y="{Binding ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}" />
-                                                </TransformGroup>
-                                            </Rectangle.RenderTransform>
-                                        </Rectangle>
-                                        <Line
-                                        Stroke="OrangeRed"
-                                        StrokeThickness="3"
-                                        X1="0"
-                                        X2="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType={x:Type Canvas}}}"
-                                        Y2="{Binding Y1, RelativeSource={RelativeSource Mode=Self}}">
-                                            <Line.Y1>
-                                                <MultiBinding Converter="{StaticResource ZIndConverter}">
-                                                    <Binding Path="ActualHeight" RelativeSource="{RelativeSource AncestorType={x:Type Canvas}, Mode=FindAncestor}" />
-                                                    <Binding FallbackValue="1" Path="Wafer.Thickness" />
-                                                    <Binding Path="ZView" />
-                                                    <Binding Path="ZBladeTouchView" />
-                                                </MultiBinding>
-                                            </Line.Y1>
-                                            <Line.RenderTransform>
-                                                <TransformGroup>
-                                                    <ScaleTransform ScaleY="-1" />
-                                                    <TranslateTransform Y="{Binding ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}" />
-                                                </TransformGroup>
-                                            </Line.RenderTransform>
-                                        </Line>
-                                    </Canvas>
-                                </Border>
-                            </StackPanel>
-
-                        </Grid>
-                    </GroupBox>-->
                 </Grid>
             </GroupBox>
             <Border
@@ -1298,7 +1308,6 @@
                                     </MultiBinding>
                                 </TranslateTransform.Y>
                             </TranslateTransform>
-                            <TranslateTransform Y="{Binding Path=Process.CutOffset}" />
                             <ScaleTransform ScaleY="{Binding Path=Machine.CameraScale}" />
                             <ScaleTransform ScaleY="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Canvas}}" />
 

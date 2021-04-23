@@ -14,6 +14,17 @@ namespace DicingBlade.Classes
         /// <summary>
         ///     Gets frequency, current, spinning state
         /// </summary>
-        public event Action<int, double, bool> GetSpindleState;
+        
+        public event EventHandler<SpindleEventArgs> GetSpindleState;
+    }
+
+    public class SpindleEventArgs : EventArgs
+    {
+        public int Rpm { get; set; } = 0;
+        public double Current { get; set; } = 0;
+        public bool OnFreq { get; set; } = false;
+        public bool Accelerating { get; set; } = false;
+        public bool Deccelarating { get; set; } = false;
+        public bool Stop { get; set; } = true;
     }
 }

@@ -46,7 +46,8 @@ namespace DicingBlade.Classes
         Correcting = 16,
         Done = 32,
         MovingNextDir = 64,
-        Ending = 128
+        Ending = 128,
+        Pause = 256
     }
     /// <summary>
     /// Структура параметров процесса

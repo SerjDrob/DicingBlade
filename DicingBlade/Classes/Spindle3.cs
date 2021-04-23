@@ -48,7 +48,10 @@ namespace DicingBlade.Classes
                 return data[0]!=0;
             }
         }
-        public event Action<int, double, bool> GetSpindleState;
+
+       
+        public event EventHandler<SpindleEventArgs> GetSpindleState;
+       
 
         public bool IsConnected { get; set; } = false;
 
@@ -71,14 +74,17 @@ namespace DicingBlade.Classes
             {
                // _client.WriteSingleRegister(1, 0x1001, 0x0020);
                 _client.WriteSingleRegister(1, 0x1001, 0x0001);
+                _hasStarted = true;
             }
         }
 
+        private bool _hasStarted = false;
         public void Stop()
         {
             lock (_modbusLock)
             {
                 _client.WriteSingleRegister(1, 0x1001, 0x0003);
+                _hasStarted = false;
             }
         }
 
@@ -90,7 +96,7 @@ namespace DicingBlade.Classes
                 BaudRate = 9600,
                 Parity = Parity.Even,
                 WriteTimeout = 1000,
-                ReadTimeout = 1000
+                ReadTimeout = 100
             };
             
             _serialPort.Open();
@@ -108,32 +114,51 @@ namespace DicingBlade.Classes
 
         private async Task WatchingStateAsync()
         {
-            async Task Function()
-            {
-                while (true)
-                {
-                    try
-                    {
-                        int current;
-                        int freq;
-                        lock (_modbusLock)
-                        {
-                            var data = _client.ReadHoldingRegisters(1, 0xD000, 2);
-                            current = data[1];
-                            freq = data[0];
-                        }
-                        GetSpindleState?.Invoke(freq * 6, (double)current / 10, freq > 0);
-                    }
-                    catch (ModbusException)
-                    {
-                        //throw;
-                    }
+            ushort[] data = default;
+            bool onFreq = false;
+            bool acc = false;
+            bool dec = false;
+            bool stop = false;
 
-                    await Task.Delay(100).ConfigureAwait(false);
+            while (true)
+            {
+                try
+                {
+                    int current;
+                    int freq;
+                    lock (_modbusLock)
+                    {
+                        data = _client.ReadHoldingRegisters(1, 0xD000, 2);
+                        current = data[1];
+                        freq = data[0];
+                        data = _client.ReadHoldingRegisters(1, 0x2000, 1);
+                        onFreq = ((data[0] == 0x0001) | (data[0] == 0x0002));
+                        acc = ((data[0] == 0x0011) | (data[0] == 0x0012));
+                        dec = ((data[0] == 0x0014) | (data[0] == 0x0015));
+                        stop = (data[0] == 0x0003);
+                    }
+                    //GetSpindleState?.Invoke(freq * 6, (double)current / 10, onFreq);
+                    GetSpindleState?.Invoke(
+                        null,
+                        new SpindleEventArgs()
+                        {
+                            Rpm=freq*6,
+                            Current = (double)current/10,
+                            Accelerating=acc,
+                            Deccelarating=dec,
+                            OnFreq=onFreq,
+                            Stop=stop
+                        }
+                        );
                 }
+                catch (ModbusException)
+                {
+                    //throw;
+                }
+
+                await Task.Delay(100).ConfigureAwait(false);
             }
 
-            Task.Run(Function);
         }
 
         private bool SetParams()

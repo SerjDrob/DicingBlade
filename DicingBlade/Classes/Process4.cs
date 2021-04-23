@@ -20,8 +20,8 @@ namespace DicingBlade.Classes
     [AddINotifyPropertyChangedInterface]
     internal class Process4 : IMessager, IDisposable
     {
-        public Process4(IMachine machine, Wafer2D wafer, Blade blade, ITechnology technology, Diagram[] proc) // В конструкторе происходит загрузка технологических параметров
-        {            
+        public Process4(IMachine machine, Wafer2D wafer, Blade blade, ITechnology technology, Diagram[] proc) 
+        {
             blade.Thickness = 0.11;
             blade.Diameter = 55.6;
 
@@ -42,37 +42,34 @@ namespace DicingBlade.Classes
             Task.Delay(500).Wait();
             if (!_machineVacuumSensor)
             {
-                throw new ProcessException("Отсутствует вакуум на столике. Возможно не установлена рамка или неисправна вакуумная система");
+               // throw new ProcessException("Отсутствует вакуум на столике. Возможно не установлена рамка или неисправна вакуумная система");
             }
             if (!_spindleWorking)
             {
                 //  throw new ProcessException("Не включен шпиндель");
             }
-                        
-            CancelProcess = false;            
-
+           
             _checkCut.Set(technology.StartControlNum, technology.ControlPeriod);
             
             ProcessStatus = Status.StartLearning;
 
             var singleCutCondition = new Condition(true);
-            var _singleCutSequence = new Sequence()
+            var singleCutSequence = new Sequence()
                 .Hire(new Leaf(GetFunc(Diagram.GoTransferingHeightZ)))
                 .Hire(new Leaf(GetFunc(Diagram.GoCurPositionCutXy)))
                 .Hire(new Leaf(GetFunc(Diagram.GoNextDepthZ)))
-                .Hire(new Leaf(GetFunc(Diagram.CuttingX)))                
-                //.Hire(new Leaf(GetFunc(Diagram.GoTransferingHeightZ)))
+                .Hire(new Leaf(GetFunc(Diagram.CuttingX))) 
                 .Hire(new Leaf(GetFunc(Diagram.GoCameraPointXyz)))
                 .Hire(new Leaf(async ()=> { singleCutCondition.SetState(false); }));
 
-            var _singleCutTicker = new Ticker(_singleCutSequence, singleCutCondition);
-            _singleCutLeaf = new Leaf(async () => { singleCutCondition.SetState(true); }, _singleCutTicker);
+            var singleCutTicker = new Ticker(singleCutSequence, singleCutCondition);
+            _singleCutLeaf = new Leaf(async () => { singleCutCondition.SetState(true); }, singleCutTicker);
             _singleCutLeaf.SetPauseToken(new PauseTokenSource());
             _workingCondition = new(true);
-            var InspectLeaf = new Leaf(TakeThePhotoAsync);//.SetBlock(_cutInspectCondition);
+            var inspectLeaf = new Leaf(TakeThePhotoAsync);//.SetBlock(_cutInspectCondition);
             var nextSideLeaf = new Leaf(GetFunc(Diagram.GoNextDirection)).SetBlock(_sideDoneCondition);
             var inspectSelector = new Selector()
-                .Hire(InspectLeaf).SetBlock(_cutInspectCondition)
+                .Hire(inspectLeaf).SetBlock(_cutInspectCondition)
                 .Hire(new Leaf(CorrectionAsync)).SetBlock(_correctSelCondition);
 
             _workingSequence
@@ -84,29 +81,29 @@ namespace DicingBlade.Classes
                 .Hire(new Leaf(GetFunc(Diagram.GoTransferingHeightZ)))
                 .Hire(nextSideLeaf);
 
-            _learningSequence = new();
+            Sequence learningSequence = new();
             _learningCondition = new(true);           
 
             var rotationSelector = new Selector();
             var rotationLeaf = new Leaf(IncrementDir,new Leaf(GetFunc(Status.MovingNextDir), new Leaf(GetFunc(Status.StartLearning))))
                                         .SetBlock(_rotateLearningCondition);
 
-            _learningSequence                
+            learningSequence                
                 .Hire(new Leaf(GetFunc(Status.Learning), rotationLeaf))
                 .SetBlock(_learningCondition);
 
             var workingTicker = new Ticker(_workingSequence, _workingCondition);
             _rootSequence
                 .Hire(new Leaf(GetFunc(Status.StartLearning)))
-                .Hire(_learningSequence)
+                .Hire(learningSequence)
                 .Hire(workingTicker)
                 .Hire(new Leaf(EndProcess));
 
             rotationLeaf.CheckMyCondition      += SetConditionsStates;
-            _learningSequence.CheckMyCondition += SetConditionsStates;
+            learningSequence.CheckMyCondition += SetConditionsStates;
             nextSideLeaf.CheckMyCondition      += SetConditionsStates;
             rotationSelector.CheckMyCondition  += SetConditionsStates;
-            InspectLeaf.CheckMyCondition       += SetConditionsStates;
+            inspectLeaf.CheckMyCondition       += SetConditionsStates;
             workingTicker.CheckMyCondition     += SetConditionsStates;
             inspectSelector.CheckMyCondition   += SetConditionsStates;
 
@@ -114,7 +111,6 @@ namespace DicingBlade.Classes
             _learningDone = false;
             _rootSequence.SetPauseToken(_pauseProcTokenSource);
             _rootSequence.DoWork();
-            procCount++;
         }
 
         public void RefresfTechnology(ITechnology technology)
@@ -129,7 +125,6 @@ namespace DicingBlade.Classes
             ThrowMessage("Всё!",0);
         }
         private ITechnology _technology;
-        
         private async Task SetProcessStatus()
         {
             ProcessStatus = Status.Working;
@@ -184,19 +179,14 @@ namespace DicingBlade.Classes
         #endregion
         private PauseTokenSource _pauseProcTokenSource = new();
         private bool _learningNextDir              = true;
-        private Condition _bladeInWaferCond        = new();
         private Condition _learningCondition       = new();
         private Sequence _workingSequence          = new();
-        private Selector _learningSelector         = new();
-        private Selector _workingSelector          = new();
         private Condition _workingCondition        = new();
         private Condition _cutInspectCondition     = new();
         private Condition _sideDoneCondition       = new(false);
-        private Sequence _rootSequence             = new();        
-        private Condition _inspectSelCondition     = new();
+        private Sequence _rootSequence             = new();
         private Condition _correctSelCondition     = new();
         private Condition _rotateLearningCondition = new(true);
-        private Sequence _learningSequence;
         private Leaf _singleCutLeaf;
         private TempWafer2D _tempWafer2D;
         private List<Task> _localTasks             = new();
@@ -206,12 +196,10 @@ namespace DicingBlade.Classes
             _localTasks.Add(task);
             await task.ConfigureAwait(false);
         }
-
         public async Task WaitProcDoneAsync()
         {
             await Task.WhenAll(_localTasks);            
         }
-
         private Func<Task> GetFunc(Diagram element)
         {
             var x = new double();
@@ -461,8 +449,8 @@ namespace DicingBlade.Classes
                 Status.Working => new Func<Task>(
                     async () =>
                     {
-                        PauseProcess = true;
-                        if (PauseProcess) AwaitTaskAsync(PauseScenarioAsync());
+                        //PauseProcess = true;
+                        //if (PauseProcess) AwaitTaskAsync(PauseScenarioAsync());
                         CutWidthMarkerVisibility = Visibility.Visible;
                         ChangeScreensEvent?.Invoke(true);
                         ProcessStatus = Status.Correcting;
@@ -479,7 +467,7 @@ namespace DicingBlade.Classes
                         ProcessStatus = Status.Working;
                         CutWidthMarkerVisibility = Visibility.Hidden;
                         CutOffset = 0;
-                        PauseProcess = false;
+                        //PauseProcess = false;
                         _machine.FreezeVideoCapture();
                     })
                 ,
@@ -514,9 +502,9 @@ namespace DicingBlade.Classes
                 }
             }
         }
-        private void _machine_OnSpindleStateChanging(int frequency, double current, bool working)
+        private void _machine_OnSpindleStateChanging(object? obj, SpindleEventArgs e )
         {
-            _spindleWorking = working;
+            _spindleWorking = e.OnFreq;
             switch (ProcessStatus)
             {
                 case Status.None:
@@ -526,7 +514,7 @@ namespace DicingBlade.Classes
                 case Status.Learning:
                     break;
                 case Status.Working when IsCutting & !_spindleWorking:
-                   // ThrowMessage("Пластине кранты!",0);
+                    EmergencyScript();
                     break;
                 case Status.Correcting:
                     break;
@@ -536,24 +524,55 @@ namespace DicingBlade.Classes
                     break;
             }
         }
-        public static int procCount = 0;
+        
         private void _machine_OnSensorStateChanged(Sensors sensor, bool state)
         {
-            switch (sensor)
+            if (!state)
             {
-                case Sensors.ChuckVacuum:
-                    _machineVacuumSensor = state;
-                    break;
-                case Sensors.Air:
-                    break;
-                case Sensors.Coolant:
-                    break;
-                case Sensors.SpindleCoolant:
-                    break;
-                default:
-                    break;
+                switch (ProcessStatus)
+                {
+                    case Status.None:
+                        break;
+                    case Status.StartLearning:
+                        break;
+                    case Status.Learning:
+                        break;
+                    case Status.Working:
+                        if (IsCutting)
+                        { 
+                            if (!_pauseProcTokenSource.IsPaused)
+                            {
+                                //EmergencyScript();
+                                //_pauseProcTokenSource.Pause();
+                                //ThrowMessage?.Invoke($"Аварийная остановка.{_machine.GetSensorName(sensor)}",0);
+                            }
+                        }
+                        break;
+                    case Status.Correcting:
+                        break;
+                    case Status.Done:
+                        break;
+                    case Status.MovingNextDir:
+                        break;
+                    case Status.Ending:
+                        break;
+                    case Status.Pause:
+                        break;
+                }
             }
+
+            if (state)
+            {
+                _offSensors ^= sensor;
+            }
+            else
+            {
+                _offSensors |= sensor;
+            }
+
         }
+
+        private Sensors _offSensors = 0;
         private void _machine_OnAxisMotionStateChanged(Ax axis, double position, bool nLmt, bool pLmt, bool motionDone, bool motionStart)
         {
             switch (axis)
@@ -607,50 +626,9 @@ namespace DicingBlade.Classes
         public double CutOffset { get; set; } = 0;
 
         private double _bladeTransferGapZ /*{ get; set; }*/ = 2;
-        private bool IsCutting { get; set; } = false;       
-
-        private bool _pauseProcess;
-        public bool PauseProcess
-        {
-            get => _pauseProcess;
-            set
-            {
-                _pauseProcess = value;
-                if (_pauseToken != null)
-                {
-                    if (value)
-                    {
-                        _pauseToken.Pause();
-                    }
-                    else _pauseToken.Resume();
-                }
-            }
-        }
-        private bool _cancelProcess;
-        public bool CancelProcess
-        {
-            set
-            {
-                _cancelProcess = value;
-                if (_cancellationToken != null)
-                {
-                    if (value)
-                    {
-                        _cancellationToken.Cancel();
-                    }
-                }
-            }
-        }
-
-        private PauseTokenSource _pauseToken;
-
-        private Diagram[] _baseProcess;
-
-        private CancellationTokenSource _cancellationToken;
+        private bool IsCutting { get; set; } = false;   
         public bool SideDone { get; private set; } = false;
-       
         private bool BladeInWafer => _zActual > _machine.GetGeometry(Place.ZBladeTouch,Ax.Z) - _wafer.Thickness - _bladeTransferGapZ;
-
         public int CurrentLine { get; private set; }
         
         private double _feedSpeed;
@@ -658,11 +636,8 @@ namespace DicingBlade.Classes
         public GetRotation GetRotationEvent;
         private bool _learningDone;
         private ProcParams _procParamsEventArgs;
-
         public event Action<string,int> ThrowMessage;
-
         public bool Rotation { get; set; } = false;
-
         public async Task PauseScenarioAsync()
         {
             await AwaitTaskAsync(_machine.WaitUntilAxisStopAsync(Ax.X));
@@ -768,31 +743,69 @@ namespace DicingBlade.Classes
             _inspectX = _xActual;
             OnControlPointAppeared();
         }
+        private void GetPermissionBySensors(Sensors sensors)
+        {
+            string s = default;
+            foreach (var sensor in Enum.GetValues(typeof(Sensors)))
+            {
+                if (sensors.HasFlag((Sensors)sensor))
+                {
+                    s += _machine.GetSensorName((Sensors)sensor) + "\n";
+                }
+            }
+
+            if (s != default)
+            {
+                throw new ProcessException($"Отсутствует:\n{s}");
+            }
+        }
         public async Task StartPauseProc()
         {
-            if (ProcessStatus!=Status.Working & ProcessStatus !=Status.Correcting)
-            {
-                /*await*/ _rootSequence.DoWork();
+            
+
+            //GetPermissionBySensors(_offSensors);
+            if (!(Status.Working|Status.Correcting|Status.Pause).HasFlag(ProcessStatus))
+            { 
+                _machine.StartVideoCapture(0);
+                _rootSequence.DoWork();
             }
             else
             {
+                if (ProcessStatus == Status.Pause)
+                {
+                    _pauseProcTokenSource.Resume();
+                    ProcessStatus = Status.Working;
+                    return;
+                }
                 if (_correctSelCondition.State)
                 { 
                     var result = MessageBox.Show($"Сместить следующие резы на {CutOffset} мм?", "", MessageBoxButton.OKCancel);
-                    if (result == MessageBoxResult.OK) _wafer.AddToSideShift(CutOffset);
+                    if (result == MessageBoxResult.OK)
+                    {
+                        _wafer.AddToSideShift(CutOffset);
+                    }
+                    var nearestNum =
+                        _wafer.GetNearestNum(_yActual - _machine.GetGeometry(Place.CameraChuckCenter, Ax.Y));
+                    if(CurrentLine != nearestNum)
+                    {
+                        result = MessageBox.Show($"Изменить номер реза на {nearestNum}?", "", MessageBoxButton.OKCancel);
+                        if (result == MessageBoxResult.OK)
+                        {
+                            CurrentLine=nearestNum-1;
+                        }
+                    }
                     ChangeScreensEvent?.Invoke(false);                    
                     CutWidthMarkerVisibility = Visibility.Hidden;
                     CutOffset = 0;
-                    PauseProcess = false;
                     _machine.FreezeVideoCapture();
                     _correctSelCondition.SetState(false);
-                    OnProcessStatusChanged("Работа");
+                    OnProcessStatusChanged?.Invoke("Работа");
                     ProcessStatus = Status.Working;
                 }
                 else
                 {
                     _correctSelCondition.SetState(true);
-                    OnProcessStatusChanged("Пауза");
+                    OnProcessStatusChanged?.Invoke("Пауза");
                     ProcessStatus = Status.Correcting;                    
                 }
             }
@@ -825,6 +838,7 @@ namespace DicingBlade.Classes
         public void EmergencyScript()
         {
             _pauseProcTokenSource.Pause();
+            //ProcessStatus = Status.Pause;
             _machine.Stop(Ax.X);
             _machine.MoveAxInPosAsync(Ax.Z, 0);
             _machine.StopSpindle();
@@ -839,7 +853,7 @@ namespace DicingBlade.Classes
         }
         public void Dispose()
         {
-            _cancellationToken?.Dispose();
+            //_cancellationToken?.Dispose();
         }
         ~Process4()
         {            

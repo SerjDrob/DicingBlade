@@ -10,6 +10,12 @@
     <Nullable>disable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Classes\Process2.cs" />
+    <Compile Remove="Classes\Process3.cs" />
+    <Compile Remove="Classes\Spindle.cs" />
+    <Compile Remove="Classes\Spindle2.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <None Remove="Views\cutshift.png" />
     <None Remove="Views\learning.png" />
     <None Remove="Views\settings.png" />

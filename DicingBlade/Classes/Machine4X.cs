@@ -54,7 +54,7 @@ namespace DicingBlade.Classes
         public event ValveStateHandler OnValveStateChanged;
         public event AxisMotioStateHandler OnAxisMotionStateChanged;
         public event BitmapHandler OnVideoSourceBmpChanged;
-        public event Action<int, double, bool> OnSpindleStateChanging;
+        public event EventHandler<SpindleEventArgs> OnSpindleStateChanging;
 
         public void AddGroup(Groups group, IAxis[] axes)
         {
@@ -169,16 +169,31 @@ namespace DicingBlade.Classes
 
         public async Task MoveAxInPosAsync(Ax axis, double position, bool precisely = false)
         {
-            if (precisely)
-                await MotionDevice.MoveAxisPreciselyAsync(_axes[axis].AxisNum, _axes[axis].LineCoefficient, position);
-            else
-                await Task.Run(() =>
-                {
-                    MotionDevice.MoveAxisAsync(_axes[axis].AxisNum, position);
-                    while (!_axes[axis].MotionDone) ;
-                });
+            if (!_axes[axis].Busy)
+            {
+                SetAxisBusy(axis);
+                if (precisely)
+                    await MotionDevice.MoveAxisPreciselyAsync(_axes[axis].AxisNum, _axes[axis].LineCoefficient,
+                        position);
+                else
+                    await Task.Run(() =>
+                    {
+                        MotionDevice.MoveAxisAsync(_axes[axis].AxisNum, position);
+                        while (!_axes[axis].MotionDone) ;
+                    });
+                ResetAxisBusy(axis);
+            }
         }
 
+        private void SetAxisBusy(Ax axis)
+        {
+            _axes[axis].Busy = true;
+        }
+
+        private void ResetAxisBusy(Ax axis)
+        {
+            _axes[axis].Busy = false;
+        }
         public void ResetErrors(Ax axis = Ax.All)
         {
             if (axis == Ax.All)
@@ -203,7 +218,13 @@ namespace DicingBlade.Classes
             VelocityRegime = velocity;
             foreach (var axis in _axes)
                 if (axis.Value.VelRegimes != null)
-                    MotionDevice.SetAxisVelocity(axis.Value.AxisNum, axis.Value.VelRegimes[velocity]);
+                {
+                    double vel = default;
+                    if (axis.Value.VelRegimes.TryGetValue(velocity, out vel))
+                    {
+                        MotionDevice.SetAxisVelocity(axis.Value.AxisNum, axis.Value.VelRegimes[velocity]);
+                    }
+                }
                 else
                     throw new MotionException($"Не настроенны скоростные режимы оси {axis.Key.ToString()}");
             foreach (var group in _axesGroups.Values)
@@ -242,53 +263,69 @@ namespace DicingBlade.Classes
             return MotionDevice.GetAxisDout(_axes[_valves[valve].axis].AxisNum, (ushort) _valves[valve].dOut);
         }
 
+        private bool BusyGroup(Groups group)
+        {
+            var busy = false;
+            foreach (var axis in _axesGroups[group].axes)
+            {
+                busy |= _axes[axis].Busy;
+            }
+
+            return busy;
+        }
+
         public async Task MoveGpInPosAsync(Groups group, double[] position, bool precisely = false)
         {
-            var k = new double();
-            try
+
+
+            if (!BusyGroup(group))
             {
-                k = Math.Abs((position.First() - _axes[Ax.X].CmdPosition) /
-                             (position.Last() - _axes[Ax.Y].ActualPosition)); //ctg a
-            }
-            catch (DivideByZeroException)
-            {
-                k = 1000;
-            }
+                var k = new double();
+                try
+                {
+                    k = Math.Abs((position.First() - _axes[Ax.X].CmdPosition) /
+                                 (position.Last() - _axes[Ax.Y].ActualPosition)); //ctg a
+                }
+                catch (DivideByZeroException)
+                {
+                    k = 1000;
+                }
 
-            var vx = _velRegimes[Ax.X][VelocityRegime];
-            var vy = _velRegimes[Ax.Y][VelocityRegime];
-            var kmax = vx / vy; // ctg a
+                var vx = _velRegimes[Ax.X][VelocityRegime];
+                var vy = _velRegimes[Ax.Y][VelocityRegime];
+                var kmax = vx / vy; // ctg a
 
-            var v = (k / kmax) switch
-            {
-                1 => Math.Sqrt(vx * vx + vy * vy),
-                < 1 => vy / Math.Sin(Math.Atan(1 / k)), // / Math.Sqrt(1 / (1 + k * k)),//yconst
-                > 1 => vx / Math.Cos(Math.Atan(1 / k)) //Math.Sqrt(k * k / (1 + k * k)) //xconst
-            };
-            MotionDevice.SetGroupVelocity(_axesGroups[group].groupNum, v);
+                var v = (k / kmax) switch
+                {
+                    1 => Math.Sqrt(vx * vx + vy * vy),
+                    < 1 => vy / Math.Sin(Math.Atan(1 / k)), // / Math.Sqrt(1 / (1 + k * k)),//yconst
+                    > 1 => vx / Math.Cos(Math.Atan(1 / k)) //Math.Sqrt(k * k / (1 + k * k)) //xconst
+                };
+                MotionDevice.SetGroupVelocity(_axesGroups[group].groupNum, v);
 
-            if (precisely)
-            {
-                var gpNum = _axesGroups[group].groupNum;
-                var axesNums = _axes.Where(a => _axesGroups[group].axes.Contains(a.Key)).Select(n => n.Value.AxisNum);
-                var lineCoeffs = _axes.Where(a => _axesGroups[group].axes.Contains(a.Key))
-                    .Select(n => n.Value.LineCoefficient);
-                var gpAxes = axesNums.Zip(lineCoeffs, (a, b) => new ValueTuple<int, double>(a, b)).ToArray();
+                if (precisely)
+                {
+                    var gpNum = _axesGroups[group].groupNum;
+                    var axesNums = _axes.Where(a => _axesGroups[group].axes.Contains(a.Key)).Select(n => n.Value.AxisNum);
+                    var lineCoeffs = _axes.Where(a => _axesGroups[group].axes.Contains(a.Key))
+                        .Select(n => n.Value.LineCoefficient);
+                    var gpAxes = axesNums.Zip(lineCoeffs, (a, b) => new ValueTuple<int, double>(a, b)).ToArray();
 
-                var n = _axesGroups[group].axes.FindIndex(a => a == Ax.Y);
+                    var n = _axesGroups[group].axes.FindIndex(a => a == Ax.Y);
 
-                position[n] -= 0.03;
+                    position[n] -= 0.03;
 
-                await MotionDevice.MoveGroupPreciselyAsync(gpNum, position, gpAxes);
+                    await MotionDevice.MoveGroupPreciselyAsync(gpNum, position, gpAxes);
 
-                position[n] += 0.03;
+                    position[n] += 0.03;
 
-                await MotionDevice.MoveAxisPreciselyAsync(_axes[Ax.Y].AxisNum, _axes[Ax.Y].LineCoefficient,
-                    position[n]);
-            }
-            else
-            {
-                await MotionDevice.MoveGroupAsync(_axesGroups[group].groupNum, position);
+                    await MotionDevice.MoveAxisPreciselyAsync(_axes[Ax.Y].AxisNum, _axes[Ax.Y].LineCoefficient,
+                        position[n]);
+                }
+                else
+                {
+                    await MotionDevice.MoveGroupAsync(_axesGroups[group].groupNum, position);
+                }
             }
         }
 
@@ -384,6 +421,22 @@ namespace DicingBlade.Classes
                 {
                     throw new MotionException($"Для оси {axis.Key} не заданы скоростные режимы");
                 }
+        }
+
+        public string GetSensorName(Sensors sensor)
+        {
+            
+            var name = "";
+            try
+            {
+                name = _sensors[sensor].name;
+            }
+            catch (KeyNotFoundException)
+            {
+                throw new MachineException($"Датчик {sensor} не сконфигурирован");
+            }
+
+            return name;
         }
 
         public void StartVideoCapture(int ind)
@@ -497,6 +550,7 @@ namespace DicingBlade.Classes
 
         public void StartSpindle(params Sensors[] blockers)
         {
+            _spindleBlockers = new(blockers);
             foreach (var blocker in blockers)
             {
                 var axis = _axes[_sensors[blocker].axis];
@@ -504,21 +558,21 @@ namespace DicingBlade.Classes
                 if (!axis.GetDi(di)^_sensors[blocker].invertion)
                 {
                     throw new MachineException($"Отсутствует {_sensors[blocker].name}");
-                    return;
                 }
             }
 
             Spindle.Start();
         }
 
+        private List<Sensors> _spindleBlockers;
         public void StopSpindle()
         {
             Spindle.Stop();
         }
 
-        private void _spindle_GetSpindleState(int rpm, double current, bool spinningState)
+        private void _spindle_GetSpindleState(object? obj, SpindleEventArgs e)
         {
-            OnSpindleStateChanging?.Invoke(rpm, current, spinningState);
+            OnSpindleStateChanging?.Invoke(null, e);
         }
 
         private void MotionDevice_TransmitAxState(int axisNum, AxisState state)
@@ -540,11 +594,21 @@ namespace DicingBlade.Classes
                 OnAxisMotionStateChanged?.Invoke(axis, position, state.nLmt, state.pLmt, state.motionDone,
                     state.vhStart);
 
+
+
                 foreach (var sensor in Enum.GetValues(typeof(Sensors)))
                     if (_sensors != null)
                     {
                         var ax = _sensors[(Sensors) sensor].axis;
-                        OnSensorStateChanged?.Invoke((Sensors) sensor, _axes[ax].GetDi(_sensors[(Sensors) sensor].dIn) ^ _sensors[(Sensors)sensor].invertion);
+                        var condition = _axes[ax].GetDi(_sensors[(Sensors) sensor].dIn) ^
+                                        _sensors[(Sensors) sensor].invertion;
+                        if (!condition & (_spindleBlockers?.Contains((Sensors) sensor) ?? false))
+                        {
+                            StopSpindle();
+                            //throw new MachineException(
+                            //    $"Аварийное отключение шпинделя. {_sensors[(Sensors) sensor].name}");
+                        }
+                        OnSensorStateChanged?.Invoke((Sensors) sensor, condition);
                     }
 
                 foreach (var valve in Enum.GetValues(typeof(Valves)))

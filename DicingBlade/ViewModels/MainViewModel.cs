@@ -29,6 +29,8 @@ namespace DicingBlade.ViewModels
         private bool _homeDone;
         private ITechnology _technology;
 
+        private IComSensor _flowMeter;
+
         private Task _tracingTask;
         private CancellationToken _tracingTaskCancellationToken;
 
@@ -110,8 +112,8 @@ namespace DicingBlade.ViewModels
                 {
                     {Sensors.Air, (Ax.Z, Di.In1, false, "Воздух")},
                     {Sensors.ChuckVacuum, (Ax.X, Di.In2, false, "Вакуум")},
-                    {Sensors.Coolant, (Ax.X, Di.In3, false, "СОЖ")},
-                    {Sensors.SpindleCoolant, (Ax.Y, Di.In2, true, "Охлаждение шпинделя")}
+                    {Sensors.Coolant, (Ax.U, Di.In2, false, "СОЖ")},
+                    {Sensors.SpindleCoolant, (Ax.Y, Di.In2, false, "Охлаждение шпинделя")}
                 });
 
 
@@ -141,6 +143,14 @@ namespace DicingBlade.ViewModels
             _settingsService = new();
             _settingsService.OnSettingsChangedEvent += _settingsService_OnSettingsChangedEvent;
             AjustWaferTechnology();
+            _flowMeter = new FlowMeter("COM9");
+            _flowMeter.GetData += _flowMeter_GetData;
+        }
+
+        public double Flow { get; set; }
+        private void _flowMeter_GetData(decimal obj)
+        {
+            Flow = (double)obj;
         }
 
         private void _settingsService_OnSettingsChangedEvent(object sender, SettingsChangedEventArgs eventArgs)
@@ -207,7 +217,10 @@ namespace DicingBlade.ViewModels
         public double WaferCurrentShiftView { get; set; }
         public ObservableCollection<TraceLine> ControlPointsView { get; set; } = new();
         public bool ResetView { get; private set; }
-        public bool SpindleState { get; private set; }
+        public bool SpindleOnFreq { get; private set; }
+        public bool SpindleAccelarating { get; private set; }
+        public bool SpindleDeccelarating { get; private set; }
+        public bool SpindleStops { get; private set; }
         public double PointX { get; set; }
         public double PointY { get; set; }
         public double CutWidthView { get; set; } = 0.05;
@@ -278,11 +291,14 @@ namespace DicingBlade.ViewModels
             }
         }
 
-        private void _machine_OnSpindleStateChanging(int rpm, double current, bool spinningState)
+        private void _machine_OnSpindleStateChanging(object? obj, SpindleEventArgs e)
         {
-            SpindleFreqView = rpm;
-            SpindleCurrentView = current;
-            SpindleState = spinningState;
+            SpindleFreqView = e.Rpm;
+            SpindleCurrentView = e.Current;
+            SpindleOnFreq = e.OnFreq;
+            SpindleAccelarating = e.Accelerating;
+            SpindleDeccelarating = e.Deccelarating;
+            SpindleStops = e.Stop;
         }
 
         private void _machine_OnVideoSourceBmpChanged(BitmapImage bitmapImage)
@@ -520,7 +536,7 @@ namespace DicingBlade.ViewModels
             if (key.Key == Key.S) _machine.GoWhile(Ax.U, AxDir.Neg);
             if (key.Key == Key.F2)
             {
-                if (SpindleState)
+                if (SpindleAccelarating | SpindleOnFreq)
                     _machine.StopSpindle();
                 else
                     try
@@ -573,6 +589,7 @@ namespace DicingBlade.ViewModels
                         {
                             await Process.WaitProcDoneAsync();
                             Process = null;
+                            Substrate = null;
                             AjustWaferTechnology();
                         }
                         else
