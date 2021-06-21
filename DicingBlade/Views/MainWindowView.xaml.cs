@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using DicingBlade.ViewModels;
 
 namespace DicingBlade.Views
@@ -14,6 +15,10 @@ namespace DicingBlade.Views
 
             DataContext = viewModel;
         }
-
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+            Environment.Exit(0);
+        }
     }
 }
