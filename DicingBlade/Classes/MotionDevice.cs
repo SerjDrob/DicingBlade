@@ -148,7 +148,7 @@ namespace DicingBlade.Classes
 
                     TransmitAxState(num, axState);
                 }
-                 Task.Delay(1).Wait();
+                Task.Delay(1).Wait();
             }
         }
         public int FormAxesGroup(int[] axisNums)
