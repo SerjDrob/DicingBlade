@@ -232,11 +232,7 @@ namespace DicingBlade.ViewModels
         public ObservableCollection<TracePath> Traces { get; set; }
         public double WvAngle { get; set; }
         public bool WvRotate { get; set; }
-        public double RotatingTime { get; set; } = 1;
-
-        //  private TempWafer2D _tempWafer2;
-
-        // private bool _test;
+        public double RotatingTime { get; set; } = 1;        
         public Map Condition { get; set; }
         public double Thickness { get; set; } = 1;
         public bool Test { get; set; }
@@ -561,7 +557,7 @@ namespace DicingBlade.ViewModels
             {
                 if (_homeDone)
                 {
-                    if (Process == null)
+                    if (Process is null)
                     {
                         try
                         {
@@ -686,7 +682,8 @@ namespace DicingBlade.ViewModels
                     
                     await Process?.WaitProcDoneAsync();
                     Process = null;
-                    ResetView ^= true;
+                    Substrate = null;
+                    //ResetView ^= true;
                     AjustWaferTechnology();
                 }
 
