@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.IO.Ports;
 using System.Threading.Tasks;
 using System.Linq;
@@ -26,18 +27,28 @@ namespace DicingBlade.Classes
         private SerialPort _serialPort;
         public bool EstablishConnection(string comPort)
         {
-           
-                _serialPort = new SerialPort
-                {
-                    PortName = comPort,
-                    BaudRate = 9600,
-                    Parity = Parity.Even,
-                    WriteTimeout = 1000,
-                    ReadTimeout = 1000
-                };
+
+            _serialPort = new SerialPort
+            {
+                PortName = comPort,
+                BaudRate = 9600,
+                Parity = Parity.Even,
+                WriteTimeout = 1000,
+                ReadTimeout = 1000
+            };
+            try
+            {
                 _serialPort.Open();
-                _serialPort.DiscardNull = true;
-                return _serialPort.IsOpen;
+            }
+            catch (FileNotFoundException e)
+            {
+                Console.WriteLine(e);
+                return false;
+            }
+            catch (Exception) { return false; }
+
+            _serialPort.DiscardNull = true;
+            return _serialPort.IsOpen;
         }
 
         private List<int> bufList;

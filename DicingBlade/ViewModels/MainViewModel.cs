@@ -586,6 +586,7 @@ namespace DicingBlade.ViewModels
                             await Process.WaitProcDoneAsync();
                             Process = null;
                             Substrate = null;
+                            ResetWaferView();
                             AjustWaferTechnology();
                         }
                         else
@@ -683,7 +684,7 @@ namespace DicingBlade.ViewModels
                     await Process?.WaitProcDoneAsync();
                     Process = null;
                     Substrate = null;
-                    //ResetView ^= true;
+                    ResetWaferView();
                     AjustWaferTechnology();
                 }
 
@@ -765,7 +766,11 @@ namespace DicingBlade.ViewModels
             }
             //key.Handled = true;
         }
-
+        private void ResetWaferView()
+        {
+            WvAngle = default;
+            ResetView ^= true;            
+        }
         private void Process_OnControlPointAppeared()
         {
             var rotateTransform = new RotateTransform(-Substrate.CurrentSideAngle);

@@ -47,6 +47,7 @@
         <System:Double x:Key="Hundred">100</System:Double>
         <System:Double x:Key="Ycoor">69.515</System:Double>
         <System:Double x:Key="CutStrokeThickness">0.002</System:Double>
+        
         <Storyboard x:Key="PathAnimation">
             <DoubleAnimation
                 By="{Binding WvAngle}"
@@ -194,6 +195,16 @@
                     <Setter Property="RadiusX" Value="5" />
                     <Setter Property="RadiusY" Value="5" />
                 </Style>
+                <Style x:Key="Text1" TargetType="TextBlock">
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                    <Setter Property="HorizontalAlignment" Value="Center" />
+                    <Setter Property="TextAlignment" Value="Center" />
+                    <Setter Property="Background" Value="AliceBlue" />
+                    <Setter Property="FontStretch" Value="Normal" />
+                    <Setter Property="FontStyle" Value="Normal" />
+                    <Setter Property="FontFamily" Value="Arial Black" />
+                    <Setter Property="Foreground" Value="#FFF11616" />
+                </Style>
             </Grid.Resources>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*" />
@@ -209,9 +220,9 @@
             Grid.Column="1">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
@@ -338,7 +349,7 @@
                             </Grid>
                         </GroupBox>
                     </StackPanel>
-                    <GroupBox Header="Процесс"  Grid.Row="1" Grid.ColumnSpan="2">
+                    <GroupBox Header="Процесс"  Grid.Row="1">
                         <StackPanel>
                             <TextBlock Text="{Binding ProcessStatus}" TextAlignment="Center"  Background="AliceBlue" FontStretch="Normal" FontStyle="Normal" FontSize="22" FontFamily="Arial Black" Foreground="#FFF11616"/>
                             <Label Content="Скорость резки: "></Label>
@@ -488,7 +499,7 @@
                             </DockPanel>
                         </Border>
                     </StackPanel>
-                    <GroupBox Grid.Row="2" Grid.ColumnSpan="2" VerticalAlignment="Top">
+                    <GroupBox Header="Перемещение" Grid.Row="1" Grid.Column="2" VerticalAlignment="Top">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="auto" />
@@ -506,7 +517,7 @@
                             <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding StringFormat=Y: {0}, Path=YView}" Background="AliceBlue"/>
                             <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding StringFormat=Z: {0}, Path=ZView}" Background="AliceBlue"/>
                             <TextBlock Grid.Column="1" Grid.Row="3" Text="{Binding StringFormat=U: {0}, Path=UView}" Background="AliceBlue"/>
-                            <StackPanel Orientation="Horizontal">
+                            <UniformGrid Columns="3" Grid.RowSpan="4">
                                 <Rectangle>
                                     <Rectangle.Style>
                                         <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
@@ -549,10 +560,7 @@
                                         </Style>
                                     </Rectangle.Style>
                                 </Rectangle>
-                            </StackPanel>
-                            <StackPanel
-                    Grid.Row="1"
-                    Orientation="Horizontal">
+                            
                                 <Rectangle>
                                     <Rectangle.Style>
                                         <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
@@ -595,10 +603,7 @@
                                         </Style>
                                     </Rectangle.Style>
                                 </Rectangle>
-                            </StackPanel>
-                            <StackPanel
-                    Grid.Row="2"
-                    Orientation="Horizontal">
+                            
                                 <Rectangle>
                                     <Rectangle.Style>
                                         <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
@@ -641,10 +646,7 @@
                                         </Style>
                                     </Rectangle.Style>
                                 </Rectangle>
-                            </StackPanel>
-                            <StackPanel
-                    Grid.Row="3"
-                    Orientation="Horizontal">
+                           
                                 <Rectangle>
                                     <Rectangle.Style>
                                         <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
@@ -687,17 +689,19 @@
                                         </Style>
                                     </Rectangle.Style>
                                 </Rectangle>
-                            </StackPanel>
-                            <TextBlock
-                    Grid.Column="3"
+                            </UniformGrid>
+                            <TextBlock Grid.RowSpan="4" 
+                    Grid.Column="2" Grid.ColumnSpan="3" Style="{StaticResource Text1}"
                     Text="Быстро"
                     Visibility="{Binding VelocityRegime, Converter={StaticResource MatchEnumConverter}, ConverterParameter={x:Static local:Velocity.Fast}}" />
                             <TextBlock
-                    Grid.Column="3"
+                                Grid.RowSpan="4" 
+                                Grid.Column="2" Grid.ColumnSpan="3" Style="{StaticResource Text1}"
                     Text="Медленно"
                     Visibility="{Binding VelocityRegime, Converter={StaticResource MatchEnumConverter}, ConverterParameter={x:Static local:Velocity.Slow}}" />
                             <TextBlock
-                    Grid.Column="3"
+                                Grid.RowSpan="4" 
+                                Grid.Column="2" Grid.ColumnSpan="3" Style="{StaticResource Text1}"
                     Text="Шаг"
                     Visibility="{Binding VelocityRegime, Converter={StaticResource MatchEnumConverter}, ConverterParameter={x:Static local:Velocity.Step}}" />
                         </Grid>
