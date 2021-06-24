@@ -45,6 +45,7 @@ namespace DicingBlade.Classes.Test
         /// </summary>
         public Action<double,double> GetRotationEvent;
         public int CurrentLine { get; private set; }
+        public double CutOffset { get; set; } = 0;
         private readonly Blade _blade;
         public int CurrentDirection { get; private set; }
         private bool IsCutting { get; set; } = false;
@@ -56,7 +57,7 @@ namespace DicingBlade.Classes.Test
         Block _inspectSequenceBlock = new Block();
         Block _inspectLeafBlock= new Block();
         Sequence _rootSequence = new Sequence();
-        public Process5(IMachine machine, Wafer2D wafer, Blade blade, ITechnology technology, Diagram[] proc)
+        public Process5(IMachine machine, Wafer2D wafer, Blade blade, ITechnology technology)
         {
             blade.Thickness = 0.11;
             blade.Diameter = 55.6;
@@ -92,7 +93,7 @@ namespace DicingBlade.Classes.Test
             var workingLeaf6 = new Leaf(GoTransferingHeightZAsync);
             var workingLeaf7 = new Leaf(GoNextDirectionAsync).SetBlock(_workingGoNextDirectionBlock.BlockMe()).SayMyName("GoNextDirectionAsync");
 
-            var inspectLeaf1 = new Leaf(TakeThePhotoAsync).SetBlock(_inspectLeafBlock.BlockMe());
+            var inspectLeaf1 = new Leaf(TakeThePhotoAsync).SetBlock(_inspectLeafBlock.BlockMe()).SayMyName("TakeThePhotoAsync");
             var inspectLeaf2 = new Leaf(CorrectionAsync);
             var inspectLeaf3 = new Leaf(EndCorrectionAsync);
 
@@ -132,15 +133,10 @@ namespace DicingBlade.Classes.Test
                  .SubscribeAllOnCheckEvent(CheckAllFlagsBeforeWorking);                            
         }
 
-        private async Task EndCorrectionAsync()
-        {            
-            _inspectX = _xActual;
-            OnControlPointAppeared();
-        }
 
         private void CheckAllFlagsBeforeWorking(string name)
         {
-            if (name== "MovingNextDirAsync")
+            if (name == "MovingNextDirAsync")
             {
                 if (CurrentDirection < _wafer.SidesCount - 1)
                 {
@@ -152,15 +148,15 @@ namespace DicingBlade.Classes.Test
                 else
                 {
                     _learningTickerBlock.BlockMe();
-                } 
+                }
             }
-            if (name== "GoNextDirectionAsync")
-            {                
+            if (name == "GoNextDirectionAsync")
+            {
                 if (CurrentLine == _wafer.CurrentLinesCount)
-                {                    
+                {
                     if (_wafer.CurrentSide != 0)
                     {
-                        _workingGoNextDirectionBlock.UnBlockMe();                        
+                        _workingGoNextDirectionBlock.UnBlockMe();
                     }
                     else
                     {
@@ -170,6 +166,17 @@ namespace DicingBlade.Classes.Test
                 else
                 {
                     _workingGoNextDirectionBlock.BlockMe();
+                }
+            }
+            if (name == "TakeThePhotoAsync")
+            {
+                if (_checkCut.Check & !_inspectSequenceBlock.NotBlocked)
+                {
+                    _inspectLeafBlock.UnBlockMe();
+                }
+                else
+                {
+                    _inspectLeafBlock.BlockMe();
                 }
             }
         }
@@ -189,54 +196,23 @@ namespace DicingBlade.Classes.Test
         }
         public async Task StartPauseProc()
         {
-
-            _rootSequence.ResumeWaitersWork();
-            
-            //if (!(Status.Working | Status.Correcting | Status.Pause).HasFlag(ProcessStatus))
-            //{
-            //    _machine.StartVideoCapture(0);
-            //    _rootSequence.DoWork();
-            //}
-            //else
-            //{
-            //    if (ProcessStatus == Status.Pause)
-            //    {
-            //        _pauseProcTokenSource.Resume();
-            //        ProcessStatus = Status.Working;
-            //        return;
-            //    }
-            //    if (_correctSelCondition.State)
-            //    {
-            //        var result = MessageBox.Show($"Сместить следующие резы на {CutOffset} мм?", "", MessageBoxButton.OKCancel);
-            //        if (result == MessageBoxResult.OK)
-            //        {
-            //            _wafer.AddToSideShift(CutOffset);
-            //        }
-            //        var nearestNum =
-            //            _wafer.GetNearestNum(_yActual - _machine.GetGeometry(Place.CameraChuckCenter, Ax.Y));
-            //        if (CurrentLine != nearestNum)
-            //        {
-            //            result = MessageBox.Show($"Изменить номер реза на {nearestNum}?", "", MessageBoxButton.OKCancel);
-            //            if (result == MessageBoxResult.OK)
-            //            {
-            //                CurrentLine = nearestNum - 1;
-            //            }
-            //        }
-            //        ChangeScreensEvent?.Invoke(false);
-            //        CutWidthMarkerVisibility = Visibility.Hidden;
-            //        CutOffset = 0;
-            //        _machine.FreezeVideoCapture();
-            //        _correctSelCondition.SetState(false);
-            //        OnProcessStatusChanged?.Invoke("Работа");
-            //        ProcessStatus = Status.Working;
-            //    }
-            //    else
-            //    {
-            //        _correctSelCondition.SetState(true);
-            //        OnProcessStatusChanged?.Invoke("Пауза");
-            //        ProcessStatus = Status.Correcting;
-            //    }
-            //}
+            if (_learningTickerBlock.NotBlocked)
+            {
+                _rootSequence.ResumeWaitersWork();
+            }
+            else
+            {
+                if (_inspectSequenceBlock.NotBlocked)
+                {
+                    _rootSequence.ResumeWaitersWork();
+                    _inspectSequenceBlock.BlockMe();
+                }
+                else
+                {
+                    _inspectSequenceBlock.UnBlockMe();
+                    OnProcessStatusChanged?.Invoke("Пауза");
+                }                
+            }
         }
 
 
@@ -248,11 +224,35 @@ namespace DicingBlade.Classes.Test
             _machine.SwitchOnValve(Valves.Blowing);
             await Task.Delay(100).ConfigureAwait(false);
             _machine.SwitchOffValve(Valves.Blowing);
-
             CutWidthMarkerVisibility = Visibility.Visible;
-            ChangeScreensEvent?.Invoke(true);
-            //ProcessStatus = Status.Correcting;
+            ChangeScreensEvent?.Invoke(true);            
             _machine.StartVideoCapture(0);            
+        }
+        private async Task EndCorrectionAsync()
+        {
+            var result = MessageBox.Show($"Сместить следующие резы на {CutOffset} мм?", "", MessageBoxButton.OKCancel);
+            if (result == MessageBoxResult.OK)
+            {
+                _wafer.AddToSideShift(CutOffset);
+            }
+            var nearestNum = _wafer.GetNearestNum(_yActual - _machine.GetGeometry(Place.CameraChuckCenter, Ax.Y));
+            if (CurrentLine != nearestNum)
+            {
+                result = MessageBox.Show($"Изменить номер реза на {nearestNum}?", "", MessageBoxButton.OKCancel);
+                if (result == MessageBoxResult.OK)
+                {
+                    CurrentLine = nearestNum - 1;
+                }
+            }
+            ChangeScreensEvent?.Invoke(false);
+            CutWidthMarkerVisibility = Visibility.Hidden;
+            CutOffset = 0;
+            _machine.FreezeVideoCapture();
+            
+            OnProcessStatusChanged?.Invoke("Работа");
+            
+            _inspectX = _xActual;
+            OnControlPointAppeared();
         }
         private async Task GoCameraPointXyzAsync()
         {
@@ -354,7 +354,6 @@ namespace DicingBlade.Classes.Test
                 OnProcParamsChanged(this, _procParamsEventArgs);
             }
         }
-
         private async Task MoveNextDirAsync(bool next = true)
         {
             double angle = _wafer.CurrentSideAngle;
@@ -374,7 +373,6 @@ namespace DicingBlade.Classes.Test
             GetRotationEvent(deltaAngle, time);
             await _machine.MoveAxInPosAsync(Ax.U, angle);
         }
-
         private async Task StartLearningAsync()
         {
             _machine.SetVelocity(Velocity.Service);

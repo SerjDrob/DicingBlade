@@ -1,0 +1,27 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:converters="clr-namespace:DicingBlade.Converters"
+                    >
+    <converters:ScaleConverter x:Key="ScaleCoverterScheme" />
+    <converters:TranslateConverter x:Key="TranslateConverterScheme" />
+    <converters:TranslateConverterInverse x:Key="TranslateConverterSchemeInverse" />
+    <converters:ConditionConverter x:Key="ConditionConvert" />
+    <converters:VisibilityConverter x:Key="VisConvert" />
+    <converters:CrossPositionConverter x:Key="CrossConverter" />
+    <converters:ToPointConverter x:Key="ToPointConvert" />
+    <converters:TransformPointConverter x:Key="TransformPoint" />
+    <converters:CursorToPathConverter x:Key="GetCursor" />
+    <converters:ZIndicatorConverter x:Key="ZIndConverter" />
+    <converters:MatchEnumVisibilityConverter x:Key="MatchEnumConverter" />
+    <converters:TraceConverter x:Key="TraceConverter" />
+    <converters:TraceAngleConverter x:Key="TraceAngleConvereter" />
+    <converters:GetRatioConverter x:Key="GetRatioConverter" />
+    <converters:DoubleToDurationConverter x:Key="DoubleToDurationConverter" />
+    <converters:WaferViewToPathConverter x:Key="WaferViewToPathConverter" />
+    <converters:TraceViewToPathConverter x:Key="TraceViewToPathConverter"/>
+    <converters:DisableBindingConverter x:Key="DisableBindingConverter" />
+    <converters:MulZeroConverter x:Key="MulZeroConverter" />
+    <converters:MouseArgsConverter x:Key="MouseArgsConverter"/>
+    <converters:MouseArgsCanvasConverter x:Key="MouseArgsCanvasConverter"/>
+    <converters:DivideConverter x:Key="DivideConverter"/>
+</ResourceDictionary>

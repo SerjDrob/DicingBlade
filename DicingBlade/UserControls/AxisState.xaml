@@ -1,0 +1,83 @@
+﻿<UserControl x:Class="DicingBlade.UserControls.AxisState"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DicingBlade.UserControls"
+             mc:Ignorable="d" 
+             >
+    <Grid x:Name="TheAxis">
+        <Grid.Resources>
+            <SolidColorBrush x:Key="SignalGreen" Color="MediumSpringGreen" />
+            <SolidColorBrush x:Key="SignalRed" Color="IndianRed" />
+            <Style x:Key="Rec1" TargetType="Rectangle">
+                <Setter Property="Margin" Value="3" />
+                <Setter Property="Width" Value="10" />
+                <Setter Property="Height" Value="10" />               
+                <Setter Property="RadiusX" Value="5" />
+                <Setter Property="RadiusY" Value="5" />
+            </Style>
+        </Grid.Resources>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="80" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <DockPanel Grid.Column="1" LastChildFill="True">
+            <TextBlock DockPanel.Dock="Left" Text="{Binding StringFormat='{}{0}: ', Path=CoordinateName}" Background="{Binding TextBackground}"/>
+            <TextBlock DockPanel.Dock="Left" Text="{Binding Coordinate}" Background="{Binding TextBackground}"/>
+        </DockPanel>
+        <UniformGrid Columns="3" Grid.RowSpan="1">
+            <Rectangle>
+                <Rectangle.Style>                    
+                    <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
+                        <Setter Property="Fill" Value="{Binding NegColor}" />
+                        <Style.Triggers>
+                            <DataTrigger Value="True">
+                                <DataTrigger.Binding>
+                                    <Binding Path="LmtNeg"/>
+                                </DataTrigger.Binding>
+                                <Setter Property="Fill" Value="{Binding PosColor}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Rectangle.Style>
+            </Rectangle>
+            <Rectangle>
+                <Rectangle.Style>
+                    <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
+                        <Setter Property="Fill" Value="{Binding NegColor}" />
+                        <Style.Triggers>
+                            <DataTrigger Value="True">
+                                <DataTrigger.Binding>
+                                    <Binding Path="LmtPos" />
+                                </DataTrigger.Binding>
+                                <Setter Property="Fill" Value="{Binding PosColor}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Rectangle.Style>
+            </Rectangle>
+            <Rectangle>
+                <Rectangle.Style>
+                    <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
+                        <Setter Property="Fill" Value="{Binding NegColor}" />
+                        <Style.Triggers>
+                            <DataTrigger Value="True">
+                                <DataTrigger.Binding>
+                                    <Binding Path="MotionDone" />
+                                </DataTrigger.Binding>
+                                <Setter Property="Fill" Value="{Binding PosColor}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Rectangle.Style>
+            </Rectangle>
+        </UniformGrid>
+    </Grid>
+</UserControl>

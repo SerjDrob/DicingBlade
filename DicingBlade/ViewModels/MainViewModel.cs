@@ -52,8 +52,8 @@ namespace DicingBlade.ViewModels
             _exceptionsAgregator = exceptionsAgregator;
 
             Test = false;
-            Cols = new[] {0, 1};
-            Rows = new[] {2, 1};
+            Cols = new[] { 0, 1 };
+            Rows = new[] { 2, 1 };
 
             OpenFileCmd = new Command(args => OpenFile());
             ChangeCmd = new Command(args => Change());

@@ -9,6 +9,7 @@
     xmlns:local="clr-namespace:DicingBlade.Classes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:model="clr-namespace:DicingBlade.ViewModels"
+    xmlns:uc="clr-namespace:DicingBlade.UserControls"
     Title="MainWindowView"
     Width="1280"
     Height="1024"
@@ -18,80 +19,63 @@
     WindowState="Maximized"
     mc:Ignorable="d" MinWidth="1280" MinHeight="1024">
     <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="MyDictionary.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            
+            <SolidColorBrush x:Key="SignalGreen" Color="MediumSpringGreen" />
+            <SolidColorBrush x:Key="SignalRed" Color="IndianRed" />
+            <System:Double x:Key="Zero">0</System:Double>
+            <System:Double x:Key="Hundred">100</System:Double>
+            <System:Double x:Key="Ycoor">69.515</System:Double>
+            <System:Double x:Key="CutStrokeThickness">0.002</System:Double>
 
-        <converters:ScaleConverter x:Key="ScaleCoverterScheme" />
-        <converters:TranslateConverter x:Key="TranslateConverterScheme" />
-        <converters:TranslateConverterInverse x:Key="TranslateConverterSchemeInverse" />
-        <converters:ConditionConverter x:Key="ConditionConvert" />
-        <converters:VisibilityConverter x:Key="VisConvert" />
-        <converters:CrossPositionConverter x:Key="CrossConverter" />
-        <converters:ToPointConverter x:Key="ToPointConvert" />
-        <converters:TransformPointConverter x:Key="TransformPoint" />
-        <converters:CursorToPathConverter x:Key="GetCursor" />
-        <converters:ZIndicatorConverter x:Key="ZIndConverter" />
-        <converters:MatchEnumVisibilityConverter x:Key="MatchEnumConverter" />
-        <converters:TraceConverter x:Key="TraceConverter" />
-        <converters:TraceAngleConverter x:Key="TraceAngleConvereter" />
-        <converters:GetRatioConverter x:Key="GetRatioConverter" />
-        <converters:DoubleToDurationConverter x:Key="DoubleToDurationConverter" />
-        <converters:WaferViewToPathConverter x:Key="WaferViewToPathConverter" />
-        <converters:TraceViewToPathConverter x:Key="TraceViewToPathConverter"/>
-        <converters:DisableBindingConverter x:Key="DisableBindingConverter" />
-        <converters:MulZeroConverter x:Key="MulZeroConverter" />
-        <converters:MouseArgsConverter x:Key="MouseArgsConverter"/>
-        <converters:MouseArgsCanvasConverter x:Key="MouseArgsCanvasConverter"/>
-        <converters:DivideConverter x:Key="DivideConverter"/>
-        <SolidColorBrush x:Key="SignalGreen" Color="MediumSpringGreen" />
-        <SolidColorBrush x:Key="SignalRed" Color="IndianRed" />
-        <System:Double x:Key="Zero">0</System:Double>
-        <System:Double x:Key="Hundred">100</System:Double>
-        <System:Double x:Key="Ycoor">69.515</System:Double>
-        <System:Double x:Key="CutStrokeThickness">0.002</System:Double>
-        
-        <Storyboard x:Key="PathAnimation">
-            <DoubleAnimation
+            <Storyboard x:Key="PathAnimation">
+                <DoubleAnimation
                 By="{Binding WvAngle}"
                 Storyboard.Target="{Binding ElementName=CutsView}"
                 Storyboard.TargetProperty="RenderTransform.Children[0].Angle"
                 Duration="{Binding RotatingTime, Converter={StaticResource DoubleToDurationConverter}}" />
-            <DoubleAnimation
+                <DoubleAnimation
                 By="{Binding WvAngle}"
                 Storyboard.Target="{Binding ElementName=TracesView}"
                 Storyboard.TargetProperty="RenderTransform.Children[0].Angle"
                 Duration="{Binding RotatingTime, Converter={StaticResource DoubleToDurationConverter}}"/>
-            <DoubleAnimation
+                <DoubleAnimation
                 By="{Binding WvAngle}"
                 Storyboard.Target="{Binding ElementName=ControlPoints}"
                 Storyboard.TargetProperty="RenderTransform.Children[0].Angle"
                 Duration="{Binding RotatingTime, Converter={StaticResource DoubleToDurationConverter}}"/>
-            <DoubleAnimation
+                <DoubleAnimation
                 By="{Binding WvAngle}"
                 Storyboard.Target="{Binding ElementName=SquareWafer}"
                 Storyboard.TargetProperty="RenderTransform.Children[1].Angle"
                 Duration="{Binding RotatingTime, Converter={StaticResource DoubleToDurationConverter}}"/>
-        </Storyboard>
-        <Storyboard x:Key="ResetView">
-            <DoubleAnimation
+            </Storyboard>
+            <Storyboard x:Key="ResetView">
+                <DoubleAnimation
                 To="0"
                 Storyboard.Target="{Binding ElementName=CutsView}"
                 Storyboard.TargetProperty="RenderTransform.Children[0].Angle"
                 Duration="0" />
-            <DoubleAnimation
+                <DoubleAnimation
                 To="{Binding WvAngle}"
                 Storyboard.Target="{Binding ElementName=TracesView}"
                 Storyboard.TargetProperty="RenderTransform.Children[0].Angle"
                 Duration="0"/>
-            <DoubleAnimation
+                <DoubleAnimation
                 To="{Binding WvAngle}"
                 Storyboard.Target="{Binding ElementName=ControlPoints}"
                 Storyboard.TargetProperty="RenderTransform.Children[0].Angle"
                 Duration="0"/>
-            <DoubleAnimation
+                <DoubleAnimation
                 To="0"
                 Storyboard.Target="{Binding ElementName=SquareWafer}"
                 Storyboard.TargetProperty="RenderTransform.Children[1].Angle"
                 Duration="0"/>
-        </Storyboard>
+            </Storyboard>
+        </ResourceDictionary>
     </Window.Resources>
     <Window.InputBindings>
         <KeyBinding Command="{Binding ToTeachCutShiftCmd}" Key="F6"/>
@@ -212,8 +196,7 @@
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <!--<RowDefinition Height="*" />-->
+                <RowDefinition Height="*" />                
             </Grid.RowDefinitions>
             <GroupBox
             Grid.Row="1"
@@ -234,8 +217,7 @@
                                 <UniformGrid Columns="1" DockPanel.Dock="Left" >
                                     <Rectangle
                                         Width="5"
-                                        Margin="3"
-                                        
+                                        Margin="3"                                        
                                         >
                                         <Rectangle.Style>
                                             <Style TargetType="Rectangle">
@@ -358,6 +340,15 @@
                         </StackPanel>
                     </GroupBox>
                     <StackPanel Grid.Column="1">
+                        <StackPanel.Resources>
+                            <Style TargetType="uc:ValveStateButton">
+                                <Setter Property="BorderOffColor" Value="{StaticResource SignalRed}"/>
+                                <Setter Property="BorderOnColor" Value="{StaticResource SignalGreen}"/>
+                                <Setter Property="SensorOffColor"  Value="{StaticResource SignalRed}"/>
+                                <Setter Property="SensorOnColor"  Value="{StaticResource SignalGreen}"/>
+                                <Setter Property="Margin" Value="1"/>
+                            </Style>
+                        </StackPanel.Resources>
                         <Border BorderBrush="Transparent" BorderThickness="3">
                             <DockPanel LastChildFill="False">
                                 <Label Content="Охл. шпинделя" DockPanel.Dock="Left" />
@@ -382,329 +373,30 @@
                                 </Rectangle>
                             </DockPanel>
                         </Border>
-                        <Border BorderThickness="3">
-                            <Border.Style>
-                                <Style TargetType="Border">
-                                    <Setter Property="BorderBrush" Value="Transparent" />
-                                    <Style.Triggers>
-                                        <DataTrigger Value="True">
-                                            <DataTrigger.Binding>
-                                                <Binding Path="CoolantValveView" />
-                                            </DataTrigger.Binding>
-                                            <Setter Property="BorderBrush" Value="{StaticResource SignalGreen}" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Border.Style>
-                            <DockPanel LastChildFill="False">
-                                <Label Content="Вода" DockPanel.Dock="Left" />
-                                <Rectangle
-                                Width="20"
-                                Height="20"
-                                Margin="3"
-                                DockPanel.Dock="Right">
-                                    <Rectangle.Style>
-                                        <Style TargetType="Rectangle">
-                                            <Setter Property="Fill" Value="{StaticResource SignalRed}" />
-                                            <Style.Triggers>
-                                                <DataTrigger Value="True">
-                                                    <DataTrigger.Binding>
-                                                        <Binding Path="CoolantSensorView" />
-                                                    </DataTrigger.Binding>
-                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Rectangle.Style>
-                                </Rectangle>
-                            </DockPanel>
-                        </Border>
-                        <Border BorderBrush="Transparent" BorderThickness="3">
-                            <DockPanel LastChildFill="False">
-                                <Label Content="Воздух" DockPanel.Dock="Left" />
-                                <Rectangle
-                                Width="20"
-                                Height="20"
-                                Margin="3"
-                                DockPanel.Dock="Right">
-                                    <Rectangle.Style>
-                                        <Style TargetType="Rectangle">
-                                            <Setter Property="Fill" Value="{StaticResource SignalRed}" />
-                                            <Style.Triggers>
-                                                <DataTrigger Value="True">
-                                                    <DataTrigger.Binding>
-                                                        <Binding Path="AirSensorView" />
-                                                    </DataTrigger.Binding>
-                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Rectangle.Style>
-                                </Rectangle>
-                            </DockPanel>
-                        </Border>
-                        <Border BorderThickness="3">
-                            <Border.Style>
-                                <Style TargetType="Border">
-                                    <Setter Property="BorderBrush" Value="Transparent" />
-                                    <Style.Triggers>
-                                        <DataTrigger Value="True">
-                                            <DataTrigger.Binding>
-                                                <Binding Path="ChuckVacuumValveView" />
-                                            </DataTrigger.Binding>
-                                            <Setter Property="BorderBrush" Value="{StaticResource SignalGreen}" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Border.Style>
-                            <DockPanel LastChildFill="False">
-                                <Label Content="Вакуум" DockPanel.Dock="Left" />
-                                <Rectangle
-                                Width="20"
-                                Height="20"
-                                Margin="3"
-                                DockPanel.Dock="Right">
-                                    <Rectangle.Style>
-                                        <Style TargetType="Rectangle">
-                                            <Setter Property="Fill" Value="{StaticResource SignalRed}" />
-                                            <Style.Triggers>
-                                                <DataTrigger Value="True">
-                                                    <DataTrigger.Binding>
-                                                        <Binding Path="ChuckVacuumSensorView" />
-                                                    </DataTrigger.Binding>
-                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Rectangle.Style>
-                                </Rectangle>
-                            </DockPanel>
-                        </Border>
-                        <Border BorderThickness="3">
-                            <Border.Style>
-                                <Style TargetType="Border">
-                                    <Setter Property="BorderBrush" Value="Transparent" />
-                                    <Style.Triggers>
-                                        <DataTrigger Value="True">
-                                            <DataTrigger.Binding>
-                                                <Binding Path="BlowingValveView" />
-                                            </DataTrigger.Binding>
-                                            <Setter Property="BorderBrush" Value="{StaticResource SignalGreen}" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Border.Style>
-                            <DockPanel LastChildFill="False">
-                                <Label Content="Обдув" DockPanel.Dock="Left" />
-                            </DockPanel>
-                        </Border>
+                        <uc:ValveStateButton ValveName="Вода" ValveIsOn="{Binding CoolantValveView}" SensorIsOn="{Binding CoolantSensorView}"/>
+                        <uc:ValveStateButton ValveName="Вакуум" ValveIsOn="{Binding ChuckVacuumValveView}" SensorIsOn="{Binding ChuckVacuumSensorView}"/>
+                        <uc:ValveStateButton ValveName="Обдув" ValveIsOn="{Binding BlowingValveView}" SensorIsOn="{Binding AirSensorView}"/>                   
                     </StackPanel>
                     <GroupBox Header="Перемещение" Grid.Row="1" Grid.Column="2" VerticalAlignment="Top">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="auto" />
-                                <ColumnDefinition Width="80" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                            </Grid.RowDefinitions>
-                            <TextBlock Grid.Column="1" Text="{Binding StringFormat=X: {0}, Path=XView}" Background="AliceBlue"/>
-                            <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding StringFormat=Y: {0}, Path=YView}" Background="AliceBlue"/>
-                            <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding StringFormat=Z: {0}, Path=ZView}" Background="AliceBlue"/>
-                            <TextBlock Grid.Column="1" Grid.Row="3" Text="{Binding StringFormat=U: {0}, Path=UView}" Background="AliceBlue"/>
-                            <UniformGrid Columns="3" Grid.RowSpan="4">
-                                <Rectangle>
-                                    <Rectangle.Style>
-                                        <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
-                                            <Style.Triggers>
-                                                <DataTrigger Value="True">
-                                                    <DataTrigger.Binding>
-                                                        <Binding Path="XnLmtView" />
-                                                    </DataTrigger.Binding>
-                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Rectangle.Style>
-                                </Rectangle>
-                                <Rectangle>
-                                    <Rectangle.Style>
-                                        <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
-                                            <Style.Triggers>
-                                                <DataTrigger Value="True">
-                                                    <DataTrigger.Binding>
-                                                        <Binding Path="XpLmtView" />
-                                                    </DataTrigger.Binding>
-                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Rectangle.Style>
-                                </Rectangle>
-                                <Rectangle>
-                                    <Rectangle.Style>
-                                        <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
-                                            <Style.Triggers>
-                                                <DataTrigger Value="True">
-                                                    <DataTrigger.Binding>
-                                                        <Binding Path="XMotDoneView" />
-                                                    </DataTrigger.Binding>
-                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Rectangle.Style>
-                                </Rectangle>
-                            
-                                <Rectangle>
-                                    <Rectangle.Style>
-                                        <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
-                                            <Style.Triggers>
-                                                <DataTrigger Value="True">
-                                                    <DataTrigger.Binding>
-                                                        <Binding Path="YnLmtView" />
-                                                    </DataTrigger.Binding>
-                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Rectangle.Style>
-                                </Rectangle>
-                                <Rectangle>
-                                    <Rectangle.Style>
-                                        <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
-                                            <Style.Triggers>
-                                                <DataTrigger Value="True">
-                                                    <DataTrigger.Binding>
-                                                        <Binding Path="YpLmtView" />
-                                                    </DataTrigger.Binding>
-                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Rectangle.Style>
-                                </Rectangle>
-                                <Rectangle>
-                                    <Rectangle.Style>
-                                        <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
-                                            <Style.Triggers>
-                                                <DataTrigger Value="True">
-                                                    <DataTrigger.Binding>
-                                                        <Binding Path="YMotDoneView" />
-                                                    </DataTrigger.Binding>
-                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Rectangle.Style>
-                                </Rectangle>
-                            
-                                <Rectangle>
-                                    <Rectangle.Style>
-                                        <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
-                                            <Style.Triggers>
-                                                <DataTrigger Value="True">
-                                                    <DataTrigger.Binding>
-                                                        <Binding Path="ZnLmtView" />
-                                                    </DataTrigger.Binding>
-                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Rectangle.Style>
-                                </Rectangle>
-                                <Rectangle>
-                                    <Rectangle.Style>
-                                        <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
-                                            <Style.Triggers>
-                                                <DataTrigger Value="True">
-                                                    <DataTrigger.Binding>
-                                                        <Binding Path="ZpLmtView" />
-                                                    </DataTrigger.Binding>
-                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Rectangle.Style>
-                                </Rectangle>
-                                <Rectangle>
-                                    <Rectangle.Style>
-                                        <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
-                                            <Style.Triggers>
-                                                <DataTrigger Value="True">
-                                                    <DataTrigger.Binding>
-                                                        <Binding Path="ZMotDoneView" />
-                                                    </DataTrigger.Binding>
-                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Rectangle.Style>
-                                </Rectangle>
-                           
-                                <Rectangle>
-                                    <Rectangle.Style>
-                                        <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
-                                            <Style.Triggers>
-                                                <DataTrigger Value="True">
-                                                    <DataTrigger.Binding>
-                                                        <Binding Path="UnLmtView" />
-                                                    </DataTrigger.Binding>
-                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Rectangle.Style>
-                                </Rectangle>
-                                <Rectangle>
-                                    <Rectangle.Style>
-                                        <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
-                                            <Style.Triggers>
-                                                <DataTrigger Value="True">
-                                                    <DataTrigger.Binding>
-                                                        <Binding Path="UpLmtView" />
-                                                    </DataTrigger.Binding>
-                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Rectangle.Style>
-                                </Rectangle>
-                                <Rectangle>
-                                    <Rectangle.Style>
-                                        <Style BasedOn="{StaticResource Rec1}" TargetType="Rectangle">
-                                            <Style.Triggers>
-                                                <DataTrigger Value="True">
-                                                    <DataTrigger.Binding>
-                                                        <Binding Path="UMotDoneView" />
-                                                    </DataTrigger.Binding>
-                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Rectangle.Style>
-                                </Rectangle>
-                            </UniformGrid>
-                            <TextBlock Grid.RowSpan="4" 
-                    Grid.Column="2" Grid.ColumnSpan="3" Style="{StaticResource Text1}"
-                    Text="Быстро"
-                    Visibility="{Binding VelocityRegime, Converter={StaticResource MatchEnumConverter}, ConverterParameter={x:Static local:Velocity.Fast}}" />
-                            <TextBlock
-                                Grid.RowSpan="4" 
-                                Grid.Column="2" Grid.ColumnSpan="3" Style="{StaticResource Text1}"
-                    Text="Медленно"
-                    Visibility="{Binding VelocityRegime, Converter={StaticResource MatchEnumConverter}, ConverterParameter={x:Static local:Velocity.Slow}}" />
-                            <TextBlock
-                                Grid.RowSpan="4" 
-                                Grid.Column="2" Grid.ColumnSpan="3" Style="{StaticResource Text1}"
-                    Text="Шаг"
-                    Visibility="{Binding VelocityRegime, Converter={StaticResource MatchEnumConverter}, ConverterParameter={x:Static local:Velocity.Step}}" />
-                        </Grid>
+                        <DockPanel>
+                            <StackPanel DockPanel.Dock="Left">
+                                <StackPanel.Resources>
+                                    <Style TargetType="uc:AxisState">
+                                        <Setter Property="NegColor" Value="{StaticResource SignalRed}"/>
+                                        <Setter Property="PosColor" Value="{StaticResource SignalGreen}"/>
+                                    </Style>
+                                </StackPanel.Resources>
+                                <uc:AxisState CoordinateName="X" Coordinate="{Binding XView}" MotionDone="{Binding XMotDoneView}" LmtNeg="{Binding XnLmtView}" LmtPos="{Binding XpLmtView}"/>
+                                <uc:AxisState CoordinateName="Y" Coordinate="{Binding YView}" MotionDone="{Binding YMotDoneView}" LmtNeg="{Binding YnLmtView}" LmtPos="{Binding YpLmtView}"/>
+                                <uc:AxisState CoordinateName="Z" Coordinate="{Binding ZView}" MotionDone="{Binding ZMotDoneView}" LmtNeg="{Binding ZnLmtView}" LmtPos="{Binding ZpLmtView}"/>
+                                <uc:AxisState CoordinateName="U" Coordinate="{Binding UView}" MotionDone="{Binding UMotDoneView}" LmtNeg="{Binding UnLmtView}" LmtPos="{Binding UpLmtView}"/>                                
+                            </StackPanel>
+                            <Grid DockPanel.Dock="Right">
+                                <TextBlock Style="{StaticResource Text1}" Text="Быстро" Visibility="{Binding VelocityRegime, Converter={StaticResource MatchEnumConverter}, ConverterParameter={x:Static local:Velocity.Fast}}" />
+                                <TextBlock Style="{StaticResource Text1}" Text="Медленно" Visibility="{Binding VelocityRegime, Converter={StaticResource MatchEnumConverter}, ConverterParameter={x:Static local:Velocity.Slow}}" />
+                                <TextBlock Style="{StaticResource Text1}" Text="Шаг" Visibility="{Binding VelocityRegime, Converter={StaticResource MatchEnumConverter}, ConverterParameter={x:Static local:Velocity.Step}}" />
+                            </Grid>
+                        </DockPanel>                       
                     </GroupBox>
                 </Grid>
             </GroupBox>

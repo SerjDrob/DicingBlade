@@ -1,0 +1,51 @@
+﻿<UserControl x:Class="DicingBlade.UserControls.ValveStateButton"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DicingBlade.UserControls"
+             mc:Ignorable="d"
+             x:Name="TheValveButton"
+             >
+    <Grid>
+        <Border BorderThickness="3">            
+                <Border.Style>                
+                <Style TargetType="Border">
+                    <Setter Property="BorderBrush"  Value="{Binding BorderOffColor}" />                    
+                    <Style.Triggers>
+                        <DataTrigger Value="True">
+                            <DataTrigger.Binding>
+                                <Binding ElementName="Toggle" Path="IsChecked" />
+                            </DataTrigger.Binding>
+                            <Setter Property="BorderBrush" Value="{Binding BorderOnColor}" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <ToggleButton Name="Toggle" HorizontalContentAlignment="Stretch" IsChecked="{Binding ValveIsOn}">                
+                <DockPanel LastChildFill="False">
+                    <Label Content="{Binding ValveName}" DockPanel.Dock="Left" />
+                    <Rectangle
+                                Width="20"
+                                Height="20"
+                                Margin="3"
+                                DockPanel.Dock="Right">
+                        <Rectangle.Style>
+                            <Style TargetType="Rectangle">
+                                <Setter Property="Fill" Value="{Binding SensorOffColor}" />
+                                <Style.Triggers>
+                                    <DataTrigger Value="True">
+                                        <DataTrigger.Binding>
+                                            <Binding Path="SensorIsOn" />
+                                        </DataTrigger.Binding>
+                                        <Setter Property="Fill" Value="{Binding SensorOnColor}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Rectangle.Style>
+                    </Rectangle>
+                </DockPanel>
+            </ToggleButton>
+        </Border>
+    </Grid>
+</UserControl>

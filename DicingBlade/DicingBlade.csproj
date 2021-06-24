@@ -37,15 +37,15 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="ViewModels\FodyWeavers.xml" />
-    <Resource Include="Views\cutshift.png" />
-    <Resource Include="Views\learning.png" />
-    <Resource Include="Views\settings.png" />
-    <Resource Include="Views\size1.png" />
-    <Resource Include="Views\size3.png" />
-    <Resource Include="Views\techniology.png" />
-    <Resource Include="Views\videoscale.png" />
-    <Resource Include="Views\wafer.png" />
-    <Resource Include="Views\wafer2.png" />
+    <Resource Include="Views\Sources\cutshift.png" />
+    <Resource Include="Views\Sources\learning.png" />
+    <Resource Include="Views\Sources\settings.png" />
+    <Resource Include="Views\Sources\size1.png" />
+    <Resource Include="Views\Sources\size3.png" />
+    <Resource Include="Views\Sources\techniology.png" />
+    <Resource Include="Views\Sources\videoscale.png" />
+    <Resource Include="Views\Sources\wafer.png" />
+    <Resource Include="Views\Sources\wafer2.png" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AForge.Imaging" Version="2.2.5" />
