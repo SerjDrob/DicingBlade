@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using PropertyChanged;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 
 namespace DicingBlade.UserControls
 {
@@ -29,6 +30,18 @@ namespace DicingBlade.UserControls
             TheValveButton.DataContext = this;
         }
 
+
+
+
+        public ICommand ValveCommand
+        {
+            get { return (ICommand)GetValue(ValveCommandProperty); }
+            set { SetValue(ValveCommandProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for ValveCommand.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty ValveCommandProperty =
+            DependencyProperty.Register("ValveCommand", typeof(ICommand), typeof(ValveStateButton), new PropertyMetadata(null));
 
 
 
@@ -118,17 +131,17 @@ namespace DicingBlade.UserControls
 
 
 
-        //private void ToggleButton_Click(object sender, RoutedEventArgs e)
-        //{
-        //    var tg = sender as ToggleButton;
-        //    if ((bool)tg.IsChecked)
-        //    {
-        //        ToggleIsOn = true;
-        //    }
-        //    else
-        //    {
-        //        ToggleIsOn = false;
-        //    }
-        //}
+        private void ToggleButton_Click(object sender, RoutedEventArgs e)
+        {
+            var tg = sender as ToggleButton;
+            if ((bool)tg.IsChecked)
+            {
+                ValveIsOn = true;
+            }
+            else
+            {
+                ValveIsOn = false;
+            }
+        }
     }
 }

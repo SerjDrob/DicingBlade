@@ -373,7 +373,7 @@
                                 </Rectangle>
                             </DockPanel>
                         </Border>
-                        <uc:ValveStateButton ValveName="Вода" ValveIsOn="{Binding CoolantValveView}" SensorIsOn="{Binding CoolantSensorView}"/>
+                        <uc:ValveStateButton ValveName="Вода" ValveCommand="{Binding CoolantValveOnCmd}" ValveIsOn="{Binding CoolantValveView}" SensorIsOn="{Binding CoolantSensorView}"/>
                         <uc:ValveStateButton ValveName="Вакуум" ValveIsOn="{Binding ChuckVacuumValveView}" SensorIsOn="{Binding ChuckVacuumSensorView}"/>
                         <uc:ValveStateButton ValveName="Обдув" ValveIsOn="{Binding BlowingValveView}" SensorIsOn="{Binding AirSensorView}"/>                   
                     </StackPanel>
