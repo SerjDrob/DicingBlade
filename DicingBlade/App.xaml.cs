@@ -24,9 +24,9 @@ namespace DicingBlade
             hostBuilder.ConfigureServices((hostContext, services) =>
             {
                 //Add business services as needed
-     //           services.AddSingleton<MotionDevice>();
-     //           services.AddSingleton<IVideoCapture, USBCamera>();
-     //           services.AddSingleton<IMachine, Machine4X>();
+                services.AddSingleton<MotionDevice>();
+                services.AddSingleton<IVideoCapture, USBCamera>();
+                services.AddSingleton<IMachine, Machine4X>();
                 services.AddSingleton<IMainViewModel, MainViewModel>();
                 services.AddSingleton<ExceptionsAgregator>();
                 services.AddSingleton<MainWindowView>();

@@ -63,7 +63,7 @@ namespace DicingBlade.Classes.Test
             blade.Thickness = 0.11;
             blade.Diameter = 55.6;
 
-            _machine = machine ?? throw new ProcessException("Не выбрана установка для процесса"); ;
+            _machine = machine ?? throw new ProcessException("Не выбрана установка для процесса");
             _wafer = wafer ?? throw new ProcessException("Не выбрана подложка для процесса");
             _blade = blade ?? throw new ProcessException("Не выбран диск для процесса");
             _technology = technology;
@@ -130,11 +130,12 @@ namespace DicingBlade.Classes.Test
             _rootSequence
                  .Hire(learningTicker)
                  .Hire(new Leaf(async () => {_wafer.SetSide(CurrentDirection = 0);}))
-                 .Hire(workingTicker)
-                 .SubscribeAllOnCheckEvent(CheckAllFlagsBeforeWorking);                            
+                 .Hire(workingTicker)                 
+                 .SubscribeAllOnCheckEvent(CheckAllFlagsBeforeWorking);
+            _rootSequence.SetPauseToken(_pauseToken = new());
         }
 
-
+        private PauseTokenSource _pauseToken;
         private void CheckAllFlagsBeforeWorking(string name)
         {
             if (name == "MovingNextDirAsync")

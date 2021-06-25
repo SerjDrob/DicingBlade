@@ -8,6 +8,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <LangVersion>9.0</LangVersion>
     <Nullable>disable</Nullable>
+    <ApplicationIcon>7863776561600002497-48.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Classes\Process2.cs" />
