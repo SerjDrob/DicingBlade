@@ -69,6 +69,7 @@ namespace DicingBlade.ViewModels
             ClickOnImageCmd = new Command(args => ClickOnImage(args));
             LeftClickOnWaferCmd = new Command(args => LeftClickOnWafer(args));
             RightClickOnWaferCmd = new Command(args => RightClickOnWafer(args));
+            CoolantValveOnCmd = new Command(args => CoolantValveOn());
 
             Bi = new BitmapImage();
 
@@ -147,6 +148,14 @@ namespace DicingBlade.ViewModels
             _flowMeter.GetData += _flowMeter_GetData;
         }
 
+        private void CoolantValveOn()
+        {
+            if (_machine.GetValveState(Valves.Coolant))
+                _machine.SwitchOffValve(Valves.Coolant);
+            else
+                _machine.SwitchOnValve(Valves.Coolant);
+        }
+
         public double Flow { get; set; }
         private void _flowMeter_GetData(decimal obj)
         {
@@ -205,6 +214,7 @@ namespace DicingBlade.ViewModels
         public bool BlowingValveView { get; set; }
         public bool ChuckVacuumSensorView { get; set; }
         public bool CoolantSensorView { get; set; }
+        public bool TestBool { get; set; } = true;
         public bool AirSensorView { get; set; }
         public double CoolantRateView { get; set; }
         public bool SpindleCoolantSensorView { get; set; }
@@ -257,6 +267,7 @@ namespace DicingBlade.ViewModels
         public ICommand LeftClickOnWaferCmd { get; }
         public ICommand RightClickOnWaferCmd { get; }
         public ICommand ToTeachCutShiftCmd { get; }
+        public ICommand CoolantValveOnCmd { get; }
 
         public Visibility TeachVScaleMarkersVisibility { get; private set; } = Visibility.Hidden;
         public string ProcessMessage { get; private set; }
