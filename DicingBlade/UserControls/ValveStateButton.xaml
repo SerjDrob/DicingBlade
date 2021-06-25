@@ -10,61 +10,67 @@
         <Grid.Resources>
             <local:HeightToRadiusConverter x:Key="HeightToRadiusConverter"/>
         </Grid.Resources>
-        <Border BorderThickness="1">
-            <Border.Style>
-                <Style TargetType="Border">
-                    <Setter Property="BorderBrush"  Value="{Binding BorderOffColor}" />
-                    <Style.Triggers>
-                        <DataTrigger Value="True">
-                            <DataTrigger.Binding>
-                                <Binding ElementName="Toggle" Path="IsChecked" />
-                            </DataTrigger.Binding>
-                            <Setter Property="BorderBrush" Value="{Binding BorderOnColor}" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Border.Style>
-            <ToggleButton Name="Toggle" Command="{Binding ValveCommand}" HorizontalContentAlignment="Stretch" IsChecked="{Binding ValveIsOn}">                
-                <ToggleButton.Style>
-                    <Style TargetType="ToggleButton">
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="ToggleButton">
-                                    <Border CornerRadius="{Binding ActualHeight, RelativeSource={RelativeSource Self}, Converter={StaticResource HeightToRadiusConverter}}"
-                                Background="{TemplateBinding Background}">
-                                        <Border Margin="5" BorderThickness="2" 
-                                CornerRadius="{Binding ActualHeight, RelativeSource={RelativeSource Self}, Converter={StaticResource HeightToRadiusConverter}}">
-                                            <ContentPresenter Margin="2" VerticalAlignment="Center" RecognizesAccessKey="True"/>
-                                        </Border>
+
+
+        <Button Name="Toggle" Command="{Binding ValveCommand}" Background="{Binding MyBackground}" HorizontalContentAlignment="Stretch">
+            <Button.Style>
+                <Style TargetType="Button">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="Button">
+                                <Border CornerRadius="{Binding ActualHeight, RelativeSource={RelativeSource Self}, Converter={StaticResource HeightToRadiusConverter}}" Background="{TemplateBinding Background}">
+                                    <Border Background="{TemplateBinding Background}" Margin="5" BorderThickness="3" CornerRadius="{Binding ActualHeight, RelativeSource={RelativeSource Self}, Converter={StaticResource HeightToRadiusConverter}}">                                        
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="BorderBrush"  Value="{Binding BorderOffColor}" />                                                
+                                                <Style.Triggers>
+                                                    <DataTrigger Value="True">
+                                                        <DataTrigger.Binding>
+                                                            <Binding Path="ValveIsOn"/>
+                                                        </DataTrigger.Binding>
+                                                        <Setter Property="BorderBrush" Value="{Binding BorderOnColor}" />                                                        
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <ContentPresenter Margin="2" VerticalAlignment="Center" RecognizesAccessKey="True"/>
                                     </Border>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </ToggleButton.Style>
-                <DockPanel LastChildFill="False">
-                    <Label Content="{Binding ValveName}" DockPanel.Dock="Left" />
-                    <Rectangle
-                                Width="20"
-                                Height="20"
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </Button.Style>
+            <DockPanel LastChildFill="True">
+                 <Rectangle
+                                Width="30"
+                                Height="5"
                                 Margin="3"
-                                DockPanel.Dock="Right">
-                        <Rectangle.Style>
-                            <Style TargetType="Rectangle">
-                                <Setter Property="Fill" Value="{Binding SensorOffColor}" />
-                                <Style.Triggers>
-                                    <DataTrigger Value="True">
-                                        <DataTrigger.Binding>
-                                            <Binding Path="SensorIsOn" />
-                                        </DataTrigger.Binding>
-                                        <Setter Property="Fill" Value="{Binding SensorOnColor}" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Rectangle.Style>
-                    </Rectangle>
-                </DockPanel>
-            </ToggleButton>
-        </Border>
+                                RadiusX="2"
+                                RadiusY="2"
+                                DockPanel.Dock="Bottom">
+                    <Rectangle.Style>
+                        <Style TargetType="Rectangle">
+                            <Setter Property="Fill" Value="{Binding SensorOffColor}" />
+                            <Style.Triggers>
+                                <DataTrigger Value="True">
+                                    <DataTrigger.Binding>
+                                        <Binding Path="SensorIsOn" />
+                                    </DataTrigger.Binding>
+                                    <Setter Property="Fill" Value="{Binding SensorOnColor}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Rectangle.Style>
+                </Rectangle>
+                <Label Content="{Binding ValveName}" DockPanel.Dock="Bottom" HorizontalContentAlignment="Center"
+                       FontWeight="UltraBold"
+                       FontStretch="ExtraExpanded"
+                       
+                       />
+               
+            </DockPanel>
+        </Button>
+
     </Grid>
 </UserControl>

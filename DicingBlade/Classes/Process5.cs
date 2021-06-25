@@ -387,11 +387,11 @@ namespace DicingBlade.Classes.Test
         #endregion
         public void SubstrateChanged(object obj, SettingsChangedEventArgs eventArgs)
         {
-            if (eventArgs.Settings is IWafer & (int)(ProcessStatus & (Status.Working | Status.Correcting | Status.MovingNextDir | Status.Ending)) == 0)
-            {
-                var wf = (IWafer)eventArgs.Settings;
-                _wafer.SetChanges(wf.IndexH, wf.IndexW, wf.Thickness, new Rectangle2D(wf.Height, wf.Width));
-            }
+            //if (eventArgs.Settings is IWafer & (int)(ProcessStatus & (Status.Working | Status.Correcting | Status.MovingNextDir | Status.Ending)) == 0)
+            //{
+            //    var wf = (IWafer)eventArgs.Settings;
+            //    _wafer.SetChanges(wf.IndexH, wf.IndexW, wf.Thickness, new Rectangle2D(wf.Height, wf.Width));
+            //}
         }
         private void _machine_OnSensorStateChanged(Sensors sensor, bool state)
         {

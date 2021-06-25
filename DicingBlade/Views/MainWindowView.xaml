@@ -10,7 +10,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:model="clr-namespace:DicingBlade.ViewModels"
     xmlns:uc="clr-namespace:DicingBlade.UserControls"
-    Title="MainWindowView"
+    Title="ЭМ-225"
+    Icon="/Views/7863776561600002497-48.png"
     Width="1280"
     Height="1024"
     d:DataContext="{d:DesignInstance model:MainViewModel, IsDesignTimeCreatable=True}"
@@ -118,19 +119,19 @@
                     <Button.ToolTip>
                         Параметры пластины
                     </Button.ToolTip>
-                    <Image Source="/Views/wafer2.png" Height="20"/>
+                    <Image Source="/Views/Sources/wafer2.png" Height="20"/>
                 </Button>
                 <Button Command="{Binding MachineSettingsCmd}">
                     <Button.ToolTip>
                         Настройки машины
                     </Button.ToolTip>
-                    <Image Source="/Views/settings.png" Height="20"/>
+                    <Image Source="/Views/Sources/settings.png" Height="20"/>
                 </Button>
                 <Button Command="{Binding TechnologySettingsCmd}">
                     <Button.ToolTip>
                         Технология
                     </Button.ToolTip>
-                    <Image Source="/Views/techniology.png" Height="20"/>
+                    <Image Source="/Views/Sources/techniology.png" Height="20"/>
                 </Button>
 
                 <Separator/>
@@ -138,12 +139,12 @@
                     <MenuItem>
                         <MenuItem.Header>
                             <StackPanel>
-                                <Image Source="/Views/learning.png" Height="20"/>
+                                <Image Source="/Views/Sources/learning.png" Height="20"/>
                             </StackPanel>
                         </MenuItem.Header>
                         <MenuItem Command="{Binding ToTeachChipSizeCmd}">
                             <MenuItem.Icon>
-                                <Image Source="/Views/size1.png" Height="20"/>
+                                <Image Source="/Views/Sources/size1.png" Height="20"/>
                             </MenuItem.Icon>
                             <MenuItem.Header>
                                 <TextBlock Text="Размер кристалла"/>
@@ -151,7 +152,7 @@
                         </MenuItem>
                         <MenuItem Command="{Binding ToTeachVideoScaleCmd}">
                             <MenuItem.Icon>
-                                <Image Source="/Views/videoscale.png" Height="20"/>
+                                <Image Source="/Views/Sources/videoscale.png" Height="20"/>
                             </MenuItem.Icon>
                             <MenuItem.Header>
                                 <TextBlock Text="Масштаб видео"/>
@@ -159,7 +160,7 @@
                         </MenuItem>
                         <MenuItem Command="{Binding ToTeachCutShiftCmd}" InputGestureText="F6">
                             <MenuItem.Icon>
-                                <Image Source="/Views/cutshift.png" Height="20"/>
+                                <Image Source="/Views/Sources/cutshift.png" Height="20"/>
                             </MenuItem.Icon>
                             <MenuItem.Header>
                                 <TextBlock Text="Смещение реза от ТВ"/>
@@ -347,7 +348,8 @@
                                 <Setter Property="SensorOffColor"  Value="{StaticResource SignalRed}"/>
                                 <Setter Property="SensorOnColor"  Value="{StaticResource SignalGreen}"/>
                                 <Setter Property="Margin" Value="1"/>
-                                <Setter Property="FontFamily" Value="Courier New"/>
+                                <Setter Property="FontFamily" Value="Noto Sans"/>
+                                <!--<Setter Property="MyBackground" Value="#2E8364"/>-->                                
                             </Style>
                         </StackPanel.Resources>
                         <Border BorderBrush="Transparent" BorderThickness="3">
@@ -374,9 +376,9 @@
                                 </Rectangle>
                             </DockPanel>
                         </Border>
-                        <uc:ValveStateButton ValveName="ВОДА" ValveIsOn="{Binding CoolantValveView}" SensorIsOn="{Binding CoolantSensorView}"/>
-                        <uc:ValveStateButton ValveName="Вакуум" ValveIsOn="{Binding ChuckVacuumValveView}" SensorIsOn="{Binding ChuckVacuumSensorView}"/>
-                        <uc:ValveStateButton ValveName="Обдув" ValveIsOn="{Binding BlowingValveView}" SensorIsOn="{Binding AirSensorView}"/>                   
+                        <uc:ValveStateButton ValveName="ВОДА" ValveIsOn="{Binding CoolantValveView}" SensorIsOn="{Binding CoolantSensorView}" ValveCommand="{Binding CoolantValveOnCmd}"/>
+                        <uc:ValveStateButton ValveName="ВАКУУМ" ValveIsOn="{Binding ChuckVacuumValveView}" SensorIsOn="{Binding ChuckVacuumSensorView}"/>
+                        <uc:ValveStateButton ValveName="ОБДУВ" ValveIsOn="{Binding BlowingValveView}" SensorIsOn="{Binding AirSensorView}"/>                   
                     </StackPanel>
                     <GroupBox Header="Перемещение" Grid.Row="1" Grid.Column="2" VerticalAlignment="Top">
                         <DockPanel>

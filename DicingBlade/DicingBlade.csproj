@@ -16,6 +16,7 @@
     <Compile Remove="Classes\Spindle2.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="Views\7863776561600002497-48.png" />
     <None Remove="Views\cutshift.png" />
     <None Remove="Views\learning.png" />
     <None Remove="Views\settings.png" />
@@ -37,6 +38,7 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="ViewModels\FodyWeavers.xml" />
+    <Resource Include="Views\7863776561600002497-48.png" />
     <Resource Include="Views\Sources\cutshift.png" />
     <Resource Include="Views\Sources\learning.png" />
     <Resource Include="Views\Sources\settings.png" />

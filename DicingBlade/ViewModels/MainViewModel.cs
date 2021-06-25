@@ -17,6 +17,7 @@ using netDxf;
 using netDxf.Entities;
 using PropertyChanged;
 using Point = System.Windows.Point;
+using DicingBlade.Classes.Test;
 
 namespace DicingBlade.ViewModels
 {
@@ -73,87 +74,84 @@ namespace DicingBlade.ViewModels
 
             Bi = new BitmapImage();
 
-            _exceptionsAgregator.SetShowMethod(s => { MessageBox.Show(s); });
-            _exceptionsAgregator.SetShowMethod(s => { ProcessMessage = s; });
-            _cameraScale = Settings.Default.CameraScale;
+            //_exceptionsAgregator.SetShowMethod(s => { MessageBox.Show(s); });
+            //_exceptionsAgregator.SetShowMethod(s => { ProcessMessage = s; });
+            //_cameraScale = Settings.Default.CameraScale;
 
-            try
-            {
-                _technology = StatMethods.DeSerializeObjectJson<Technology>(Settings.Default.TechnologyLastFile);
+            //try
+            //{
+            //    _technology = StatMethods.DeSerializeObjectJson<Technology>(Settings.Default.TechnologyLastFile);
 
-                _machine = machine;
+            //    _machine = machine;
 
-                _machine.ConfigureAxes(new (Ax, double)[]
-                {
-                    (Ax.X, 0),
-                    (Ax.U, 0),
-                    (Ax.Z, 0),
-                    (Ax.Y, 12.8)
-                });
+            //    _machine.ConfigureAxes(new (Ax, double)[]
+            //    {
+            //        (Ax.X, 0),
+            //        (Ax.U, 0),
+            //        (Ax.Z, 0),
+            //        (Ax.Y, 12.8)
+            //    });
 
-                _machine.ConfigureAxesGroups(new Dictionary<Groups, Ax[]>
-                {
-                    {Groups.XY, new[] {Ax.X, Ax.Y}}
-                });
+            //    _machine.ConfigureAxesGroups(new Dictionary<Groups, Ax[]>
+            //    {
+            //        {Groups.XY, new[] {Ax.X, Ax.Y}}
+            //    });
 
-                _machine.ConfigureValves(new Dictionary<Valves, (Ax, Do)>
-                {
-                    {Valves.Blowing, (Ax.Z, Do.Out6)},
-                    {Valves.ChuckVacuum, (Ax.Z, Do.Out4)},
-                    {Valves.Coolant, (Ax.U, Do.Out4)},
-                    {Valves.SpindleContact, (Ax.U, Do.Out5)}
-                });
+            //    _machine.ConfigureValves(new Dictionary<Valves, (Ax, Do)>
+            //    {
+            //        {Valves.Blowing, (Ax.Z, Do.Out6)},
+            //        {Valves.ChuckVacuum, (Ax.Z, Do.Out4)},
+            //        {Valves.Coolant, (Ax.U, Do.Out4)},
+            //        {Valves.SpindleContact, (Ax.U, Do.Out5)}
+            //    });
 
-                _machine.SwitchOffValve(Valves.Blowing);
-                _machine.SwitchOffValve(Valves.ChuckVacuum);
-                _machine.SwitchOffValve(Valves.Coolant);
-                _machine.SwitchOffValve(Valves.SpindleContact);
+            //    _machine.SwitchOffValve(Valves.Blowing);
+            //    _machine.SwitchOffValve(Valves.ChuckVacuum);
+            //    _machine.SwitchOffValve(Valves.Coolant);
+            //    _machine.SwitchOffValve(Valves.SpindleContact);
 
-                _machine.ConfigureSensors(new Dictionary<Sensors, (Ax, Di, Boolean, string)>
-                {
-                    {Sensors.Air, (Ax.Z, Di.In1, false, "Воздух")},
-                    {Sensors.ChuckVacuum, (Ax.X, Di.In2, false, "Вакуум")},
-                    {Sensors.Coolant, (Ax.U, Di.In2, false, "СОЖ")},
-                    {Sensors.SpindleCoolant, (Ax.Y, Di.In2, false, "Охлаждение шпинделя")}
-                });
-
-
-
-                ImplementMachineSettings();
-                _machine.StartVideoCapture(0);
-                _machine.OnVideoSourceBmpChanged += _machine_OnVideoSourceBmpChanged;
-                _machine.OnAxisMotionStateChanged += _machine_OnAxisMotionStateChanged;
-                _machine.OnSensorStateChanged += _machine_OnAxisSensorStateChanged;
-                _machine.OnValveStateChanged += _machine_OnAxisValveStateChanged;
-                _machine.OnSpindleStateChanging += _machine_OnSpindleStateChanging;
-            }
-            catch (MotionException ex)
-            {
-                MessageBox.Show(ex.Message, ex.StackTrace);
-            }
+            //    _machine.ConfigureSensors(new Dictionary<Sensors, (Ax, Di, Boolean, string)>
+            //    {
+            //        {Sensors.Air, (Ax.Z, Di.In1, false, "Воздух")},
+            //        {Sensors.ChuckVacuum, (Ax.X, Di.In2, false, "Вакуум")},
+            //        {Sensors.Coolant, (Ax.U, Di.In2, false, "СОЖ")},
+            //        {Sensors.SpindleCoolant, (Ax.Y, Di.In2, false, "Охлаждение шпинделя")}
+            //    });
 
 
-            BaseProcess = new[]
-            {
-                Diagram.GoNextCutXy,
-                Diagram.GoNextDepthZ,
-                Diagram.CuttingX,
-                Diagram.GoTransferingHeightZ,
-                Diagram.GoNextDirection
-            };
-            _settingsService = new();
-            _settingsService.OnSettingsChangedEvent += _settingsService_OnSettingsChangedEvent;
-            AjustWaferTechnology();
-            _flowMeter = new FlowMeter("COM9");
-            _flowMeter.GetData += _flowMeter_GetData;
+
+            //    ImplementMachineSettings();
+            //    _machine.StartVideoCapture(0);
+            //    _machine.OnVideoSourceBmpChanged += _machine_OnVideoSourceBmpChanged;
+            //    _machine.OnAxisMotionStateChanged += _machine_OnAxisMotionStateChanged;
+            //    _machine.OnSensorStateChanged += _machine_OnAxisSensorStateChanged;
+            //    _machine.OnValveStateChanged += _machine_OnAxisValveStateChanged;
+            //    _machine.OnSpindleStateChanging += _machine_OnSpindleStateChanging;
+            //}
+            //catch (MotionException ex)
+            //{
+            //    MessageBox.Show(ex.Message, ex.StackTrace);
+            //}
+
+
+            //BaseProcess = new[]
+            //{
+            //    Diagram.GoNextCutXy,
+            //    Diagram.GoNextDepthZ,
+            //    Diagram.CuttingX,
+            //    Diagram.GoTransferingHeightZ,
+            //    Diagram.GoNextDirection
+            //};
+            //_settingsService = new();
+            //_settingsService.OnSettingsChangedEvent += _settingsService_OnSettingsChangedEvent;
+            //AjustWaferTechnology();
+            //_flowMeter = new FlowMeter("COM9");
+            //_flowMeter.GetData += _flowMeter_GetData;
         }
 
         private void CoolantValveOn()
         {
-            if (_machine.GetValveState(Valves.Coolant))
-                _machine.SwitchOffValve(Valves.Coolant);
-            else
-                _machine.SwitchOnValve(Valves.Coolant);
+           CoolantValveView^=true;
         }
 
         public double Flow { get; set; }
@@ -185,7 +183,7 @@ namespace DicingBlade.ViewModels
             }
         }
 
-        
+        private Process5 Process5 { get; set; }
         
         public Velocity VelocityRegime { get; set; } = Velocity.Fast;
         public ObservableCollection<TraceLine> TracesCollectionView { get; set; } = new();
@@ -517,10 +515,11 @@ namespace DicingBlade.ViewModels
             }
             if (key.Key == Key.Q)
             {
-                if (_machine.GetValveState(Valves.ChuckVacuum))
-                    _machine.SwitchOffValve(Valves.ChuckVacuum);
-                else
-                    _machine.SwitchOnValve(Valves.ChuckVacuum);
+                CoolantValveView ^= true;
+                //if (_machine.GetValveState(Valves.ChuckVacuum))
+                //    _machine.SwitchOffValve(Valves.ChuckVacuum);
+                //else
+                //    _machine.SwitchOnValve(Valves.ChuckVacuum);
             }
 
             if (key.Key == Key.W)
@@ -567,6 +566,20 @@ namespace DicingBlade.ViewModels
             if (key.Key == Key.T) Change();
             if (key.Key == Key.Divide)
             {
+                if(Process5 is null)
+                {
+                    Process5 = new Process5(_machine,Substrate,new Blade(),_technology);
+                    Process.GetRotationEvent += SetRotation;
+                    Process.ChangeScreensEvent += ChangeScreensRegime;
+                    Process.BladeTracingEvent += Process_BladeTracingEvent;
+                    Process.OnProcessStatusChanged += Process_OnProcessStatusChanged;
+                    Process.OnProcParamsChanged += Process_OnProcParamsChanged;
+                    Process.OnControlPointAppeared += Process_OnControlPointAppeared;
+                }
+                else
+                {
+                    Process5.StartPauseProc();
+                }
                 //if (_homeDone)
                 //{
                 //    if (Process is null)
