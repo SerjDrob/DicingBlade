@@ -331,6 +331,7 @@
                                 <TextBlock Text="{Binding StringFormat={}{0} л/мин, Path=Flow}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Grid>
                         </GroupBox>
+                        <uc:Indicator Width="150" Height="30" CurrentLevel="{Binding Flow}" MinLevel="0" MaxLevel="2" Units="л/мин" NoLessLevel="1"/>
                     </StackPanel>
                     <GroupBox Header="Процесс"  Grid.Row="1">
                         <StackPanel>
@@ -351,31 +352,8 @@
                                 <Setter Property="FontFamily" Value="Noto Sans"/>
                                 <!--<Setter Property="MyBackground" Value="#2E8364"/>-->                                
                             </Style>
-                        </StackPanel.Resources>
-                        <Border BorderBrush="Transparent" BorderThickness="3">
-                            <DockPanel LastChildFill="False">
-                                <Label Content="Охл. шпинделя" DockPanel.Dock="Left" />
-                                <Rectangle
-                                Width="20"
-                                Height="20"
-                                Margin="3"
-                                DockPanel.Dock="Right">
-                                    <Rectangle.Style>
-                                        <Style TargetType="Rectangle">
-                                            <Setter Property="Fill" Value="{StaticResource SignalRed}" />
-                                            <Style.Triggers>
-                                                <DataTrigger Value="True">
-                                                    <DataTrigger.Binding>
-                                                        <Binding Path="SpindleCoolantSensorView" />
-                                                    </DataTrigger.Binding>
-                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Rectangle.Style>
-                                </Rectangle>
-                            </DockPanel>
-                        </Border>
+                        </StackPanel.Resources>                        
+                        <uc:ValveStateButton ValveName="ОХЛАЖДЕНИЕ ШПИНДЕЛЯ" ValveIsOn="{Binding SpindleCoolantSensorView}" SensorIsOn="{Binding SpindleCoolantSensorView}"/>
                         <uc:ValveStateButton ValveName="ВОДА" ValveIsOn="{Binding CoolantValveView}" SensorIsOn="{Binding CoolantSensorView}" ValveCommand="{Binding CoolantValveOnCmd}"/>
                         <uc:ValveStateButton ValveName="ВАКУУМ" ValveIsOn="{Binding ChuckVacuumValveView}" SensorIsOn="{Binding ChuckVacuumSensorView}"/>
                         <uc:ValveStateButton ValveName="ОБДУВ" ValveIsOn="{Binding BlowingValveView}" SensorIsOn="{Binding AirSensorView}"/>                   
