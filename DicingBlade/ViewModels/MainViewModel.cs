@@ -177,6 +177,7 @@ namespace DicingBlade.ViewModels
         }
 
         
+        
         public Velocity VelocityRegime { get; set; } = Velocity.Fast;
         public ObservableCollection<TraceLine> TracesCollectionView { get; set; } = new();
         public double XTrace { get; set; }
@@ -555,57 +556,57 @@ namespace DicingBlade.ViewModels
             if (key.Key == Key.T) Change();
             if (key.Key == Key.Divide)
             {
-                if (_homeDone)
-                {
-                    if (Process is null)
-                    {
-                        try
-                        {
-                            Process = new Process4(_machine, Substrate /*Wafer*/, new Blade(), _technology,
-                                BaseProcess);
-                            _exceptionsAgregator.RegisterMessager(Process);
+                //if (_homeDone)
+                //{
+                //    if (Process is null)
+                //    {
+                //        try
+                //        {
+                //            Process = new Process4(_machine, Substrate /*Wafer*/, new Blade(), _technology,
+                //                BaseProcess);
+                //            _exceptionsAgregator.RegisterMessager(Process);
 
-                            Process.GetRotationEvent += SetRotation;
-                            Process.ChangeScreensEvent += ChangeScreensRegime;
-                            Process.BladeTracingEvent += Process_BladeTracingEvent;
-                            Process.OnProcessStatusChanged += Process_OnProcessStatusChanged;
-                            Process.OnProcParamsChanged += Process_OnProcParamsChanged;
-                            Process.OnControlPointAppeared += Process_OnControlPointAppeared;
-                            _settingsService.OnSettingsChangedEvent += Process.SubstrateChanged;
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show(ex.Message);
-                            Process = null;
-                        }
-                    }
-                    else
-                    {
-                        if (Process.ProcessStatus == Status.Done)
-                        {
-                            await Process.WaitProcDoneAsync();
-                            Process = null;
-                            Substrate = null;
-                            ResetWaferView();
-                            AjustWaferTechnology();
-                        }
-                        else
-                        {
-                            try
-                            {
-                                await Process.StartPauseProc();
-                            }
-                            catch (Exception ex)
-                            {
-                                MessageBox.Show($"{ex.Message}\n{ex.StackTrace}");
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("Обнулись!");
-                }
+                //            Process.GetRotationEvent += SetRotation;
+                //            Process.ChangeScreensEvent += ChangeScreensRegime;
+                //            Process.BladeTracingEvent += Process_BladeTracingEvent;
+                //            Process.OnProcessStatusChanged += Process_OnProcessStatusChanged;
+                //            Process.OnProcParamsChanged += Process_OnProcParamsChanged;
+                //            Process.OnControlPointAppeared += Process_OnControlPointAppeared;
+                //            _settingsService.OnSettingsChangedEvent += Process.SubstrateChanged;
+                //        }
+                //        catch (Exception ex)
+                //        {
+                //            MessageBox.Show(ex.Message);
+                //            Process = null;
+                //        }
+                //    }
+                //    else
+                //    {
+                //        if (Process.ProcessStatus == Status.Done)
+                //        {
+                //            await Process.WaitProcDoneAsync();
+                //            Process = null;
+                //            Substrate = null;
+                //            ResetWaferView();
+                //            AjustWaferTechnology();
+                //        }
+                //        else
+                //        {
+                //            try
+                //            {
+                //                await Process.StartPauseProc();
+                //            }
+                //            catch (Exception ex)
+                //            {
+                //                MessageBox.Show($"{ex.Message}\n{ex.StackTrace}");
+                //            }
+                //        }
+                //    }
+                //}
+                //else
+                //{
+                //    MessageBox.Show("Обнулись!");
+                //}
             }
 
             if (key.Key == Key.A)

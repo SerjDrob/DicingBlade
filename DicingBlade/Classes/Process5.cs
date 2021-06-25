@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using PropertyChanged;
 using Microsoft.VisualStudio.Workspace;
 using System.Windows;
+using DicingBlade.ViewModels;
 
 
 namespace DicingBlade.Classes.Test
@@ -384,6 +385,14 @@ namespace DicingBlade.Classes.Test
             await AwaitTaskAsync(_machine.MoveAxesInPlaceAsync(Place.ZFocus));            
         }
         #endregion
+        public void SubstrateChanged(object obj, SettingsChangedEventArgs eventArgs)
+        {
+            if (eventArgs.Settings is IWafer & (int)(ProcessStatus & (Status.Working | Status.Correcting | Status.MovingNextDir | Status.Ending)) == 0)
+            {
+                var wf = (IWafer)eventArgs.Settings;
+                _wafer.SetChanges(wf.IndexH, wf.IndexW, wf.Thickness, new Rectangle2D(wf.Height, wf.Width));
+            }
+        }
         private void _machine_OnSensorStateChanged(Sensors sensor, bool state)
         {
             if (state)

@@ -347,6 +347,7 @@
                                 <Setter Property="SensorOffColor"  Value="{StaticResource SignalRed}"/>
                                 <Setter Property="SensorOnColor"  Value="{StaticResource SignalGreen}"/>
                                 <Setter Property="Margin" Value="1"/>
+                                <Setter Property="FontFamily" Value="Courier New"/>
                             </Style>
                         </StackPanel.Resources>
                         <Border BorderBrush="Transparent" BorderThickness="3">
@@ -373,7 +374,7 @@
                                 </Rectangle>
                             </DockPanel>
                         </Border>
-                        <uc:ValveStateButton ValveName="Вода" ValveIsOn="{Binding CoolantValveView}" SensorIsOn="{Binding CoolantSensorView}"/>
+                        <uc:ValveStateButton ValveName="ВОДА" ValveIsOn="{Binding CoolantValveView}" SensorIsOn="{Binding CoolantSensorView}"/>
                         <uc:ValveStateButton ValveName="Вакуум" ValveIsOn="{Binding ChuckVacuumValveView}" SensorIsOn="{Binding ChuckVacuumSensorView}"/>
                         <uc:ValveStateButton ValveName="Обдув" ValveIsOn="{Binding BlowingValveView}" SensorIsOn="{Binding AirSensorView}"/>                   
                     </StackPanel>

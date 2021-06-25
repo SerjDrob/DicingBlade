@@ -8,10 +8,13 @@
              x:Name="TheValveButton"
              >
     <Grid>
-        <Border BorderThickness="3">            
-                <Border.Style>                
+        <Grid.Resources>
+            <local:HeightToRadiusConverter x:Key="HeightToRadiusConverter"/>
+        </Grid.Resources>
+        <Border BorderThickness="1">
+            <Border.Style>
                 <Style TargetType="Border">
-                    <Setter Property="BorderBrush"  Value="{Binding BorderOffColor}" />                    
+                    <Setter Property="BorderBrush"  Value="{Binding BorderOffColor}" />
                     <Style.Triggers>
                         <DataTrigger Value="True">
                             <DataTrigger.Binding>
@@ -22,7 +25,24 @@
                     </Style.Triggers>
                 </Style>
             </Border.Style>
-            <ToggleButton Name="Toggle" HorizontalContentAlignment="Stretch" IsChecked="{Binding ValveIsOn}">                
+            <ToggleButton Name="Toggle" HorizontalContentAlignment="Stretch" IsChecked="{Binding ValveIsOn}">
+                <ToggleButton.Style>
+                    <Style TargetType="ToggleButton">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ToggleButton">
+                                    <Border CornerRadius="{Binding ActualHeight, RelativeSource={RelativeSource Self}, Converter={StaticResource HeightToRadiusConverter}}"
+                                Background="{TemplateBinding Background}">
+                                        <Border Margin="5" BorderThickness="2" 
+                                CornerRadius="{Binding ActualHeight, RelativeSource={RelativeSource Self}, Converter={StaticResource HeightToRadiusConverter}}">
+                                            <ContentPresenter Margin="2" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+                                        </Border>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ToggleButton.Style>
                 <DockPanel LastChildFill="False">
                     <Label Content="{Binding ValveName}" DockPanel.Dock="Left" />
                     <Rectangle
