@@ -625,7 +625,7 @@ namespace DicingBlade.Classes
         public Status ProcessStatus { get; private set; }       
         public double CutOffset { get; set; } = 0;
 
-        private double _bladeTransferGapZ /*{ get; set; }*/ = 2;
+        private double _bladeTransferGapZ /*{ get; set; }*/ = 3;
         private bool IsCutting { get; set; } = false;   
         public bool SideDone { get; private set; } = false;
         private bool BladeInWafer => _zActual > _machine.GetGeometry(Place.ZBladeTouch,Ax.Z) - _wafer.Thickness - _bladeTransferGapZ;
