@@ -1,4 +1,14 @@
-﻿using System;
+﻿#define Proc5
+using Advantech.Motion;
+using DicingBlade.Classes;
+using DicingBlade.Classes.BehaviourTrees;
+using DicingBlade.Classes.Test;
+using DicingBlade.Properties;
+using DicingBlade.Views;
+using netDxf;
+using netDxf.Entities;
+using PropertyChanged;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -9,15 +19,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using Advantech.Motion;
-using DicingBlade.Classes;
-using DicingBlade.Properties;
-using DicingBlade.Views;
-using netDxf;
-using netDxf.Entities;
-using PropertyChanged;
 using Point = System.Windows.Point;
-using DicingBlade.Classes.Test;
 
 namespace DicingBlade.ViewModels
 {
@@ -151,7 +153,7 @@ namespace DicingBlade.ViewModels
 
         private void CoolantValveOn()
         {
-           CoolantValveView^=true;
+            CoolantValveView ^= true;
         }
 
         public double Flow { get; set; }
@@ -175,7 +177,7 @@ namespace DicingBlade.ViewModels
                 {
                     substrate.SetSide(Process.CurrentDirection);
                 }
-                
+
                 var wfViewFactory = new WaferViewFactory(substrate);
                 ResetView ^= true;
                 WaferView = new();
@@ -184,7 +186,7 @@ namespace DicingBlade.ViewModels
         }
 
         private Process5 Process5 { get; set; }
-        
+
         public Velocity VelocityRegime { get; set; } = Velocity.Fast;
         public ObservableCollection<TraceLine> TracesCollectionView { get; set; } = new();
         public double XTrace { get; set; }
@@ -233,7 +235,7 @@ namespace DicingBlade.ViewModels
         public double PointX { get; set; }
         public double PointY { get; set; }
         public double CutWidthView { get; set; } = 0.05;
-        public double RealCutWidthView { get; set; } = 0.1;    
+        public double RealCutWidthView { get; set; } = 0.1;
         public Process4 Process { get; set; }
         public Wafer Wafer { get; set; }
         public Wafer2D Substrate { get; private set; }
@@ -241,7 +243,7 @@ namespace DicingBlade.ViewModels
         public ObservableCollection<TracePath> Traces { get; set; }
         public double WvAngle { get; set; }
         public bool WvRotate { get; set; }
-        public double RotatingTime { get; set; } = 1;        
+        public double RotatingTime { get; set; } = 1;
         public Map Condition { get; set; }
         public double Thickness { get; set; } = 1;
         public bool Test { get; set; }
@@ -389,7 +391,7 @@ namespace DicingBlade.ViewModels
 
         private async Task ClickOnImage(object o)
         {
-            var point = (Point) o;
+            var point = (Point)o;
             PointX = XView - point.X * _cameraScale;
             PointY = YView + point.Y * _cameraScale;
             _machine.SetVelocity(Velocity.Service);
@@ -399,7 +401,7 @@ namespace DicingBlade.ViewModels
 
         private async Task LeftClickOnWafer(object o)
         {
-            var points = (Point[]) o;
+            var points = (Point[])o;
 
             if (WaferView.ShapeSize[0] > WaferView.ShapeSize[1])
             {
@@ -422,7 +424,7 @@ namespace DicingBlade.ViewModels
 
         private async Task RightClickOnWafer(object o)
         {
-            var points = (Point[]) o;
+            var points = (Point[])o;
 
             if (WaferView.ShapeSize[0] > WaferView.ShapeSize[1])
             {
@@ -501,12 +503,12 @@ namespace DicingBlade.ViewModels
 
         private async Task KeyDownAsync(object args)
         {
-            var key = (KeyEventArgs) args;
+            var key = (KeyEventArgs)args;
 
             //test key
             if (key.Key == Key.Tab)
             {
-               
+
             }
 
             if (key.Key == Key.Multiply)
@@ -550,7 +552,7 @@ namespace DicingBlade.ViewModels
                         _machine.SetSpindleFreq(_technology.SpindleFreq);
                         // TODO await
                         Task.Delay(100).Wait();
-                        _machine.StartSpindle(Sensors.Air,Sensors.SpindleCoolant);
+                        _machine.StartSpindle(Sensors.Air, Sensors.SpindleCoolant);
                     }
                     catch (Exception ex)
                     {
@@ -565,20 +567,23 @@ namespace DicingBlade.ViewModels
             if (key.Key == Key.T) Change();
             if (key.Key == Key.Divide)
             {
-                //if(Process5 is null)
-                //{
-                //    Process5 = new Process5(_machine,Substrate,new Blade(),_technology);
-                //    Process.GetRotationEvent += SetRotation;
-                //    Process.ChangeScreensEvent += ChangeScreensRegime;
-                //    Process.BladeTracingEvent += Process_BladeTracingEvent;
-                //    Process.OnProcessStatusChanged += Process_OnProcessStatusChanged;
-                //    Process.OnProcParamsChanged += Process_OnProcParamsChanged;
-                //    Process.OnControlPointAppeared += Process_OnControlPointAppeared;
-                //}
-                //else
-                //{
-                //    Process5.StartPauseProc();
-                //}
+#if Proc5
+                if (Process5 is null)
+                {
+                    Process5 = new Process5(_machine, Substrate, new Blade(), _technology);
+                    Process.GetRotationEvent += SetRotation;
+                    Process.ChangeScreensEvent += ChangeScreensRegime;
+                    Process.BladeTracingEvent += Process_BladeTracingEvent;
+                    Process.OnProcessStatusChanged += Process_OnProcessStatusChanged;
+                    Process.OnProcParamsChanged += Process_OnProcParamsChanged;
+                    Process.OnControlPointAppeared += Process_OnControlPointAppeared;
+                    Process5.OnProcStatusChanged += Process5_OnProcStatusChanged;
+                }
+                else
+                {
+                    Process5.StartPauseProc();
+                }
+#else
                 if (_homeDone)
                 {
                     if (Process is null)
@@ -629,7 +634,8 @@ namespace DicingBlade.ViewModels
                 else
                 {
                     MessageBox.Show("Обнулись!");
-                }
+                } 
+#endif
             }
 
             if (key.Key == Key.A)
@@ -704,7 +710,7 @@ namespace DicingBlade.ViewModels
             if (key.Key == Key.I)
                 if (MessageBox.Show("Завершить процесс?", "Процесс", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
                 {
-                    
+
                     await Process?.WaitProcDoneAsync();
                     Process = null;
                     Substrate = null;
@@ -790,10 +796,33 @@ namespace DicingBlade.ViewModels
             }
             //key.Handled = true;
         }
+
+        private void Process5_OnProcStatusChanged(object sender, Process5.Stat e)
+        {
+            switch (e)
+            {
+                case Process5.Stat.Cancelled:
+                    break;
+                case Process5.Stat.End:
+                    Process5.WaitProcDoneAsync().ContinueWith
+                        (t =>
+                        {
+                            Process = null;
+                            Substrate = null;
+                            ResetWaferView();
+                            AjustWaferTechnology();
+                        });
+
+                    break;
+                default:
+                    break;
+            }
+        }
+
         private void ResetWaferView()
         {
             WvAngle = default;
-            ResetView ^= true;            
+            ResetView ^= true;
         }
         private void Process_OnControlPointAppeared()
         {
@@ -805,7 +834,7 @@ namespace DicingBlade.ViewModels
             List<TraceLine> temp = new(ControlPointsView);
             temp.ForEach(br => br.Brush = Brushes.Blue);
             temp.Add(new TraceLine()
-                {XStart = point1.X, XEnd = point2.X, YStart = point1.Y, YEnd = point2.Y, Brush = Brushes.OrangeRed});
+            { XStart = point1.X, XEnd = point2.X, YStart = point1.Y, YEnd = point2.Y, Brush = Brushes.OrangeRed });
             ControlPointsView = new ObservableCollection<TraceLine>(temp);
         }
 
@@ -837,14 +866,14 @@ namespace DicingBlade.ViewModels
                 _tracingTaskCancellationTokenSource.Cancel();
 
                 var rotateTransform = new RotateTransform(
-                    
+
                     //-Substrate.CurrentSideAngle,
                     -WaferCurrentSideAngle,
                     BCCenterXView,
                     BCCenterYView
                 );
 
-                var point1 = rotateTransform.Transform(new Point(XTrace,YTrace + WaferCurrentShiftView));
+                var point1 = rotateTransform.Transform(new Point(XTrace, YTrace + WaferCurrentShiftView));
                 var point2 = rotateTransform.Transform(new Point(XTraceEnd, YTrace + WaferCurrentShiftView));
                 point1 = new TranslateTransform(-BCCenterXView, -BCCenterYView).Transform(point1);
                 point2 = new TranslateTransform(-BCCenterXView, -BCCenterYView).Transform(point2);
@@ -893,7 +922,7 @@ namespace DicingBlade.ViewModels
 
         private void KeyUp(object args)
         {
-            var key = (KeyEventArgs) args;
+            var key = (KeyEventArgs)args;
             if (((key.Key == Key.A) | (key.Key == Key.Z)) & (VelocityRegime != Velocity.Step)) _machine.Stop(Ax.Y);
             if ((key.Key == Key.X) | (key.Key == Key.C)) _machine.Stop(Ax.X);
             if ((key.Key == Key.S) | (key.Key == Key.D)) _machine.Stop(Ax.U);
@@ -909,7 +938,7 @@ namespace DicingBlade.ViewModels
 
             waferSettingsView.ShowDialog();
 
-           // AjustWaferTechnology();
+            // AjustWaferTechnology();
         }
 
         private void MachineSettings()
@@ -939,9 +968,9 @@ namespace DicingBlade.ViewModels
                 maxAcc = 180,
                 maxDec = 180,
                 maxVel = 50,
-                axDirLogic = (int) DirLogic.DIR_ACT_HIGH,
-                plsOutMde = (int) PulseOutMode.OUT_DIR,
-                reset = (int) HomeReset.HOME_RESET_EN,
+                axDirLogic = (int)DirLogic.DIR_ACT_HIGH,
+                plsOutMde = (int)PulseOutMode.OUT_DIR,
+                reset = (int)HomeReset.HOME_RESET_EN,
                 acc = Settings.Default.XAcc,
                 dec = Settings.Default.XDec,
                 ppu = Settings.Default.XPPU,
@@ -953,13 +982,13 @@ namespace DicingBlade.ViewModels
                 maxAcc = 180,
                 maxDec = 180,
                 maxVel = 50,
-                plsOutMde = (int) PulseOutMode.OUT_DIR_ALL_NEG,
-                axDirLogic = (int) DirLogic.DIR_ACT_HIGH,
-                reset = (int) HomeReset.HOME_RESET_EN,
+                plsOutMde = (int)PulseOutMode.OUT_DIR_ALL_NEG,
+                axDirLogic = (int)DirLogic.DIR_ACT_HIGH,
+                reset = (int)HomeReset.HOME_RESET_EN,
                 acc = Settings.Default.YAcc,
                 dec = Settings.Default.YDec,
                 ppu = Settings.Default.YPPU,
-                plsInMde = (int) PulseInMode.AB_4X,
+                plsInMde = (int)PulseInMode.AB_4X,
                 homeVelLow = Settings.Default.YVelLow,
                 homeVelHigh = Settings.Default.YVelService
             };
@@ -968,9 +997,9 @@ namespace DicingBlade.ViewModels
                 maxAcc = 180,
                 maxDec = 180,
                 maxVel = 50,
-                axDirLogic = (int) DirLogic.DIR_ACT_HIGH,
-                plsOutMde = (int) PulseOutMode.OUT_DIR,
-                reset = (int) HomeReset.HOME_RESET_EN,
+                axDirLogic = (int)DirLogic.DIR_ACT_HIGH,
+                plsOutMde = (int)PulseOutMode.OUT_DIR,
+                reset = (int)HomeReset.HOME_RESET_EN,
                 acc = Settings.Default.ZAcc,
                 dec = Settings.Default.ZDec,
                 ppu = Settings.Default.ZPPU,
@@ -983,9 +1012,9 @@ namespace DicingBlade.ViewModels
                 maxAcc = 180,
                 maxDec = 180,
                 maxVel = 50,
-                axDirLogic = (int) DirLogic.DIR_ACT_HIGH,
-                plsOutMde = (int) PulseOutMode.OUT_DIR,
-                reset = (int) HomeReset.HOME_RESET_EN,
+                axDirLogic = (int)DirLogic.DIR_ACT_HIGH,
+                plsOutMde = (int)PulseOutMode.OUT_DIR,
+                reset = (int)HomeReset.HOME_RESET_EN,
                 acc = Settings.Default.UAcc,
                 dec = Settings.Default.UDec,
                 ppu = Settings.Default.UPPU,
@@ -1089,7 +1118,7 @@ namespace DicingBlade.ViewModels
             if (File.Exists(fileName))
             {
                 // TODO ASYNC
-                ((IWafer) StatMethods.DeSerializeObjectJson<TempWafer>(fileName)).CopyPropertiesTo(waf);
+                ((IWafer)StatMethods.DeSerializeObjectJson<TempWafer>(fileName)).CopyPropertiesTo(waf);
                 if (waf.IsRound)
                 {
                     Wafer = new Wafer(new Vector2(0, 0), waf.Thickness, waf.Diameter, (0, waf.IndexW), (90, waf.IndexH));
@@ -1098,7 +1127,7 @@ namespace DicingBlade.ViewModels
                 {
                     if (Substrate is null)
                     {
-                        Substrate = new Substrate2D(waf.IndexH, waf.IndexW, waf.Thickness,new Rectangle2D(waf.Height, waf.Width));
+                        Substrate = new Substrate2D(waf.IndexH, waf.IndexW, waf.Thickness, new Rectangle2D(waf.Height, waf.Width));
                     }
                 }
             }
@@ -1114,12 +1143,12 @@ namespace DicingBlade.ViewModels
             if (File.Exists(fileName))
             {
                 // TODO ASYNC
-                ((ITechnology) StatMethods.DeSerializeObjectJson<Technology>(fileName)).CopyPropertiesTo(tech);
+                ((ITechnology)StatMethods.DeSerializeObjectJson<Technology>(fileName)).CopyPropertiesTo(tech);
                 PropContainer.Technology = tech;
                 Thickness = waf.Thickness;
             }
 
-            
+
         }
 
         private void TechnologySettings()
@@ -1139,8 +1168,8 @@ namespace DicingBlade.ViewModels
 
         private void Change()
         {
-            Cols = new[] {Cols[1], Cols[0]};
-            Rows = new[] {Rows[1], Rows[0]};
+            Cols = new[] { Cols[1], Cols[0] };
+            Rows = new[] { Rows[1], Rows[0] };
         }
 
         public async Task ToTeachVideoScaleAsync()

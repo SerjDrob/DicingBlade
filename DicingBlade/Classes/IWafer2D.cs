@@ -12,9 +12,9 @@ namespace DicingBlade.Classes
     {
         public double X;
         public double Y;
-        public double Z;                
+        public double Z;
     }
-    
+
     public struct Line2D
     {
         public Line2D(Point start, Point end)
@@ -39,7 +39,7 @@ namespace DicingBlade.Classes
         H
     }
     public abstract class Wafer2D
-    {          
+    {
         protected IShape _shape;
         public double Thickness { get; protected set; }
         protected Dictionary<int, (double angle, double index, double sideshift, double realangle)> _directions;
@@ -60,9 +60,9 @@ namespace DicingBlade.Classes
                 return (int)Math.Floor(_shape.GetIndexSide(CurrentSide) / CurrentIndex);
             }
         }
-        public double CurrentIndex 
+        public double CurrentIndex
         {
-            get => _directions[CurrentSide].index;            
+            get => _directions[CurrentSide].index;
         }
         public int SidesCount
         {
@@ -80,6 +80,33 @@ namespace DicingBlade.Classes
         public double PrevSideAngle { get => _prevSideAngle; }
         private double _prevSideActualAngle = 0;
         public double PrevSideActualAngle { get => _prevSideActualAngle; }
+
+        public bool IncrementSide()
+        {
+            if (CurrentSide == _directions.Count - 1)
+            {
+                return false;
+            }
+            else
+            {
+                SetSide(CurrentSide + 1);
+                CurrentCutNum = 0;
+                return true;
+            }
+        }
+        public bool DecrementSide()
+        {
+            if (CurrentSide == 0)
+            {
+                return false;
+            }
+            else
+            {
+                SetSide(CurrentSide - 1);
+                CurrentCutNum = 0;
+                return true;
+            }
+        }
         public void SetSide(int side)
         {
             if (side < 0 | side > _directions.Count - 1)
@@ -98,9 +125,9 @@ namespace DicingBlade.Classes
             var tuple = _directions[CurrentSide];
             _directions[CurrentSide] = (tuple.angle, index, tuple.sideshift, tuple.realangle);
         }
-        public double CurrentSideLength 
-        { 
-            get 
+        public double CurrentSideLength
+        {
+            get
             {
                 return _shape.GetLengthSide(CurrentSide);
             }
@@ -123,7 +150,7 @@ namespace DicingBlade.Classes
             var bias = (side - Math.Floor(side / index) * index) / 2;
 
             var num = 0;
-            if ((num = GetNearestNum(y))!=-1)
+            if ((num = GetNearestNum(y)) != -1)
             {
                 return num * index + bias - side / 2;
             }
@@ -153,13 +180,13 @@ namespace DicingBlade.Classes
             var bias = (side - Math.Floor(side / index) * index) / 2;
 
             var ypos = y + side / 2;
-            var delta = side;            
+            var delta = side;
             var num = -1;
             for (int i = 0; i < side / index; i++)
             {
                 var d = Math.Abs(ypos - i * index - bias);
                 if (d <= delta)
-                {                    
+                {
                     delta = d;
                     num = i;
                 }
@@ -178,18 +205,68 @@ namespace DicingBlade.Classes
         {
             _directions[CurrentSide] = (_directions[CurrentSide].angle, _directions[CurrentSide].index, _directions[CurrentSide].sideshift, angle);
         }
+        public int CurrentCutNum { get; private set; } = 0;
+        public bool SetCurrentCutNum(int num)
+        {
+            if (0 >= num && num < CurrentLinesCount)
+            {
+                CurrentCutNum = num;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        public bool IncrementCut()
+        {
+            if (CurrentCutNum == CurrentLinesCount - 1)
+            {
+                return false;
+            }
+            else
+            {
+                CurrentCutNum++;
+                return true;
+            }
+        }
+        public bool DecrementCut()
+        {
+            if (CurrentCutNum == 0)
+            {
+                return false;
+            }
+            else
+            {
+                CurrentCutNum--;
+                return true;
+            }
+        }
+        public Line2D GetCurrentCut() => this[CurrentCutNum];
         public Line2D this[int cutNum]
         {
-            get 
-            {   
+            get
+            {
+                if (cutNum >= CurrentLinesCount - 1)
+                {
+                    LastCutOfTheSide = true;
+                    cutNum = CurrentLinesCount - 1;
+                }
+                else
+                {
+                    LastCutOfTheSide = false;
+                }
+                CurrentCutNum = cutNum;
                 var angle = _directions[CurrentSide].angle;
                 var line = _shape.GetLine2D(CurrentIndex, cutNum, angle);
                 var sign = XMirror ? -1 : 1;
                 line.Start.X *= sign;
                 line.End.X *= sign;
-                return line;    
+                return line;
             }
         }
+        public bool LastCutOfTheSide { get; private set; } = false;
+        public bool IsLastSide { get { return SidesCount - 1 == CurrentSide; } }
         public double this[double zratio]
         {
             get
@@ -211,18 +288,18 @@ namespace DicingBlade.Classes
         {
             var delta0 = (Height - Math.Floor(Height / index) * index) / 2;
             var delta90 = (Width - Math.Floor(Width / index) * index) / 2;
-            var zeroShift = index * num;           
+            var zeroShift = index * num;
             return angle switch
             {
-                0 => new Line2D() { Start = new Point(-Width/2,zeroShift - (Height/2) + delta0), End=new Point(Width/2,zeroShift-(Height/2) + delta0) },
-                90 => new Line2D() { Start = new Point(-Height / 2, zeroShift-(Width/2) + delta90), End = new Point(Height / 2, zeroShift-(Width/2) + delta90) }
+                0 => new Line2D() { Start = new Point(-Width / 2, zeroShift - (Height / 2) + delta0), End = new Point(Width / 2, zeroShift - (Height / 2) + delta0) },
+                90 => new Line2D() { Start = new Point(-Height / 2, zeroShift - (Width / 2) + delta90), End = new Point(Height / 2, zeroShift - (Width / 2) + delta90) }
             };
         }
         public bool InYArea(double zeroShift, double angle)
         {
             return angle switch
             {
-                0 => (zeroShift + Height/2) < Height & (zeroShift + Height / 2) > 0,
+                0 => (zeroShift + Height / 2) < Height & (zeroShift + Height / 2) > 0,
                 90 => (zeroShift + Width / 2) < Width & (zeroShift + Width / 2) > 0
             };
         }
@@ -243,7 +320,7 @@ namespace DicingBlade.Classes
             };
         }
     }
-   
+
     public class Substrate2D : Wafer2D
     {
         public Substrate2D(double indexH, double indexW, double thickness, IShape shape)

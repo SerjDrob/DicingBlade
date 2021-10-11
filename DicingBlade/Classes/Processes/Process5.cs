@@ -9,11 +9,11 @@ using System.Windows;
 using DicingBlade.ViewModels;
 
 
-namespace DicingBlade.Classes.Test
+namespace DicingBlade.Classes.BehaviourTrees
 {
     [AddINotifyPropertyChangedInterface]
     class Process5 : IMessager
-    {
+    {        
         private IMachine _machine;
         private Wafer2D _wafer;
         private ProcParams _procParamsEventArgs;
@@ -21,9 +21,7 @@ namespace DicingBlade.Classes.Test
         private double _yActual;
         private double _zActual;
         private double _uActual;
-        private double _bladeTransferGapZ = 2;
-        private bool _learningNextDir = true;
-        private bool _learningDone = false;
+        private double _bladeTransferGapZ = 4;       
         private bool _spindleWorking;
         private double _zRatio = 0;
         private double _feedSpeed;
@@ -34,9 +32,14 @@ namespace DicingBlade.Classes.Test
         private ITechnology _technology;
         private CheckCutControl _checkCut;
         private List<Task> _localTasks = new();
-        private PauseTokenSource _pauseProcTokenSource = new();
         public Visibility CutWidthMarkerVisibility { get; set; } = Visibility.Hidden;
         public event Action<string> OnProcessStatusChanged;
+        public event EventHandler<Stat> OnProcStatusChanged;
+        public enum Stat
+        {
+            Cancelled,
+            End
+        }
         public event Action<bool> BladeTracingEvent;
         public event Action OnControlPointAppeared;
         public event Action<bool> ChangeScreensEvent;
@@ -60,8 +63,9 @@ namespace DicingBlade.Classes.Test
         Sequence _rootSequence = new Sequence();
         public Process5(IMachine machine, Wafer2D wafer, Blade blade, ITechnology technology)
         {
-            blade.Thickness = 0.11;
-            blade.Diameter = 55.6;
+            //blade.Thickness = 0.11;
+            //blade.Diameter = 55.6;
+            _blade = blade;
 
             _machine = machine ?? throw new ProcessException("Не выбрана установка для процесса");
             _wafer = wafer ?? throw new ProcessException("Не выбрана подложка для процесса");
@@ -78,13 +82,19 @@ namespace DicingBlade.Classes.Test
 
             _checkCut.Set(technology.StartControlNum, technology.ControlPeriod);
             TuneBT();
-            _rootSequence.DoWork();
+            _rootSequence.DoWork().ContinueWith(t=> 
+            {
+                if (t.Result) OnProcStatusChanged(this,Stat.End) ; 
+            });
         }
         private void TuneBT()
         {
-            var learnLeaf1 = new Leaf(StartLearningAsync);
-            var learnLeaf2 = new Leaf(LearningAsync);
-            var learnLeaf3 = new Leaf(MovingNextDirAsync).SetBlock(_learningMoveNextDirBlock).SayMyName("MovingNextDirAsync");           
+            var learnLeaf1 = new Leaf(StartLearningAsync).WaitForMe();
+            var learnLeaf2 = new Leaf(LearningAsync).WaitForMe();
+            var learnLeaf3 = new Leaf(MovingNextDirAsync).SetBlock(_learningMoveNextDirBlock)
+                                                         .SetActionBeforeWork(BeforeMovingNextDirAsync);
+
+
 
             var workingLeaf1 = new Leaf(SetProcessStatusAsync);
             var workingLeaf2 = new Leaf(GoNextCutXYAsync);
@@ -92,23 +102,30 @@ namespace DicingBlade.Classes.Test
             var workingLeaf4 = new Leaf(CuttingXAsync);
             var workingLeaf5 = new Leaf(IncrementLineAsync);
             var workingLeaf6 = new Leaf(GoTransferingHeightZAsync);
-            var workingLeaf7 = new Leaf(GoNextDirectionAsync).SetBlock(_workingGoNextDirectionBlock.BlockMe()).SayMyName("GoNextDirectionAsync");
+            var workingLeaf7 = new Leaf(GoNextDirectionAsync).SetBlock(_workingGoNextDirectionBlock.BlockMe())
+                                                             .SetActionBeforeWork(BeforeGoNextDirectionAsync);
 
-            var inspectLeaf1 = new Leaf(TakeThePhotoAsync).SetBlock(_inspectLeafBlock.BlockMe()).SayMyName("TakeThePhotoAsync");
-            var inspectLeaf2 = new Leaf(CorrectionAsync);
+
+
+            var inspectLeaf1 = new Leaf(TakeThePhotoAsync).SetBlock(_inspectLeafBlock.BlockMe())
+                                                          .SetActionBeforeWork(BeforeTakeThePhotoAsync);
+
+
+
+            var inspectLeaf2 = new Leaf(CorrectionAsync).WaitForMe();
             var inspectLeaf3 = new Leaf(EndCorrectionAsync);
 
             var learningSequence = new Sequence()
-                .Hire(learnLeaf1).WaitForMe()
-                .Hire(learnLeaf2).WaitForMe()
-                .Hire(learnLeaf3).WaitForMe();                
-            
+                .Hire(learnLeaf1)
+                .Hire(learnLeaf2)
+                .Hire(learnLeaf3);
+
             var learningTicker = new Ticker()
                 .Hire(learningSequence)
                 .SetBlock(_learningTickerBlock);
 
             var inspectSequence = new Sequence()
-                .Hire(inspectLeaf2).WaitForMe()
+                .Hire(inspectLeaf2)
                 .Hire(inspectLeaf3)
                 .SetBlock(_inspectSequenceBlock.BlockMe());
 
@@ -126,62 +143,59 @@ namespace DicingBlade.Classes.Test
             var workingTicker = new Ticker()
                 .Hire(workingSequence)
                 .SetBlock(_workingTickerBlock);
-           
+
             _rootSequence
                  .Hire(learningTicker)
-                 .Hire(new Leaf(async () => {_wafer.SetSide(CurrentDirection = 0);}))
-                 .Hire(workingTicker)                 
-                 .SubscribeAllOnCheckEvent(CheckAllFlagsBeforeWorking);
-            _rootSequence.SetPauseToken(_pauseToken = new());
+                 .Hire(workingTicker);
         }
 
         private PauseTokenSource _pauseToken;
-        private void CheckAllFlagsBeforeWorking(string name)
-        {
-            if (name == "MovingNextDirAsync")
-            {
-                if (CurrentDirection < _wafer.SidesCount - 1)
-                {
-                    if (_wafer.SidesCount - 1 == _wafer.CurrentSide)
-                    {
-                        _learningMoveNextDirBlock.BlockMe();
-                    }
-                }
-                else
-                {
-                    _learningTickerBlock.BlockMe();
-                }
-            }
-            if (name == "GoNextDirectionAsync")
-            {
-                if (CurrentLine == _wafer.CurrentLinesCount)
-                {
-                    if (_wafer.CurrentSide != 0)
-                    {
-                        _workingGoNextDirectionBlock.UnBlockMe();
-                    }
-                    else
-                    {
-                        _workingTickerBlock.BlockMe();
-                    }
-                }
-                else
-                {
-                    _workingGoNextDirectionBlock.BlockMe();
-                }
-            }
-            if (name == "TakeThePhotoAsync")
-            {
-                if (_checkCut.Check & !_inspectSequenceBlock.NotBlocked)
-                {
-                    _inspectLeafBlock.UnBlockMe();
-                }
-                else
-                {
-                    _inspectLeafBlock.BlockMe();
-                }
-            }
-        }
+        //private void CheckAllFlagsBeforeWorking(string name)
+        //{
+        //    if (name == "MovingNextDirAsync")
+        //    {
+        //        if (CurrentDirection < _wafer.SidesCount - 1)
+        //        {
+        //            if (_wafer.SidesCount - 1 == _wafer.CurrentSide)
+        //            {
+        //                _learningMoveNextDirBlock.BlockMe();
+        //            }
+        //        }
+        //        else
+        //        {
+        //            _learningTickerBlock.BlockMe();
+        //        }
+        //    }
+        //    if (name == "GoNextDirectionAsync")
+        //    {
+        //        if (CurrentLine == _wafer.CurrentLinesCount)
+        //        {
+        //            if (_wafer.CurrentSide != 0)
+        //            {
+        //                _workingGoNextDirectionBlock.UnBlockMe();
+        //            }
+        //            else
+        //            {
+        //                _workingTickerBlock.BlockMe();
+        //            }
+        //        }
+        //        else
+        //        {
+        //            _workingGoNextDirectionBlock.BlockMe();
+        //        }
+        //    }
+        //    if (name == "TakeThePhotoAsync")
+        //    {
+        //        if (_checkCut.Check & !_inspectSequenceBlock.NotBlocked)
+        //        {
+        //            _inspectLeafBlock.UnBlockMe();
+        //        }
+        //        else
+        //        {
+        //            _inspectLeafBlock.BlockMe();
+        //        }
+        //    }
+        //}
         public void RefresfTechnology(ITechnology technology)
         {
             _feedSpeed = technology.FeedSpeed;
@@ -200,37 +214,74 @@ namespace DicingBlade.Classes.Test
         {
             if (_learningTickerBlock.NotBlocked)
             {
-                _rootSequence.ResumeWaitersWork();
+                _rootSequence.PulseAction(false);
             }
             else
             {
                 if (_inspectSequenceBlock.NotBlocked)
                 {
-                    _rootSequence.ResumeWaitersWork();
+                    _rootSequence.PulseAction(false);
                     _inspectSequenceBlock.BlockMe();
                 }
                 else
                 {
                     _inspectSequenceBlock.UnBlockMe();
                     OnProcessStatusChanged?.Invoke("Пауза");
-                }                
+                }
+            }
+        }
+        void BeforeMovingNextDirAsync()
+        {
+            if (_wafer.IsLastSide)
+            {
+                _learningMoveNextDirBlock.BlockMe();
+                _learningTickerBlock.BlockMe();
+            }
+        }
+        void BeforeGoNextDirectionAsync()
+        {
+            if (_wafer.LastCutOfTheSide)
+            {
+                if (_wafer.IsLastSide)
+                {
+                    _workingGoNextDirectionBlock.UnBlockMe();
+                }
+                else
+                {
+                    _workingTickerBlock.BlockMe();
+                }
+            }
+            else
+            {
+                _workingGoNextDirectionBlock.BlockMe();
+            }
+        }
+        void BeforeTakeThePhotoAsync()
+        {
+            if (_checkCut.Check & !_inspectSequenceBlock.NotBlocked)
+            {
+                _inspectLeafBlock.UnBlockMe();
+            }
+            else
+            {
+                _inspectLeafBlock.BlockMe();
             }
         }
 
-
         #region Functions for behaviour tree
-        private async Task CorrectionAsync()
+
+        private void CorrectionAsync()
         {
-            await GoTransferingHeightZAsync();
-            await GoCameraPointXyzAsync();
+            GoTransferingHeightZAsync();
+            GoCameraPointXyzAsync();
             _machine.SwitchOnValve(Valves.Blowing);
-            await Task.Delay(100).ConfigureAwait(false);
+            Task.Delay(500).Wait();
             _machine.SwitchOffValve(Valves.Blowing);
             CutWidthMarkerVisibility = Visibility.Visible;
             ChangeScreensEvent?.Invoke(true);            
             _machine.StartVideoCapture(0);            
         }
-        private async Task EndCorrectionAsync()
+        private void EndCorrectionAsync()
         {
             var result = MessageBox.Show($"Сместить следующие резы на {CutOffset} мм?", "", MessageBoxButton.OKCancel);
             if (result == MessageBoxResult.OK)
@@ -238,12 +289,12 @@ namespace DicingBlade.Classes.Test
                 _wafer.AddToSideShift(CutOffset);
             }
             var nearestNum = _wafer.GetNearestNum(_yActual - _machine.GetGeometry(Place.CameraChuckCenter, Ax.Y));
-            if (CurrentLine != nearestNum)
+            if (_wafer.CurrentCutNum != nearestNum)
             {
                 result = MessageBox.Show($"Изменить номер реза на {nearestNum}?", "", MessageBoxButton.OKCancel);
                 if (result == MessageBoxResult.OK)
                 {
-                    CurrentLine = nearestNum - 1;
+                    _wafer.SetCurrentCutNum(nearestNum - 1);
                 }
             }
             ChangeScreensEvent?.Invoke(false);
@@ -256,87 +307,87 @@ namespace DicingBlade.Classes.Test
             _inspectX = _xActual;
             OnControlPointAppeared();
         }
-        private async Task GoCameraPointXyzAsync()
+        private void GoCameraPointXyzAsync()
         {
             _machine.SetVelocity(Velocity.Service);
             var z = _machine.TranslateSpecCoor(Place.ZBladeTouch, _wafer.Thickness + _bladeTransferGapZ, Ax.Z);
-            await AwaitTaskAsync(_machine.MoveAxInPosAsync(Ax.Z, z));
+            AwaitTaskAsync(_machine.MoveAxInPosAsync(Ax.Z, z)).Wait();
             var y = -_machine.TranslateSpecCoor(Place.BladeChuckCenter, _yActual, Ax.Y);
             y = _machine.TranslateSpecCoor(Place.CameraChuckCenter, -y, Ax.Y);
-            await AwaitTaskAsync(_machine.MoveGpInPosAsync(Groups.XY, new double[] { _inspectX, y }, true));
-            await AwaitTaskAsync(_machine.MoveAxesInPlaceAsync(Place.ZFocus));
+            AwaitTaskAsync(_machine.MoveGpInPosAsync(Groups.XY, new double[] { _inspectX, y }, true)).Wait();
+            AwaitTaskAsync(_machine.MoveAxesInPlaceAsync(Place.ZFocus)).Wait();
         }
-        private async Task TakeThePhotoAsync()
+        private void TakeThePhotoAsync()
         {
             _machine.StartVideoCapture(0);
-            await GoTransferingHeightZAsync();
-            await GoCameraPointXyzAsync();
+            GoTransferingHeightZAsync();
+            GoCameraPointXyzAsync();
             _machine.SwitchOnValve(Valves.Blowing);
-            await Task.Delay(100).ConfigureAwait(false);
+            Task.Delay(100).Wait();
             _machine.FreezeVideoCapture();
             _machine.SwitchOffValve(Valves.Blowing);
             OnControlPointAppeared();
         }
-        private async Task GoNextDirectionAsync()
+        private void GoNextDirectionAsync()
         {
-            _wafer.SetSide(_wafer.CurrentSide - 1);
+            _wafer.DecrementSide();
             _machine.SetVelocity(Velocity.Service);
-            await AwaitTaskAsync(MoveNextDirAsync());
+            MoveNextDirAsync();
             _procParamsEventArgs.currentShift = _wafer.CurrentShift;
             _procParamsEventArgs.currentSideAngle = _wafer.CurrentSideAngle;
-            OnProcParamsChanged(this, _procParamsEventArgs);
-            CurrentLine = 0;
+            OnProcParamsChanged(this, _procParamsEventArgs);           
         }
-        private async Task GoTransferingHeightZAsync()
+        private void GoTransferingHeightZAsync()
         {
             _machine.SetVelocity(Velocity.Service);
-            await AwaitTaskAsync(_machine.MoveAxInPosAsync(Ax.Z, _machine.GetFeature(MFeatures.ZBladeTouch) - _wafer.Thickness - _bladeTransferGapZ));
+            AwaitTaskAsync(_machine.MoveAxInPosAsync(Ax.Z, _machine.GetFeature(MFeatures.ZBladeTouch) - _wafer.Thickness - _bladeTransferGapZ)).Wait();
         }
-        private async Task IncrementLineAsync()
+        private void IncrementLineAsync()
         {
-            CurrentLine++;
+            _wafer.IncrementCut();
         }
-        private async Task CuttingXAsync()
+        private void CuttingXAsync()
         {
             _machine.SwitchOnValve(Valves.Coolant);
-            await AwaitTaskAsync(Task.Delay(300));
+            AwaitTaskAsync(Task.Delay(300)).Wait();
             _machine.SetAxFeedSpeed(Ax.X, _feedSpeed);
             IsCutting = true;
 
-            var xCurLineEnd = _wafer[CurrentLine].End.X;
+            var xCurLineEnd = _wafer.GetCurrentCut().End.X;
             var x = _machine.TranslateSpecCoor(Place.BladeChuckCenter, -xCurLineEnd, 0);
 
             BladeTracingEvent(true);
-            await AwaitTaskAsync(_machine.MoveAxInPosAsync(Ax.X, x));
+            AwaitTaskAsync(_machine.MoveAxInPosAsync(Ax.X, x)).Wait();
             BladeTracingEvent(false);
             IsCutting = false;
             _lastCutY = _yActual;
             _checkCut.addToCurrentCut();
             _machine.SwitchOffValve(Valves.Coolant);
         }
-        private async Task GoNextDepthZAsync()
+        private void GoNextDepthZAsync()
         {
             _machine.SetVelocity(Velocity.Service);
             var z = _machine.TranslateSpecCoor(Place.ZBladeTouch, _wafer[_zRatio] + _undercut, Ax.Z);
-            await AwaitTaskAsync(_machine.MoveAxInPosAsync(Ax.Z, z));
+            AwaitTaskAsync(_machine.MoveAxInPosAsync(Ax.Z, z)).Wait();
         }
-        private async Task GoNextCutXYAsync()
+        private void GoNextCutXYAsync()
         {
             // if (BladeInWafer) ;
+            var line = _wafer.GetCurrentCut();
             _machine.SetVelocity(Velocity.Service);
-            var x = _wafer[CurrentLine].Start.X;
+            var x = line.Start.X;
             x = x + Math.Sign(x) * _blade.XGap(_wafer.Thickness);
-            var y = _wafer[CurrentLine].Start.Y - _wafer.CurrentShift;
+            var y = line.Start.Y - _wafer.CurrentShift;
             var arr = _machine.TranslateActualCoors(Place.BladeChuckCenter, new (Ax, double)[] { (Ax.X, -x), (Ax.Y, -y) });
             var xy = new double[] { arr.GetVal(Ax.X), arr.GetVal(Ax.Y) };
-            await AwaitTaskAsync(_machine.MoveGpInPosAsync(Groups.XY, xy, true));
+            AwaitTaskAsync(_machine.MoveGpInPosAsync(Groups.XY, xy, true)).Wait();
         }
-        private async Task SetProcessStatusAsync()
+        private void SetProcessStatusAsync()
         {
             //ProcessStatus = Status.Working;
             OnProcessStatusChanged("Работа");
         }
-        private async Task LearningAsync()
+        private void LearningAsync()
         {
             var y = _machine.TranslateActualCoors(Place.CameraChuckCenter, Ax.Y);
             _wafer.TeachSideShift(y);
@@ -344,19 +395,18 @@ namespace DicingBlade.Classes.Test
             OnProcParamsChanged(this, _procParamsEventArgs);
             _wafer.TeachSideAngle(_uActual);            
         }        
-        private async Task MovingNextDirAsync()
+        private void MovingNextDirAsync()
         {
-            if (CurrentDirection < _wafer.SidesCount - 1)
-            {
-                _wafer.SetSide(++CurrentDirection);
+            if (_wafer.IncrementSide())
+            {                
                 _machine.SetVelocity(Velocity.Service);
-                await AwaitTaskAsync(MoveNextDirAsync(false));
+                MoveNextDirAsync(false);
                 _procParamsEventArgs.currentShift = _wafer.CurrentShift;
                 _procParamsEventArgs.currentSideAngle = _wafer.CurrentSideAngle;
                 OnProcParamsChanged(this, _procParamsEventArgs);
             }
         }
-        private async Task MoveNextDirAsync(bool next = true)
+        private void MoveNextDirAsync(bool next = true)
         {
             double angle = _wafer.CurrentSideAngle;
             double time = 0;
@@ -373,17 +423,17 @@ namespace DicingBlade.Classes.Test
             }
 
             GetRotationEvent(deltaAngle, time);
-            await _machine.MoveAxInPosAsync(Ax.U, angle);
+            _machine.MoveAxInPosAsync(Ax.U, angle).Wait();
         }
-        private async Task StartLearningAsync()
+        private void StartLearningAsync()
         {
             _machine.SetVelocity(Velocity.Service);
-            await AwaitTaskAsync(_machine.MoveAxInPosAsync(Ax.Z, _machine.GetFeature(MFeatures.ZBladeTouch) - _wafer.Thickness - _bladeTransferGapZ));
+            AwaitTaskAsync(_machine.MoveAxInPosAsync(Ax.Z, _machine.GetFeature(MFeatures.ZBladeTouch) - _wafer.Thickness - _bladeTransferGapZ)).Wait();
             var y = _wafer.GetNearestCut(0).Start.Y;
             var arr = _machine.TranslateActualCoors(Place.CameraChuckCenter, new (Ax, double)[] { (Ax.X, 0), (Ax.Y, -y) });           
             var point = new double[] { arr.GetVal(Ax.X), arr.GetVal(Ax.Y) };
-            await AwaitTaskAsync(_machine.MoveGpInPosAsync(Groups.XY, point));
-            await AwaitTaskAsync(_machine.MoveAxesInPlaceAsync(Place.ZFocus));            
+            AwaitTaskAsync(_machine.MoveGpInPosAsync(Groups.XY, point)).Wait();
+            AwaitTaskAsync(_machine.MoveAxesInPlaceAsync(Place.ZFocus)).Wait();            
         }
         #endregion
         public void SubstrateChanged(object obj, SettingsChangedEventArgs eventArgs)
@@ -438,7 +488,7 @@ namespace DicingBlade.Classes.Test
         }
         public void EmergencyScript()
         {
-            _pauseProcTokenSource.Pause();            
+            _rootSequence?.CancellAction(true);          
             _machine.Stop(Ax.X);
             _machine.MoveAxInPosAsync(Ax.Z, 0);
             _machine.StopSpindle();
