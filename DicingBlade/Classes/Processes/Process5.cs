@@ -47,11 +47,9 @@ namespace DicingBlade.Classes.BehaviourTrees
         /// first parameter: angle
         /// second parameter: time
         /// </summary>
-        public Action<double,double> GetRotationEvent;
-        public int CurrentLine { get; private set; }
+        public event Action<double,double> GetRotationEvent;
         public double CutOffset { get; set; } = 0;
         private readonly Blade _blade;
-        public int CurrentDirection { get; private set; }
         private bool IsCutting { get; set; } = false;
 
         Block _learningTickerBlock = new Block();
@@ -71,6 +69,7 @@ namespace DicingBlade.Classes.BehaviourTrees
             _wafer = wafer ?? throw new ProcessException("Не выбрана подложка для процесса");
             _blade = blade ?? throw new ProcessException("Не выбран диск для процесса");
             _technology = technology;
+            _inspectX = _machine.GetGeometry(Place.CameraChuckCenter, Ax.X);
             RefresfTechnology(_technology);
             
             _machine.OnSensorStateChanged += _machine_OnSensorStateChanged;
@@ -84,13 +83,13 @@ namespace DicingBlade.Classes.BehaviourTrees
             TuneBT();
             _rootSequence.DoWork().ContinueWith(t=> 
             {
-                if (t.Result) OnProcStatusChanged(this,Stat.End) ; 
+                if (t.Result) OnProcStatusChanged?.Invoke(this,Stat.End) ; 
             });
         }
         private void TuneBT()
         {
             var learnLeaf1 = new Leaf(StartLearningAsync).WaitForMe();
-            var learnLeaf2 = new Leaf(LearningAsync).WaitForMe();
+            var learnLeaf2 = new Leaf(LearningAsync);
             var learnLeaf3 = new Leaf(MovingNextDirAsync).SetBlock(_learningMoveNextDirBlock)
                                                          .SetActionBeforeWork(BeforeMovingNextDirAsync);
 
@@ -146,56 +145,11 @@ namespace DicingBlade.Classes.BehaviourTrees
 
             _rootSequence
                  .Hire(learningTicker)
+                 .Hire(new Leaf(()=> { _wafer.ResetWafer(); }))
                  .Hire(workingTicker);
         }
 
-        private PauseTokenSource _pauseToken;
-        //private void CheckAllFlagsBeforeWorking(string name)
-        //{
-        //    if (name == "MovingNextDirAsync")
-        //    {
-        //        if (CurrentDirection < _wafer.SidesCount - 1)
-        //        {
-        //            if (_wafer.SidesCount - 1 == _wafer.CurrentSide)
-        //            {
-        //                _learningMoveNextDirBlock.BlockMe();
-        //            }
-        //        }
-        //        else
-        //        {
-        //            _learningTickerBlock.BlockMe();
-        //        }
-        //    }
-        //    if (name == "GoNextDirectionAsync")
-        //    {
-        //        if (CurrentLine == _wafer.CurrentLinesCount)
-        //        {
-        //            if (_wafer.CurrentSide != 0)
-        //            {
-        //                _workingGoNextDirectionBlock.UnBlockMe();
-        //            }
-        //            else
-        //            {
-        //                _workingTickerBlock.BlockMe();
-        //            }
-        //        }
-        //        else
-        //        {
-        //            _workingGoNextDirectionBlock.BlockMe();
-        //        }
-        //    }
-        //    if (name == "TakeThePhotoAsync")
-        //    {
-        //        if (_checkCut.Check & !_inspectSequenceBlock.NotBlocked)
-        //        {
-        //            _inspectLeafBlock.UnBlockMe();
-        //        }
-        //        else
-        //        {
-        //            _inspectLeafBlock.BlockMe();
-        //        }
-        //    }
-        //}
+        
         public void RefresfTechnology(ITechnology technology)
         {
             _feedSpeed = technology.FeedSpeed;
@@ -305,13 +259,14 @@ namespace DicingBlade.Classes.BehaviourTrees
             OnProcessStatusChanged?.Invoke("Работа");
             
             _inspectX = _xActual;
-            OnControlPointAppeared();
+            OnControlPointAppeared?.Invoke();
         }
         private void GoCameraPointXyzAsync()
         {
             _machine.SetVelocity(Velocity.Service);
             var z = _machine.TranslateSpecCoor(Place.ZBladeTouch, _wafer.Thickness + _bladeTransferGapZ, Ax.Z);
             AwaitTaskAsync(_machine.MoveAxInPosAsync(Ax.Z, z)).Wait();
+            
             var y = -_machine.TranslateSpecCoor(Place.BladeChuckCenter, _yActual, Ax.Y);
             y = _machine.TranslateSpecCoor(Place.CameraChuckCenter, -y, Ax.Y);
             AwaitTaskAsync(_machine.MoveGpInPosAsync(Groups.XY, new double[] { _inspectX, y }, true)).Wait();
@@ -326,7 +281,7 @@ namespace DicingBlade.Classes.BehaviourTrees
             Task.Delay(100).Wait();
             _machine.FreezeVideoCapture();
             _machine.SwitchOffValve(Valves.Blowing);
-            OnControlPointAppeared();
+            OnControlPointAppeared?.Invoke();
         }
         private void GoNextDirectionAsync()
         {
@@ -335,7 +290,7 @@ namespace DicingBlade.Classes.BehaviourTrees
             MoveNextDirAsync();
             _procParamsEventArgs.currentShift = _wafer.CurrentShift;
             _procParamsEventArgs.currentSideAngle = _wafer.CurrentSideAngle;
-            OnProcParamsChanged(this, _procParamsEventArgs);           
+            OnProcParamsChanged?.Invoke(this, _procParamsEventArgs);           
         }
         private void GoTransferingHeightZAsync()
         {
@@ -356,9 +311,9 @@ namespace DicingBlade.Classes.BehaviourTrees
             var xCurLineEnd = _wafer.GetCurrentCut().End.X;
             var x = _machine.TranslateSpecCoor(Place.BladeChuckCenter, -xCurLineEnd, 0);
 
-            BladeTracingEvent(true);
+            BladeTracingEvent?.Invoke(true);
             AwaitTaskAsync(_machine.MoveAxInPosAsync(Ax.X, x)).Wait();
-            BladeTracingEvent(false);
+            BladeTracingEvent?.Invoke(false);
             IsCutting = false;
             _lastCutY = _yActual;
             _checkCut.addToCurrentCut();
@@ -385,14 +340,14 @@ namespace DicingBlade.Classes.BehaviourTrees
         private void SetProcessStatusAsync()
         {
             //ProcessStatus = Status.Working;
-            OnProcessStatusChanged("Работа");
+            OnProcessStatusChanged?.Invoke("Работа");
         }
         private void LearningAsync()
         {
             var y = _machine.TranslateActualCoors(Place.CameraChuckCenter, Ax.Y);
             _wafer.TeachSideShift(y);
             _procParamsEventArgs.currentShift = _wafer.CurrentShift;
-            OnProcParamsChanged(this, _procParamsEventArgs);
+            OnProcParamsChanged?.Invoke(this, _procParamsEventArgs);
             _wafer.TeachSideAngle(_uActual);            
         }        
         private void MovingNextDirAsync()
@@ -403,7 +358,7 @@ namespace DicingBlade.Classes.BehaviourTrees
                 MoveNextDirAsync(false);
                 _procParamsEventArgs.currentShift = _wafer.CurrentShift;
                 _procParamsEventArgs.currentSideAngle = _wafer.CurrentSideAngle;
-                OnProcParamsChanged(this, _procParamsEventArgs);
+                OnProcParamsChanged?.Invoke(this, _procParamsEventArgs);
             }
         }
         private void MoveNextDirAsync(bool next = true)
@@ -422,7 +377,7 @@ namespace DicingBlade.Classes.BehaviourTrees
                 time = Math.Abs(_wafer.CurrentSideActualAngle - _uActual) / _machine.GetAxisSetVelocity(Ax.U);
             }
 
-            GetRotationEvent(deltaAngle, time);
+            GetRotationEvent?.Invoke(deltaAngle, time);
             _machine.MoveAxInPosAsync(Ax.U, angle).Wait();
         }
         private void StartLearningAsync()
@@ -435,7 +390,7 @@ namespace DicingBlade.Classes.BehaviourTrees
             AwaitTaskAsync(_machine.MoveGpInPosAsync(Groups.XY, point)).Wait();
             AwaitTaskAsync(_machine.MoveAxesInPlaceAsync(Place.ZFocus)).Wait();            
         }
-        #endregion
+#endregion
         public void SubstrateChanged(object obj, SettingsChangedEventArgs eventArgs)
         {
             //if (eventArgs.Settings is IWafer & (int)(ProcessStatus & (Status.Working | Status.Correcting | Status.MovingNextDir | Status.Ending)) == 0)

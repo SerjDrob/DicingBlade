@@ -43,7 +43,7 @@ namespace DicingBlade.Classes
         protected IShape _shape;
         public double Thickness { get; protected set; }
         protected Dictionary<int, (double angle, double index, double sideshift, double realangle)> _directions;
-        public int CurrentSide { get; private set; }
+        public int CurrentSide { get; private set; } = 0;
         public void SetChanges(double indexH, double indexW, double thickness, IShape shape)
         {
             Thickness = thickness;
@@ -273,6 +273,12 @@ namespace DicingBlade.Classes
             {
                 return zratio * Thickness;
             }
+        }
+        public void ResetWafer()
+        {
+            CurrentCutNum = 0;
+            CurrentSide = 0;
+            LastCutOfTheSide = false;
         }
     }
     public class Rectangle2D : IShape

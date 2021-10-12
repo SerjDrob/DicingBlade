@@ -1,4 +1,4 @@
-﻿#define Proc5
+﻿//#define Proc5
 using Advantech.Motion;
 using DicingBlade.Classes;
 using DicingBlade.Classes.BehaviourTrees;
@@ -570,13 +570,17 @@ namespace DicingBlade.ViewModels
 #if Proc5
                 if (Process5 is null)
                 {
-                    Process5 = new Process5(_machine, Substrate, new Blade(), _technology);
-                    Process.GetRotationEvent += SetRotation;
-                    Process.ChangeScreensEvent += ChangeScreensRegime;
-                    Process.BladeTracingEvent += Process_BladeTracingEvent;
-                    Process.OnProcessStatusChanged += Process_OnProcessStatusChanged;
-                    Process.OnProcParamsChanged += Process_OnProcParamsChanged;
-                    Process.OnControlPointAppeared += Process_OnControlPointAppeared;
+                    var blade = new Blade();
+                    blade.Diameter = 55.6;
+                    blade.Thickness = 0.11;
+                    Substrate.ResetWafer();
+                    Process5 = new Process5(_machine, Substrate, blade, _technology);
+                    Process5.GetRotationEvent += SetRotation;
+                    Process5.ChangeScreensEvent += ChangeScreensRegime;
+                    Process5.BladeTracingEvent += Process_BladeTracingEvent;
+                    Process5.OnProcessStatusChanged += Process_OnProcessStatusChanged;
+                    Process5.OnProcParamsChanged += Process_OnProcParamsChanged;
+                    Process5.OnControlPointAppeared += Process_OnControlPointAppeared;
                     Process5.OnProcStatusChanged += Process5_OnProcStatusChanged;
                 }
                 else
@@ -789,10 +793,17 @@ namespace DicingBlade.ViewModels
 
             if (key.Key == Key.F12)
             {
+#if Proc5
+                Process5?.EmergencyScript();
+                MessageBox.Show("Процесс экстренно прерван оператором");
+                Process5.WaitProcDoneAsync().Wait(1000);
+                Process = null;
+#else
                 Process?.EmergencyScript();
                 MessageBox.Show("Процесс экстренно прерван оператором");
                 await Process.WaitProcDoneAsync();
                 Process = null;
+#endif
             }
             //key.Handled = true;
         }
