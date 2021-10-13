@@ -1,4 +1,4 @@
-﻿//#define Proc5
+﻿#define Proc5
 using Advantech.Motion;
 using DicingBlade.Classes;
 using DicingBlade.Classes.BehaviourTrees;

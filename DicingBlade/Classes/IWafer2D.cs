@@ -256,7 +256,7 @@ namespace DicingBlade.Classes
                 {
                     LastCutOfTheSide = false;
                 }
-                CurrentCutNum = cutNum;
+               // CurrentCutNum = cutNum;
                 var angle = _directions[CurrentSide].angle;
                 var line = _shape.GetLine2D(CurrentIndex, cutNum, angle);
                 var sign = XMirror ? -1 : 1;

@@ -48,6 +48,8 @@ namespace DicingBlade.Classes.BehaviourTrees
         /// second parameter: time
         /// </summary>
         public event Action<double,double> GetRotationEvent;
+        public event Action<object, ProcParams> OnProcParamsChanged;
+        public event Action<string, int> ThrowMessage;
         public double CutOffset { get; set; } = 0;
         private readonly Blade _blade;
         private bool IsCutting { get; set; } = false;
@@ -144,8 +146,7 @@ namespace DicingBlade.Classes.BehaviourTrees
                 .SetBlock(_workingTickerBlock);
 
             _rootSequence
-                 .Hire(learningTicker)
-                 .Hire(new Leaf(()=> { _wafer.ResetWafer(); }))
+                 .Hire(learningTicker)                 
                  .Hire(workingTicker);
         }
 
@@ -384,7 +385,7 @@ namespace DicingBlade.Classes.BehaviourTrees
         {
             _machine.SetVelocity(Velocity.Service);
             AwaitTaskAsync(_machine.MoveAxInPosAsync(Ax.Z, _machine.GetFeature(MFeatures.ZBladeTouch) - _wafer.Thickness - _bladeTransferGapZ)).Wait();
-            var y = _wafer.GetNearestCut(0).Start.Y;
+            var y = _wafer.GetNearestY(0);
             var arr = _machine.TranslateActualCoors(Place.CameraChuckCenter, new (Ax, double)[] { (Ax.X, 0), (Ax.Y, -y) });           
             var point = new double[] { arr.GetVal(Ax.X), arr.GetVal(Ax.Y) };
             AwaitTaskAsync(_machine.MoveGpInPosAsync(Groups.XY, point)).Wait();
@@ -448,7 +449,6 @@ namespace DicingBlade.Classes.BehaviourTrees
             _machine.MoveAxInPosAsync(Ax.Z, 0);
             _machine.StopSpindle();
         }
-        public event Action<object, ProcParams> OnProcParamsChanged;
-        public event Action<string, int> ThrowMessage;
+        
     }
 }
