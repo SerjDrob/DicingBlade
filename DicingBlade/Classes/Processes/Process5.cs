@@ -163,7 +163,7 @@ namespace DicingBlade.Classes.BehaviourTrees
         }
         public async Task WaitProcDoneAsync()
         {
-            await Task.WhenAll(_localTasks);
+            await Task.WhenAll(_localTasks);          
         }
         public async Task StartPauseProc()
         {

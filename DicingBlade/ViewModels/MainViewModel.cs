@@ -568,24 +568,31 @@ namespace DicingBlade.ViewModels
             if (key.Key == Key.Divide)
             {
 #if Proc5
-                if (Process5 is null)
+                if (_homeDone)
                 {
-                    var blade = new Blade();
-                    blade.Diameter = 55.6;
-                    blade.Thickness = 0.11;
-                    Substrate.ResetWafer();
-                    Process5 = new Process5(_machine, Substrate, blade, _technology);
-                    Process5.GetRotationEvent += SetRotation;
-                    Process5.ChangeScreensEvent += ChangeScreensRegime;
-                    Process5.BladeTracingEvent += Process_BladeTracingEvent;
-                    Process5.OnProcessStatusChanged += Process_OnProcessStatusChanged;
-                    Process5.OnProcParamsChanged += Process_OnProcParamsChanged;
-                    Process5.OnControlPointAppeared += Process_OnControlPointAppeared;
-                    Process5.OnProcStatusChanged += Process5_OnProcStatusChanged;
+                    if (Process5 is null)
+                    {
+                        var blade = new Blade();
+                        blade.Diameter = 55.6;
+                        blade.Thickness = 0.11;
+                        Substrate.ResetWafer();
+                        Process5 = new Process5(_machine, Substrate, blade, _technology);
+                        Process5.GetRotationEvent += SetRotation;
+                        Process5.ChangeScreensEvent += ChangeScreensRegime;
+                        Process5.BladeTracingEvent += Process_BladeTracingEvent;
+                        Process5.OnProcessStatusChanged += Process_OnProcessStatusChanged;
+                        Process5.OnProcParamsChanged += Process_OnProcParamsChanged;
+                        Process5.OnControlPointAppeared += Process_OnControlPointAppeared;
+                        Process5.OnProcStatusChanged += Process5_OnProcStatusChanged;
+                    }
+                    else
+                    {
+                        Process5.StartPauseProc();
+                    } 
                 }
                 else
                 {
-                    Process5.StartPauseProc();
+                    MessageBox.Show("Необходимо обнулить координаты. Нажмите клавишу Home");
                 }
 #else
                 if (_homeDone)
@@ -794,10 +801,17 @@ namespace DicingBlade.ViewModels
             if (key.Key == Key.F12)
             {
 #if Proc5
-                Process5?.EmergencyScript();
-                MessageBox.Show("Процесс экстренно прерван оператором");
-                Process5.WaitProcDoneAsync().Wait(1000);
-                Process = null;
+                if (Process5 is not null)
+                {
+                    Process5?.EmergencyScript();
+                    Process5.WaitProcDoneAsync().Wait();
+                    Process5 = null;
+                    Substrate = null;
+                    ResetWaferView();
+                    AjustWaferTechnology();
+                    //MessageBox.Show("Процесс экстренно прерван оператором.", "Процесс", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+
+                }
 #else
                 Process?.EmergencyScript();
                 MessageBox.Show("Процесс экстренно прерван оператором");
@@ -816,14 +830,16 @@ namespace DicingBlade.ViewModels
                     break;
                 case Process5.Stat.End:
                     Process5.WaitProcDoneAsync().ContinueWith
-                        (t =>
+                        (async t =>
                         {
-                            Process = null;
+                            Process5 = null;
                             Substrate = null;
                             ResetWaferView();
                             AjustWaferTechnology();
+                            await _machine.GoThereAsync(Place.Loading);
+                            MessageBox.Show("Процесс завершён.", "Процесс", MessageBoxButton.OK, MessageBoxImage.Exclamation);
                         });
-
+                    
                     break;
                 default:
                     break;

@@ -220,7 +220,7 @@ namespace DicingBlade.Classes
         }
         public bool IncrementCut()
         {
-            if (CurrentCutNum == CurrentLinesCount - 1)
+            if (CurrentCutNum == CurrentLinesCount)
             {
                 return false;
             }
@@ -247,16 +247,17 @@ namespace DicingBlade.Classes
         {
             get
             {
-                if (cutNum >= CurrentLinesCount - 1)
+                if (cutNum < 0) cutNum = 0;
+                
+                if (cutNum >= CurrentLinesCount)
                 {
                     LastCutOfTheSide = true;
-                    cutNum = CurrentLinesCount - 1;
+                    cutNum = CurrentLinesCount;
                 }
                 else
                 {
                     LastCutOfTheSide = false;
                 }
-               // CurrentCutNum = cutNum;
                 var angle = _directions[CurrentSide].angle;
                 var line = _shape.GetLine2D(CurrentIndex, cutNum, angle);
                 var sign = XMirror ? -1 : 1;
