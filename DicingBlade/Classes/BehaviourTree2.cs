@@ -101,7 +101,7 @@ namespace DicingBlade.Classes.Test
         }
         private void SetWaters() 
         {            
-            _pauseTokenAfterWork.Pause();
+            _pauseTokenAfterWork?.Pause();
         }
         public void EnslaveMe(PauseTokenSource pauseTokenSource)
         {
@@ -109,7 +109,7 @@ namespace DicingBlade.Classes.Test
         }
         public void ResumeWaitersWork() 
         {
-            _pauseTokenAfterWork.Resume();
+            _pauseTokenAfterWork?.Resume();
         }
         /// <summary>
         /// Makes last added worker wait for resuming after the work's done
@@ -130,7 +130,7 @@ namespace DicingBlade.Classes.Test
                     _workers?.ForEach(async worker => {
                         SetWaters();
                         await worker.DoWork();
-                        if (worker.WaitMeAfterWorkDone)
+                        if (worker.WaitMeAfterWorkDone & _pauseTokenAfterWork is not null)
                         {
                             await _pauseTokenAfterWork.Token.WaitWhilePausedAsync();
                         }                        
@@ -251,7 +251,7 @@ namespace DicingBlade.Classes.Test
         public virtual async Task<bool> DoWork()
         {
             CheckBeforeWorking?.Invoke(_name);
-            if (_notBlocked)
+            if (_notBlocked & _pauseTokenBeforeWork is not null)
             {
                 await _pauseTokenBeforeWork?.Token.WaitWhilePausedAsync(); 
             }

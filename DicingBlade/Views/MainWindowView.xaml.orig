@@ -10,8 +10,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:model="clr-namespace:DicingBlade.ViewModels"
     xmlns:uc="clr-namespace:DicingBlade.UserControls"
-    Title="ЭМ-225"
-    Icon="/Views/7863776561600002497-48.png"
+    Title="MainWindowView"
     Width="1280"
     Height="1024"
     d:DataContext="{d:DesignInstance model:MainViewModel, IsDesignTimeCreatable=True}"
@@ -119,19 +118,19 @@
                     <Button.ToolTip>
                         Параметры пластины
                     </Button.ToolTip>
-                    <Image Source="/Views/Sources/wafer2.png" Height="20"/>
+                    <Image Source="/Views/wafer2.png" Height="20"/>
                 </Button>
                 <Button Command="{Binding MachineSettingsCmd}">
                     <Button.ToolTip>
                         Настройки машины
                     </Button.ToolTip>
-                    <Image Source="/Views/Sources/settings.png" Height="20"/>
+                    <Image Source="/Views/settings.png" Height="20"/>
                 </Button>
                 <Button Command="{Binding TechnologySettingsCmd}">
                     <Button.ToolTip>
                         Технология
                     </Button.ToolTip>
-                    <Image Source="/Views/Sources/techniology.png" Height="20"/>
+                    <Image Source="/Views/techniology.png" Height="20"/>
                 </Button>
 
                 <Separator/>
@@ -139,12 +138,12 @@
                     <MenuItem>
                         <MenuItem.Header>
                             <StackPanel>
-                                <Image Source="/Views/Sources/learning.png" Height="20"/>
+                                <Image Source="/Views/learning.png" Height="20"/>
                             </StackPanel>
                         </MenuItem.Header>
                         <MenuItem Command="{Binding ToTeachChipSizeCmd}">
                             <MenuItem.Icon>
-                                <Image Source="/Views/Sources/size1.png" Height="20"/>
+                                <Image Source="/Views/size1.png" Height="20"/>
                             </MenuItem.Icon>
                             <MenuItem.Header>
                                 <TextBlock Text="Размер кристалла"/>
@@ -152,7 +151,7 @@
                         </MenuItem>
                         <MenuItem Command="{Binding ToTeachVideoScaleCmd}">
                             <MenuItem.Icon>
-                                <Image Source="/Views/Sources/videoscale.png" Height="20"/>
+                                <Image Source="/Views/videoscale.png" Height="20"/>
                             </MenuItem.Icon>
                             <MenuItem.Header>
                                 <TextBlock Text="Масштаб видео"/>
@@ -160,7 +159,7 @@
                         </MenuItem>
                         <MenuItem Command="{Binding ToTeachCutShiftCmd}" InputGestureText="F6">
                             <MenuItem.Icon>
-                                <Image Source="/Views/Sources/cutshift.png" Height="20"/>
+                                <Image Source="/Views/cutshift.png" Height="20"/>
                             </MenuItem.Icon>
                             <MenuItem.Header>
                                 <TextBlock Text="Смещение реза от ТВ"/>
@@ -319,8 +318,18 @@
                             </DockPanel>
                         </GroupBox>
                         <GroupBox Header="СОЖ">
-                            <uc:Indicator Width="150" Height="30" CurrentLevel="{Binding Flow}" MinLevel="0" MaxLevel="2" Units="л/мин" NoLessLevel="1"/>
-                        </GroupBox>                        
+                            <Grid>
+                                <ProgressBar
+                                    Width="150"
+                                    Height="30"
+                                    Margin="3"
+                                    HorizontalAlignment="Center"
+                                    Maximum="2"
+                                    Minimum="0"
+                                    Value="{Binding Flow}" />
+                                <TextBlock Text="{Binding StringFormat={}{0} л/мин, Path=Flow}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Grid>
+                        </GroupBox>
                     </StackPanel>
                     <GroupBox Header="Процесс"  Grid.Row="1">
                         <StackPanel>
@@ -338,14 +347,40 @@
                                 <Setter Property="SensorOffColor"  Value="{StaticResource SignalRed}"/>
                                 <Setter Property="SensorOnColor"  Value="{StaticResource SignalGreen}"/>
                                 <Setter Property="Margin" Value="1"/>
-                                <Setter Property="FontFamily" Value="Noto Sans"/>
-                                <!--<Setter Property="MyBackground" Value="#2E8364"/>-->                                
+                                <Setter Property="FontFamily" Value="Courier New"/>
                             </Style>
-                        </StackPanel.Resources>                        
-                        <uc:ValveStateButton ValveName="ОХЛАЖДЕНИЕ ШПИНДЕЛЯ" ValveIsOn="{Binding SpindleCoolantSensorView}" SensorIsOn="{Binding SpindleCoolantSensorView}"/>
+                        </StackPanel.Resources>
+                        <Border BorderBrush="Transparent" BorderThickness="3">
+                            <DockPanel LastChildFill="False">
+                                <Label Content="Охл. шпинделя" DockPanel.Dock="Left" />
+                                <Rectangle
+                                Width="20"
+                                Height="20"
+                                Margin="3"
+                                DockPanel.Dock="Right">
+                                    <Rectangle.Style>
+                                        <Style TargetType="Rectangle">
+                                            <Setter Property="Fill" Value="{StaticResource SignalRed}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Value="True">
+                                                    <DataTrigger.Binding>
+                                                        <Binding Path="SpindleCoolantSensorView" />
+                                                    </DataTrigger.Binding>
+                                                    <Setter Property="Fill" Value="{StaticResource SignalGreen}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Rectangle.Style>
+                                </Rectangle>
+                            </DockPanel>
+                        </Border>
+<<<<<<< HEAD
                         <uc:ValveStateButton ValveName="ВОДА" ValveIsOn="{Binding CoolantValveView}" SensorIsOn="{Binding CoolantSensorView}"/>
-                        <uc:ValveStateButton ValveName="ВАКУУМ" ValveIsOn="{Binding ChuckVacuumValveView}" SensorIsOn="{Binding ChuckVacuumSensorView}"/>
-                        <uc:ValveStateButton ValveName="ОБДУВ" ValveIsOn="{Binding BlowingValveView}" SensorIsOn="{Binding AirSensorView}"/>                   
+=======
+                        <uc:ValveStateButton ValveName="Вода" ValveCommand="{Binding CoolantValveOnCmd}" ValveIsOn="{Binding CoolantValveView}" SensorIsOn="{Binding CoolantSensorView}"/>
+>>>>>>> eb94763e2179f269de02ea608c7000e5d2ea6776
+                        <uc:ValveStateButton ValveName="Вакуум" ValveIsOn="{Binding ChuckVacuumValveView}" SensorIsOn="{Binding ChuckVacuumSensorView}"/>
+                        <uc:ValveStateButton ValveName="Обдув" ValveIsOn="{Binding BlowingValveView}" SensorIsOn="{Binding AirSensorView}"/>                   
                     </StackPanel>
                     <GroupBox Header="Перемещение" Grid.Row="1" Grid.Column="2" VerticalAlignment="Top">
                         <DockPanel>

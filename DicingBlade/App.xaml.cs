@@ -29,7 +29,6 @@ namespace DicingBlade
                 services.AddSingleton<IMachine, Machine4X>();
                 services.AddSingleton<IMainViewModel, MainViewModel>();
                 services.AddSingleton<ExceptionsAgregator>();
-
                 services.AddSingleton<MainWindowView>();
             });
 

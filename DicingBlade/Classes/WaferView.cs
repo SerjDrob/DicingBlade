@@ -22,11 +22,18 @@ namespace DicingBlade.Classes
         public ObservableCollection<Line2D> RawLines { get; set; }
         private double[] GetSize()
         {
-            return new double[]
+            if (RawLines.Any())
             {
-                RawLines.Max(l=>l.Start.X>l.End.X?l.Start.X:l.End.X)-RawLines.Min(l=>l.Start.X<l.End.X?l.Start.X:l.End.X),
-                RawLines.Max(l=>l.Start.Y>l.End.Y?l.Start.Y:l.End.Y)-RawLines.Min(l=>l.Start.Y<l.End.Y?l.Start.Y:l.End.Y)
-            };
+                return new double[]
+                            {
+                            RawLines.Max(l=>l.Start.X>l.End.X?l.Start.X:l.End.X)-RawLines.Min(l=>l.Start.X<l.End.X?l.Start.X:l.End.X),
+                            RawLines.Max(l=>l.Start.Y>l.End.Y?l.Start.Y:l.End.Y)-RawLines.Min(l=>l.Start.Y<l.End.Y?l.Start.Y:l.End.Y)
+                            };
+            }
+            else
+            {
+                return new double[] { 10, 10 };
+            }
         }
 
         public double[] ShapeSize { get; set; }
