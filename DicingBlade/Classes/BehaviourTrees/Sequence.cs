@@ -14,13 +14,17 @@ namespace DicingBlade.Classes.BehaviourTrees
 
         public override async Task<bool> DoWork()
         {
-            base.DoWork();
-            if (_notBlocked)
+            if (!_isCancelled)
             {
-                foreach (var worker in _workers)
+                base.DoWork();
+                if (_notBlocked)
                 {
-                    if (worker is Leaf) worker.PulseAction(true);
-                    var res = await worker.DoWork();
+                    foreach (var worker in _workers)
+                    {
+                        if (_isCancelled) return true;
+                        if (worker is Leaf) worker.PulseAction(true);
+                        var res = await worker.DoWork();
+                    }
                 }
             }
             return true;
@@ -54,6 +58,7 @@ namespace DicingBlade.Classes.BehaviourTrees
 
         public override void CancellAction(bool info)
         {
+            _isCancelled = true;
             Cancell?.Invoke(info);
         }
     }

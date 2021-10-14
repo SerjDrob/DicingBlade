@@ -23,22 +23,25 @@ namespace DicingBlade.Classes.BehaviourTrees
         private bool _waitMeAfterWorkDone = false;
         public override async Task<bool> DoWork()
         {
-            base.DoWork();
-            try
+            if (!_isCancelled)
             {
-                if (_notBlocked)
+                base.DoWork();
+                try
                 {
-                    var task = new Task(_myWork, cancellationTokenSource.Token);
-                    task.Start();
-                    await task;
+                    if (_notBlocked)
+                    {
+                        var task = new Task(_myWork, cancellationTokenSource.Token);
+                        task.Start();
+                        await task;
 
-                    if (_waitMeAfterWorkDone)
-                        await _pauseTokenAfterWork.Token.WaitWhilePausedAsync().ContinueWith(t => { isPausedAfterWork = false; });
+                        if (_waitMeAfterWorkDone)
+                            await _pauseTokenAfterWork.Token.WaitWhilePausedAsync().ContinueWith(t => { isPausedAfterWork = false; });
+                    }
                 }
-            }
-            catch (Exception)
-            {
-                return false;
+                catch (Exception)
+                {
+                    return false;
+                }
             }
             return true;
         }
@@ -65,7 +68,6 @@ namespace DicingBlade.Classes.BehaviourTrees
                 {
                     if (isPausedAfterWork)
                     {
-                        //isPausedAfterWork = false;
                         resumeCount++;
                         _pauseTokenAfterWork.Resume();
                     }

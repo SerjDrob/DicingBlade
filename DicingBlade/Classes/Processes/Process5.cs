@@ -32,14 +32,14 @@ namespace DicingBlade.Classes.BehaviourTrees
         private ITechnology _technology;
         private CheckCutControl _checkCut;
         private List<Task> _localTasks = new();
-        public Visibility CutWidthMarkerVisibility { get; set; } = Visibility.Hidden;
-        public event Action<string> OnProcessStatusChanged;
-        public event EventHandler<Stat> OnProcStatusChanged;
         public enum Stat
         {
             Cancelled,
             End
         }
+        public Visibility CutWidthMarkerVisibility { get; set; } = Visibility.Hidden;
+        public event Action<string> OnProcessStatusChanged;
+        public event EventHandler<Stat> OnProcStatusChanged;        
         public event Action<bool> BladeTracingEvent;
         public event Action OnControlPointAppeared;
         public event Action<bool> ChangeScreensEvent;
