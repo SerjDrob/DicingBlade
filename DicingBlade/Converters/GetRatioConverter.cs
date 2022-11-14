@@ -1,10 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Data;
 using System.Windows.Data;
 using System.Globalization;
 
 namespace DicingBlade.Converters
 {
-    internal class GetRatioConverter : IMultiValueConverter
+    class GetRatioConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
@@ -15,7 +20,7 @@ namespace DicingBlade.Converters
                 x = System.Convert.ToDouble(values[0]);
                 y = System.Convert.ToDouble(values[1]);
             }
-            catch { }
+            catch{}
             return x / y;
         }
 

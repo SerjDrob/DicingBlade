@@ -1,43 +1,49 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using DicingBlade.Classes;
 using DicingBlade.Properties;
 using PropertyChanged;
+using FluentValidation.Results;
+using System.Windows.Forms;
 using System.ComponentModel;
 using System.Windows.Input;
+using Newtonsoft.Json;
 using System.IO;
-using Microsoft.Win32;
 
 namespace DicingBlade.ViewModels
 {
-
+   
     [AddINotifyPropertyChangedInterface]
-    public class TechnologySettingsViewModel : ITechnology, IDataErrorInfo
-    {
-        public TechnologySettingsViewModel()
-        {
-            _validator = new TechnologySettingsValidator();
+    public class TechnologySettingsViewModel:ITechnology,IDataErrorInfo
+    {        
+        public TechnologySettingsViewModel() 
+        {            
+            validator = new TechnologySettingsValidator();
             CloseCmd = new Command(args => ClosingWnd());
-            OpenFileCmd = new Command(args => OpenFile());
-            SaveFileAsCmd = new Command(args => SaveFileAs());
+            OpenFileCmd=new Command(args=>OpenFile());
+            SaveFileAsCmd = new Command(args=>SaveFileAs());
             FileName = Settings.Default.TechnologyLastFile;
-            if (FileName == null | !File.Exists(FileName))
+            if (FileName == null | !File.Exists(FileName)) 
             {
                 SpindleFreq = 25000;
                 FeedSpeed = 2;
                 WaferBladeGap = 1;
-                FilmThickness = 0.08;
+                FilmThickness=0.08;
                 UnterCut = 0;
                 PassCount = 1;
-                PassType = Directions.Direct;
+                PassType = Directions.direct;
                 StartControlNum = 3;
                 ControlPeriod = 3;
-                PassType = Directions.Direct;
+                PassType = Directions.direct;
             }
             else
             {
-                ((ITechnology)StatMethods.DeSerializeObjectJson<Technology>(FileName)).CopyPropertiesTo(this);
+                ((ITechnology) (new Technology().DeSerializeObjectJson(FileName))).CopyPropertiesTo(this);
             }
-
+            
         }
         public string FileName { get; set; }
         public int SpindleFreq { get; set; }
@@ -49,7 +55,7 @@ namespace DicingBlade.ViewModels
         public Directions PassType { get; set; }
         public int StartControlNum { get; set; }
         public int ControlPeriod { get; set; }
-        public ICommand CloseCmd { get; set; }
+        public ICommand CloseCmd{ get; set; }
         public ICommand OpenFileCmd { get; set; }
         public ICommand SaveFileAsCmd { get; set; }
         private void ClosingWnd()
@@ -62,54 +68,55 @@ namespace DicingBlade.ViewModels
 
         private void OpenFile()
         {
-            var dialog = new OpenFileDialog
+            using (var dialog = new OpenFileDialog())
             {
-                Filter = "Файлы технологии (*.json)|*.json",
-            };
-
-            var result = dialog.ShowDialog();
-            if (result.HasValue && result.Value)
-            {
-                FileName = dialog.FileName;
-                ((ITechnology)StatMethods.DeSerializeObjectJson<Technology>(FileName)).CopyPropertiesTo(this);
+                dialog.Filter = "Файлы технологии (*.json)|*.json";
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    FileName = dialog.FileName;
+                    ((ITechnology)(new Technology().DeSerializeObjectJson(FileName))).CopyPropertiesTo(this);
+                }
             }
         }
 
         private void SaveFileAs()
         {
-            var dialog = new SaveFileDialog
+            using (var dialog = new SaveFileDialog())
             {
-                Filter = "Файлы технологии (*.json)|*.json",
-            };
-
-            var result = dialog.ShowDialog();
-            if (result.HasValue && result.Value)
-            {
-                FileName = dialog.FileName;
-                ClosingWnd();
+                dialog.Filter = "Файлы технологии (*.json)|*.json";
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    FileName = dialog.FileName;
+                    ClosingWnd();
+                }
             }
         }
-        public string Error =>
-            //if (validator != null)
-            //{
-            //    var results = validator.Validate(this);
-            //    if (results != null && results.Errors.Any())
-            //    {
-            //        var errors = string.Join(Environment.NewLine, results.Errors.Select(x => x.ErrorMessage).ToArray());
-            //        return errors;
-            //    }
-            //}
-            string.Empty;
+        public string Error
+        {
+            get
+            {
+                //if (validator != null)
+                //{
+                //    var results = validator.Validate(this);
+                //    if (results != null && results.Errors.Any())
+                //    {
+                //        var errors = string.Join(Environment.NewLine, results.Errors.Select(x => x.ErrorMessage).ToArray());
+                //        return errors;
+                //    }
+                //}
+                return string.Empty;
+            }
+        }
 
-        private readonly TechnologySettingsValidator _validator;
+        private TechnologySettingsValidator validator;
         public string this[string columnName]
         {
             get
             {
-                var firstOrDefault = _validator.Validate(this).Errors.FirstOrDefault(lol => lol.PropertyName == columnName);
+                var firstOrDefault = validator.Validate(this).Errors.FirstOrDefault(lol => lol.PropertyName == columnName);
                 if (firstOrDefault != null)
-                    return _validator != null ? firstOrDefault.ErrorMessage : string.Empty;
-                return string.Empty;
+                    return validator != null ? firstOrDefault.ErrorMessage : "";
+                return "";
             }
         }
 

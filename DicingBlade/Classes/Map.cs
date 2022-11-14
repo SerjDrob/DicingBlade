@@ -1,18 +1,23 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Globalization;
 
 namespace DicingBlade.Classes
 {
-    internal class Map : INotifyPropertyChanged
+    class Map : INotifyPropertyChanged
     {
-        private Int32 _mask;
-        public Int32 Mask
+        private Int32 mask;
+        public Int32 Mask 
         {
-            get => _mask;
-            set
+            get { return mask; }
+            set 
             {
-                _mask = value;
+                mask = value;
                 OnPropertyChanged();
             }
         }
@@ -25,12 +30,12 @@ namespace DicingBlade.Classes
                 Mask |= 1 << item;
             }
         }
-        public bool GetCondition(int bit) => (Mask & (1 << bit)) != 0;
-
+        public bool GetCondition(int bit) => (Mask & (1 << bit)) != 0 ? true : false;
+        
         public event PropertyChangedEventHandler PropertyChanged;
-        public void OnPropertyChanged([CallerMemberName] string prop = "")
+        public void OnPropertyChanged([CallerMemberName]string prop = "") 
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
+            if (PropertyChanged != null) PropertyChanged(this, new PropertyChangedEventArgs(prop));
         }
 
     }

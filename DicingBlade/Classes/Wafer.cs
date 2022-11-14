@@ -1,7 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using netDxf;
+using static System.Math;
+using netDxf.Entities;
+using System.ComponentModel;
+using System.Security;
+using System.Windows;
 using PropertyChanged;
 
 namespace DicingBlade.Classes
@@ -9,7 +17,7 @@ namespace DicingBlade.Classes
     [AddINotifyPropertyChangedInterface]
     public class Wafer
     {
-        //private double thickness;
+        //private double thickness;       
         /// <summary>
         /// Признак выравненности по определённому углу
         /// </summary>
@@ -19,19 +27,58 @@ namespace DicingBlade.Classes
         {
             return !GetCurrentCut(currentLine).Status;
         }
-        public int DirectionLinesCount => Grid.Lines[Directions[CurrentAngleNum].angle].Count;
-        public int DirectionsCount => Directions.Count;
+        public int DirectionLinesCount
+        {
+            get
+            {
+                return Grid.Lines[Directions[CurrentAngleNum].angle].Count;
+            }
+        }
+        public int DirectionsCount
+        {
+            get
+            {
+                return Directions.Count;
+            }
+        }
         public int CurrentAngleNum { get; private set; }
         private Grid Grid { get; set; }
         public double Thickness { get; set; }
         private List<(double angle, double actualAngle, double indexShift)> Directions { get; set; }
-        public double GetCurrentDiretionAngle => Directions[CurrentAngleNum].angle;
-        public double GetCurrentDiretionActualAngle => Directions[CurrentAngleNum].actualAngle;
-        public double GetPrevDiretionAngle => CurrentAngleNum != 0 ? Directions[CurrentAngleNum - 1].angle : Directions.Last().angle;
-        public double GetPrevDiretionActualAngle => CurrentAngleNum != 0 ? Directions[CurrentAngleNum - 1].actualAngle : Directions.Last().actualAngle;
+        public double GetCurrentDiretionAngle
+        {
+            get
+            {
+                return Directions[CurrentAngleNum].angle;
+            }
+        }
+        public double GetCurrentDiretionActualAngle
+        {
+            get
+            {
+                return Directions[CurrentAngleNum].actualAngle;
+            }
+        }
+        public double GetPrevDiretionAngle
+        {
+            get
+            {
+                return CurrentAngleNum != 0 ? Directions[CurrentAngleNum - 1].angle : Directions.Last().angle;
+            }
+        }
+        public double GetPrevDiretionActualAngle
+        {
+            get
+            {
+                return CurrentAngleNum != 0 ? Directions[CurrentAngleNum - 1].actualAngle : Directions.Last().actualAngle;
+            }
+        }
         public double SetCurrentDirectionAngle
         {
-            set => Directions[CurrentAngleNum] = (Directions[CurrentAngleNum].angle, value, Directions[CurrentAngleNum].indexShift);
+            set
+            {
+                Directions[CurrentAngleNum] = (Directions[CurrentAngleNum].angle, value, Directions[CurrentAngleNum].indexShift);
+            }
         }
         public double AddToCurrentDirectionIndexShift
         {
@@ -42,28 +89,32 @@ namespace DicingBlade.Classes
                 GetCurrentDirectionIndexShift = Directions[CurrentAngleNum].indexShift;
             }
         }
-
-        private double _currentShift;
+        double _currentShift;
         public double GetCurrentDirectionIndexShift //{ get; set; }
         {
-            set => _currentShift = value;
-            get => -Directions[CurrentAngleNum].indexShift;
+            set { _currentShift = value; }
+            get => - Directions[CurrentAngleNum].indexShift;
         }
         public Wafer() { }
         public void ResetWafer()
         {
-            foreach (var cut in Grid.Lines.SelectMany(s => s.Value))
+            foreach (var key in Grid.Lines.Keys)
             {
-                cut.ResetCut();
+                foreach (var cut in Grid.Lines[key])
+                {
+                    cut.ResetCut();
+                }
             }
-
             CurrentAngleNum = 0;
         }
-        public void SetPassCount(int passes)
+        public void SetPassCount(int passes) 
         {
-            foreach (var cut in Grid.Lines.SelectMany(s => s.Value))
+            foreach (var key in Grid.Lines.Keys)
             {
-                cut.CutCount = passes;
+                foreach (var cut in Grid.Lines[key])
+                {
+                    cut.CutCount=passes;
+                }
             }
         }
         public Wafer(double thickness, DxfDocument dxf, string layer)
@@ -73,7 +124,7 @@ namespace DicingBlade.Classes
             MakeDirections(new List<double>(Grid.Lines.Keys));
             CurrentAngleNum = 0;
         }
-        private void MakeDirections(List<double> list)
+        private void MakeDirections(List<double> list) 
         {
             Directions = new List<(double, double, double)>();
             foreach (var item in list)
@@ -97,7 +148,7 @@ namespace DicingBlade.Classes
             CurrentAngleNum = 0;
             IsRound = true;
         }
-        public WaferView MakeWaferView()
+        public WaferView MakeWaferView() 
         {
             var tempView = Grid.MakeGridView();
             tempView.IsRound = IsRound;
@@ -105,66 +156,70 @@ namespace DicingBlade.Classes
         }
         public bool NextDir(bool reset = false)
         {
-            //CurrentAngleNum++;
             if (Directions.Count - 1 == CurrentAngleNum)
             {
-                if (reset) CurrentAngleNum = 0;
+                if(reset) CurrentAngleNum = 0;
                 return false;
             }
-
-            CurrentAngleNum++;
-            return true;
+            else
+            {
+                CurrentAngleNum++;
+                return true;
+            }
         }
-        public bool PrevDir()
+        public bool PrevDir() 
         {
             if (CurrentAngleNum == 0)
             {
                 CurrentAngleNum = Directions.Count - 1;
                 return false;
             }
-
-            CurrentAngleNum--;
-            return true;
+            else
+            {
+                CurrentAngleNum--;
+                return true;
+            }
         }
         //private void RotateWafer(double angle, Vector2 origin) => Grid.RotateRawLines(angle);
-        public Cut GetNearestCut(double y)
+        public Cut GetNearestCut(double y) 
         {
             int index = 0;
-            var angle = Directions[CurrentAngleNum].angle;
-            var gridLine = Grid.Lines[angle];
-
-            double diff = Math.Abs(gridLine[index].StartPoint.Y - y);
-
-            for (int i = 0; i < gridLine.Count; i++)
-            {
-                if (Math.Abs(gridLine[i].StartPoint.Y - y) < diff)
+            double diff = Math.Abs(Grid.Lines[Directions[CurrentAngleNum].angle][index].StartPoint.Y-y);
+            
+            for (int i = 0; i < Grid.Lines[Directions[CurrentAngleNum].angle].Count; i++)
+            {                
+                if (Math.Abs(Grid.Lines[Directions[CurrentAngleNum].angle][i].StartPoint.Y - y) < diff)
                 {
-                    diff = Math.Abs(gridLine[i].StartPoint.Y - y);
+                    diff = (Math.Abs(Grid.Lines[Directions[CurrentAngleNum].angle][i].StartPoint.Y - y));
                     index = i;
                 }
             }
-            return gridLine[index];
+            return (Cut)Grid.Lines[Directions[CurrentAngleNum].angle][index];
         }
         private Cut GetCurrentCut(int currentLine)
         {
             return Grid.Lines[Directions[CurrentAngleNum].angle][currentLine];
-        }
-        public (Vector2 start, Vector2 end) GetCurrentLine(int currentLine)
+        }       
+        public (Vector2 start,Vector2 end) GetCurrentLine(int currentLine)
         {
-            var (angle, _, indexShift) = Directions[CurrentAngleNum];
-
-            var (s, e) = Grid.GetCenteredLine(angle, currentLine);
-            s.Y += indexShift;
-            e.Y += indexShift;
-            return (s, e);
+            Vector2 s;
+            Vector2 e;
+            (s, e) = Grid.GetCenteredLine(Directions[CurrentAngleNum].angle, currentLine);
+            s.Y += Directions[CurrentAngleNum].indexShift;
+            e.Y += Directions[CurrentAngleNum].indexShift;
+            return (s,e);
         }
         public double GetCurrentCutZ(int currentLine)
         {
             double res = GetCurrentCut(currentLine).CutRatio;
             return (1 - res) * Thickness;
-        }       
-        public bool CurrentCutIncrement(int currentLine)
+        }
+        public void test() 
         {
+          //  List<Cut> cuts = Grid.Lines[CurrentAngleNum];
+        }
+        public bool CurrentCutIncrement(int currentLine) 
+        {            
             return Grid.Lines.GetItemByIndex(CurrentAngleNum)[currentLine].NextCut();
         }
     }

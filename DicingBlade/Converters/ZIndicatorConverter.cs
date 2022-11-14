@@ -1,21 +1,25 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Data;
 
 namespace DicingBlade.Converters
 {
-    internal class ZIndicatorConverter : IMultiValueConverter
+    class ZIndicatorConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             try
             {
-                var h = System.Convert.ToDouble(values[0]);
-                var thickness = System.Convert.ToDouble(values[1]);
-                var val = System.Convert.ToDouble(values[2]);
-                var ztouch = System.Convert.ToDouble(values[3]);
-                var result = Math.Abs((-ztouch + val) * h / 3 * thickness);
-                return result > h ? h : result;
+                double H = System.Convert.ToDouble(values[0]);
+                double thickness = System.Convert.ToDouble(values[1]);
+                double val = System.Convert.ToDouble(values[2]);
+                double ztouch = System.Convert.ToDouble(values[3]);
+                var result = Math.Abs((-ztouch + val) * H / 3 * thickness);
+                return result > H ? H : result;
             }
             catch { return 0; }
         }

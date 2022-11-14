@@ -3,97 +3,90 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Advantech.Motion;
 using netDxf;
 using Microsoft.VisualStudio.Workspace;
 using PropertyChanged;
+using System.ComponentModel;
 using netDxf.Entities;
 using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Forms;
+using MessageBox = System.Windows.Forms.MessageBox;
+using System.Reflection.PortableExecutable;
 using System.Windows.Media;
 
 namespace DicingBlade.Classes
 {
     public delegate void GetRotation(double angle, double time);
     public delegate void ChangeScreens(bool regime);
-
-    internal enum Diagram
+    enum Diagram 
     {
-        GoWaferStartX,
-        GoWaferEndX,
-        GoNextDepthZ,
-        CuttingX,
-        GoCameraPointXyz,
-        GoOnWaferRightX,
-        GoOnWaferLeftX,
-        GoWaferCenterXy,
-        GoNextCutY,
-        GoNextCutXy,
-        GoTransferingHeightZ,
-        GoDockHeightZ,
-        GoNextDirection,
-        GoCameraPointLearningXyz,
-        GoCurPositionCutXy
+        goWaferStartX,
+        goWaferEndX,
+        goNextDepthZ,
+        cuttingX,
+        goCameraPointXYZ,
+        goOnWaferRightX,
+        goOnWaferLeftX,
+        goWaferCenterXY,
+        goNextCutY,
+        goNextCutXY,
+        goTransferingHeightZ,
+        goDockHeightZ,
+        goNextDirection,
+        goCameraPointLearningXYZ
     }
-    [Flags]
-    internal enum Status
+    enum Status 
     {
-        None = 1,
-        StartLearning = 2,
-        Learning = 4,
-        Working = 8,
-        Correcting = 16,
-        Done = 32,
-        MovingNextDir = 64,
-        Ending = 128,
-        Pause = 256
+        StartLearning,
+        Learning,
+        Working,
+        Correcting,
+        Done
     }
     /// <summary>
     /// Структура параметров процесса
     /// </summary>
-    internal struct TempWafer2D
-    {
-        
-        public bool FirstPointSet;
-        public double[] Point1;
-        public double[] Point2;
+    struct TempWafer2D
+    {        
+        //public bool Round;
+        //public double XIndex;
+        //public double XShift;
+        //public double YIndex;
+        //public double YShift;
+        //public double XAngle;
+        //public double YAngle;
+        public bool firstPointSet;
+        public Vector2 point1;
+        public Vector2 point2;
         public double GetAngle()
         {
-            var x = Point2[0] - Point1[0];
-            if (x!=0)
-            {
-                var tan = (Point2[1] - Point1[1]) / x;
-                var sign = Math.Sign(tan);
-                var angle = Math.Atan(Math.Abs(tan)) * 180 / Math.PI;
-                return sign * angle; 
-            }
-            else
-            {
-                FirstPointSet = false;
-                return 0;
-            }
+            return Math.Atan2(point2.Y - point1.Y, point2.X - point1.X);
         }
     }
+
     struct CheckCutControl
     {
         int startCut;
         int checkInterval;
         int currentCut;
-        public bool Check;
-        public void addToCurrentCut()
+        public bool addToCurrentCut()
         {
             int res = 0;
             currentCut++;
             if (currentCut >= startCut)
             {
                 Math.DivRem(currentCut - startCut, checkInterval, out res);
-                Check = res == 0;
+                if (res == 0) return true;
+                else return false;
             }
-            else
-            {
-                Check = false;
-            }
+            else return false;
         }
         public void Reset()
         {
@@ -108,14 +101,14 @@ namespace DicingBlade.Classes
     }
     //public delegate void SetPause(bool pause);
     [AddINotifyPropertyChangedInterface]
-    internal class Process
+    class Process
     {
         public string ProcessMessage { get; set; } = "";
         public bool UserConfirmation { get; set; } = false;
-        private readonly Wafer _wafer;
-        private readonly Machine _machine;
-        private readonly Blade _blade;
-        private CheckCutControl _checkCut;
+        private readonly Wafer Wafer;
+        private readonly Machine Machine;
+        private readonly Blade Blade;
+        private CheckCutControl checkCut;
         public ChangeScreens ChangeScreensEvent;
         public Visibility TeachVScaleMarkersVisibility { get; set; } = Visibility.Hidden;
         public Visibility CutWidthMarkerVisibility { get; set; } = Visibility.Hidden;
@@ -125,115 +118,122 @@ namespace DicingBlade.Classes
         public ObservableCollection<TracePath> Traces { get; set; }
         public double CutWidth { get; set; } = 0.05;
         public double CutOffset { get; set; } = 0;
-        private List<TracePath> _traces;
-        private double _bladeTransferGapZ /*{ get; set; }*/ = 1;
+        private List<TracePath> traces;
+        private double BladeTransferGapZ /*{ get; set; }*/ = 1;
         private bool IsCutting { get; set; } = false;
         private bool InProcess { get; set; } = false;
         public bool CutsRotate { get; set; } = true;
         //private bool procToken = true;
         private bool _pauseProcess;
-        public bool PauseProcess
+        public bool PauseProcess 
         {
-            get => _pauseProcess;
-            set
+            get { return _pauseProcess; }
+            set 
             {
                 _pauseProcess = value;
-                if (_pauseToken != null)
+                if (pauseToken != null) 
                 {
                     if (value)
                     {
-                        _pauseToken.Pause();
+                        pauseToken.Pause();                                        
                     }
-                    else _pauseToken.Resume();
+                    else pauseToken.Resume();
                 }
             }
         }
         private bool _cancelProcess;
         public bool CancelProcess
-        {
+        {            
             set
             {
                 _cancelProcess = value;
-                if (_cancellationToken != null)
+                if (cancellationToken != null)
                 {
                     if (value)
                     {
-                        _cancellationToken.Cancel();
-                    }
+                        cancellationToken.Cancel();
+                    }                    
                 }
             }
         }
 
-        private PauseTokenSource _pauseToken;
+        private PauseTokenSource pauseToken;
 
-        private Diagram[] _baseProcess;
-
-        private CancellationTokenSource _cancellationToken;
+        private Diagram[] BaseProcess;
+        
+        private CancellationTokenSource cancellationToken;
         public bool SideDone { get; private set; } = false;
         public int SideCounter { get; private set; } = 0;
-        private bool BladeInWafer => _machine.Z.ActualPosition > _machine.ZBladeTouch - _wafer.Thickness - _bladeTransferGapZ;
-
+        private bool BladeInWafer 
+        {
+            get 
+            {
+                if (Machine.Z.ActualPosition > Machine.ZBladeTouch - Wafer.Thickness - BladeTransferGapZ) return true;
+                else return false;
+            }
+        }
         public int CurrentLine { get; private set; }
-        //private double RotationSpeed { get; set; }
-        private double FeedSpeed { get; set; }
+        //private double RotationSpeed { get; set; } 
+        private double FeedSpeed { get; set; }        
         //private bool Aligned { get; set; }
         //private double OffsetAngle { get; set; }
         public GetRotation GetRotationEvent;
         public bool Rotation { get; set; } = false;
-        public Process(Machine machine, Wafer wafer, Blade blade, ITechnology technology, Diagram[] proc) // В конструкторе происходит загрузка технологических параметров
+        public Process(Machine machine, Wafer wafer, Blade blade,ITechnology technology, Diagram[] proc) // В конструкторе происходит загрузка технологических параметров
         {
-            _machine = machine;
-            _wafer = wafer;
-            _blade = blade;
+            Machine = machine;
+            Wafer = wafer;
+            Blade = blade;
             Traces = new ObservableCollection<TracePath>();
             TracesView = new WaferView();
-            _baseProcess = proc;
+            BaseProcess = proc;
             CancelProcess = false;
-            FeedSpeed = PropContainer.Technology.FeedSpeed;
-            _machine.OnAirWanished += Machine_OnAirWanished;
-            _machine.OnCoolWaterWanished += Machine_OnCoolWaterWanished;
-            _machine.OnSpinWaterWanished += Machine_OnSpinWaterWanished;
-            _machine.OnVacuumWanished += Machine_OnVacuumWanished;
-            _checkCut.Set(1, 2);
+            FeedSpeed = PropContainer.Technology.FeedSpeed;            
+            Machine.OnAirWanished += Machine_OnAirWanished;
+            Machine.OnCoolWaterWanished += Machine_OnCoolWaterWanished;
+            Machine.OnSpinWaterWanished += Machine_OnSpinWaterWanished;
+            Machine.OnVacuumWanished += Machine_OnVacuumWanished;
+            checkCut.Set(1, 2);
         }
-        public async Task PauseScenarioAsync()
+        public async Task PauseScenarioAsync() 
         {
-            await _machine.X.WaitUntilStopAsync();
+            await Machine.X.WaitUntilStopAsync();
             //Machine.EmgStop();
-            await ProcElementDispatcherAsync(Diagram.GoCameraPointXyz);
+            await ProcElementDispatcherAsync(Diagram.goCameraPointXYZ);
         }
         public async Task DoProcessAsync(Diagram[] diagrams)
         {
             if (!InProcess)
             {
+                
                 PauseProcess = false;
-                _pauseToken = new PauseTokenSource();
-                _cancellationToken = new CancellationTokenSource();
+                pauseToken = new PauseTokenSource();
+                cancellationToken = new CancellationTokenSource();
                 InProcess = true;
                 while (InProcess)
                 {
                     foreach (var item in diagrams)
                     {
-                        if (_cancellationToken.IsCancellationRequested)
+                        if (cancellationToken.IsCancellationRequested) 
                         {
                             InProcess = false;
-                            _cancellationToken.Dispose();
+                            cancellationToken.Dispose();
                             CancelProcess = false;
                             break;
                         }
-                        await _pauseToken.Token.WaitWhilePausedAsync();
+                        await pauseToken.Token.WaitWhilePausedAsync();
                         await ProcElementDispatcherAsync(item);
                     }
                 }
                 ProcessStatus = Status.Done;
-                _wafer.ResetWafer();
-                await _machine.GoThereAsync(Place.Loading);
+                Wafer.ResetWafer();
+                await Machine.GoThereAsync(Place.Loading);
             }
         }
-        private void NextLine()
+        private void NextLine() 
         {
-            if (CurrentLine < _wafer.DirectionLinesCount - 1) CurrentLine++;
-            else if (CurrentLine == _wafer.DirectionLinesCount - 1)
+            if (CurrentLine < Wafer.DirectionLinesCount - 1) CurrentLine++;
+            else if(CurrentLine == Wafer.DirectionLinesCount - 1) 
             {
                 SideDone = true;
             }
@@ -241,37 +241,37 @@ namespace DicingBlade.Classes
 
         private async Task MoveNextDirAsync(bool next = true)
         {
-            if (!next || !_wafer.NextDir(true))
+            if (next ? !Wafer.NextDir(true) : true)
             {
-
+                
                 double angle = 0;
                 double time = 0;
-                var deltaAngle = _wafer.GetCurrentDiretionAngle - _wafer.GetPrevDiretionAngle;
-                if (_wafer.GetCurrentDiretionActualAngle == _wafer.GetCurrentDiretionAngle)
+                var deltaAngle = Wafer.GetCurrentDiretionAngle - Wafer.GetPrevDiretionAngle;
+                if (Wafer.GetCurrentDiretionActualAngle == Wafer.GetCurrentDiretionAngle)
                 {
-                    angle = _wafer.GetPrevDiretionActualAngle - _wafer.GetPrevDiretionAngle + _wafer.GetCurrentDiretionAngle;
-                    time = Math.Abs(angle - _machine.U.ActualPosition) / _machine.U.GetVelocity();
+                    angle = Wafer.GetPrevDiretionActualAngle - Wafer.GetPrevDiretionAngle + Wafer.GetCurrentDiretionAngle;
+                    time = Math.Abs(angle - Machine.U.ActualPosition) / Machine.U.GetVelocity();                                                            
                 }
                 else
                 {
-                    angle = _wafer.GetCurrentDiretionActualAngle;
-                    time = Math.Abs(_wafer.GetCurrentDiretionActualAngle - _machine.U.ActualPosition) / _machine.U.GetVelocity();
+                    angle = Wafer.GetCurrentDiretionActualAngle;
+                    time = Math.Abs(Wafer.GetCurrentDiretionActualAngle - Machine.U.ActualPosition) / Machine.U.GetVelocity();                    
                 }
                 Rotation = true;
                 GetRotationEvent(deltaAngle, time);
-                await _machine.U.MoveAxisInPosAsync(angle);
+                await Machine.U.MoveAxisInPosAsync(angle);                
                 Rotation = false;
             }
 
         }
-        private async Task MovePrevDirAsync()
+        private async Task MovePrevDirAsync() 
         {
-            if (_wafer.PrevDir())
+            if (Wafer.PrevDir())
             {
-                await _machine.U.MoveAxisInPosAsync(_wafer.GetCurrentDiretionActualAngle);
+                await Machine.U.MoveAxisInPosAsync(Wafer.GetCurrentDiretionActualAngle);
             }
         }
-        private void PrevLine()
+        private void PrevLine() 
         {
             if (CurrentLine > 0) CurrentLine--;
         }
@@ -280,28 +280,28 @@ namespace DicingBlade.Classes
             TeachVScaleMarkersVisibility = Visibility.Hidden;
             ProcessMessage = "Подведите ориентир к одному из визиров и нажмите *";
             await WaitForConfirmationAsync();
-            var y = _machine.Y.ActualPosition;
+            var y = Machine.Y.ActualPosition;
             ProcessMessage = "Подведите ориентир ко второму визиру и нажмите *";
             await WaitForConfirmationAsync();
-            _machine.CameraScale = _machine.TeachMarkersRatio / Math.Abs(y - _machine.Y.ActualPosition);
+            Machine.CameraScale = Machine.TeachMarkersRatio / Math.Abs(y - Machine.Y.ActualPosition);
             ProcessMessage = "";
             TeachVScaleMarkersVisibility = Visibility.Hidden;
         }
         public async Task ToTeachChipSizeAsync()
         {
-            if (MessageBox.Show("Обучить размер кристалла?", "Обучение", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+            if (System.Windows.MessageBox.Show("Обучить размер кристалла?", "Обучение", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
             {
                 ProcessMessage = "Подведите ориентир к перекрестию и нажмите *";
                 await WaitForConfirmationAsync();
-                var y = _machine.Y.ActualPosition;
+                var y = Machine.Y.ActualPosition;
                 ProcessMessage = "Подведите следующий ориентир к перекрестию и нажмите *";
                 await WaitForConfirmationAsync();
-                var size = Math.Round(Math.Abs(y - _machine.Y.ActualPosition), 3);
+                var size = Math.Round(Math.Abs(y - Machine.Y.ActualPosition),3);
                 ProcessMessage = "";
-                if (MessageBox.Show($"\rНовый размер кристалла {size} мм.\n Запомнить?", "Обучение", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+                if (System.Windows.MessageBox.Show($"\rНовый размер кристалла {size} мм.\n Запомнить?" , "Обучение", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
                 {
-                    PropContainer.WaferTemp.IndexH = size;//currentIndex?
-                }
+                    PropContainer.WaferTemp.IndexH=size;//currentIndex?                    
+                }    
             }
         }
         private async Task WaitForConfirmationAsync()
@@ -315,9 +315,9 @@ namespace DicingBlade.Classes
                 }
             });
         }
-        private async Task ProcElementDispatcherAsync(Diagram element)
+        private async Task ProcElementDispatcherAsync(Diagram element) 
         {
-            #region MyRegion
+            #region MyRegion            
             // проверка перед каждым действием. асинхронные действия await()!!!
             // паузы, корректировки.
             //if(pauseToken.Equals(default)) await pauseToken.Token.WaitWhilePausedAsync();
@@ -326,183 +326,183 @@ namespace DicingBlade.Classes
             Vector2 target;
             switch (element)
             {
-                case Diagram.GoWaferStartX:
+                case Diagram.goWaferStartX:
                     if (BladeInWafer) break;
-                    _machine.SetVelocity(Velocity.Service);
-                    target = _machine.CtoBSystemCoors(_wafer.GetCurrentLine(CurrentLine).start);
-                    double xGap = _blade.XGap(_wafer.Thickness);
-                    await _machine.X.MoveAxisInPosAsync(target.X + xGap);
+                    Machine.SetVelocity(Velocity.Service);
+                    target = Machine.CtoBSystemCoors(Wafer.GetCurrentLine(CurrentLine).start);
+                    double xGap = Blade.XGap(Wafer.Thickness);
+                    await Machine.X.MoveAxisInPosAsync(target.X + xGap);
                     break;
-                case Diagram.GoWaferEndX:
+                case Diagram.goWaferEndX:
                     if (BladeInWafer) break;
-                    _machine.SetVelocity(Velocity.Service);
-                    await _machine.X.MoveAxisInPosAsync(_wafer.GetCurrentLine(CurrentLine).end.X + _machine.BladeChuckCenter.X);
+                    Machine.SetVelocity(Velocity.Service);
+                    await Machine.X.MoveAxisInPosAsync(Wafer.GetCurrentLine(CurrentLine).end.X + Machine.BladeChuckCenter.X);
                     break;
-                case Diagram.GoNextDepthZ:
-                    _machine.SetVelocity(Velocity.Service);
-                    if (_wafer.CurrentCutIsDone(CurrentLine)) break;
-                    await _machine.Z.MoveAxisInPosAsync(_machine.ZBladeTouch - _wafer.GetCurrentCutZ(CurrentLine));
+                case Diagram.goNextDepthZ:
+                    Machine.SetVelocity(Velocity.Service);
+                    if (Wafer.CurrentCutIsDone(CurrentLine)) break;                    
+                    await Machine.Z.MoveAxisInPosAsync(Machine.ZBladeTouch - Wafer.GetCurrentCutZ(CurrentLine));                   
                     break;
-                case Diagram.CuttingX:
-                    _machine.SwitchOnCoolantWater = true;
-                    _machine.X.SetVelocity(FeedSpeed);
+                case Diagram.cuttingX:
+                    Machine.SwitchOnCoolantWater = true;
+                    Machine.X.SetVelocity(FeedSpeed);
                     IsCutting = true;
 
-                    target = _machine.CtoBSystemCoors(_wafer.GetCurrentLine(CurrentLine).end);
-                    var traceX = _machine.X.ActualPosition;
-                    var traceY = _machine.Y.ActualPosition;
-                    var angle = _machine.U.ActualPosition;
+                    target = Machine.CtoBSystemCoors(Wafer.GetCurrentLine(CurrentLine).end);
+                    var traceX = Machine.X.ActualPosition;
+                    var traceY = Machine.Y.ActualPosition;
+                    var angle = Machine.U.ActualPosition;
                     Thread tracingThread = new Thread(new ThreadStart(() =>
                     {
                         do
-                        {
-                            TracingLine = new TracePath(traceY, traceX, _machine.X.ActualPosition, angle);
+                        {                            
+                            TracingLine = new TracePath(traceY, traceX, Machine.X.ActualPosition, angle);
                             Thread.Sleep(1);
                         } while (IsCutting);
                     }));
                     tracingThread.Start();
-                    await _machine.X.MoveAxisInPosAsync(target.X);
+                    await Machine.X.MoveAxisInPosAsync(target.X);
                     IsCutting = false;
-
-
+                    tracingThread.Abort();
                     //traces.Add(TracingLine);
 
                     RotateTransform rotateTransform = new RotateTransform(
-                        -_wafer.GetCurrentDiretionAngle,
-                        _machine.BladeChuckCenter.X,
-                        _machine.BladeChuckCenter.Y
+                        -Wafer.GetCurrentDiretionAngle,
+                        Machine.BladeChuckCenter.X,
+                        Machine.BladeChuckCenter.Y
                         );
+                    
+                    var point1 = rotateTransform.Transform(new System.Windows.Point(traceX, traceY+Wafer.GetCurrentDirectionIndexShift));
+                    var point2 = rotateTransform.Transform(new System.Windows.Point(Machine.X.ActualPosition, traceY+Wafer.GetCurrentDirectionIndexShift));
+                    point1 = new TranslateTransform(-Machine.BladeChuckCenter.X, -Machine.BladeChuckCenter.Y).Transform(point1);
+                    point2 = new TranslateTransform(-Machine.BladeChuckCenter.X, -Machine.BladeChuckCenter.Y).Transform(point2);
 
-                    var point1 = rotateTransform.Transform(new System.Windows.Point(traceX, traceY + _wafer.GetCurrentDirectionIndexShift));
-                    var point2 = rotateTransform.Transform(new System.Windows.Point(_machine.X.ActualPosition, traceY + _wafer.GetCurrentDirectionIndexShift));
-                    point1 = new TranslateTransform(-_machine.BladeChuckCenter.X, -_machine.BladeChuckCenter.Y).Transform(point1);
-                    point2 = new TranslateTransform(-_machine.BladeChuckCenter.X, -_machine.BladeChuckCenter.Y).Transform(point2);
-
-
-                    TracesView.RawLines.Add(new Line2D(
-                        new System.Windows.Point(point1.X, point1.Y),
-                        new System.Windows.Point(point2.X, point2.Y)
+                    
+                    TracesView.RawLines.Add(new Line(
+                        new Vector2(point1.X, point1.Y),
+                        new Vector2(point2.X, point2.Y)
                         ));
-                    TracesView.RawLines = new ObservableCollection<Line2D>(TracesView.RawLines);
+                    TracesView.RawLines = new ObservableCollection<Line>(TracesView.RawLines);
                     TracingLine = null;
-                    _machine.SwitchOnCoolantWater = false;
+                    Machine.SwitchOnCoolantWater = false;
+                    if (checkCut.addToCurrentCut()) await TakeThePhotoAsync();
 
-                    if (!_wafer.CurrentCutIncrement(CurrentLine))
+                    if (!Wafer.CurrentCutIncrement(CurrentLine))
                     {
                         NextLine();
                     }
-                    _checkCut.addToCurrentCut();
-                    if (_checkCut.Check) await TakeThePhotoAsync();
                     break;
-                case Diagram.GoCameraPointXyz:
-                    _machine.SetVelocity(Velocity.Service);
-                    await _machine.Z.MoveAxisInPosAsync(_machine.ZBladeTouch - _wafer.Thickness - _bladeTransferGapZ);
-                    await _machine.MoveInPosXyAsync(new Vector2(
-                        _machine.CameraChuckCenter.X,
-                        _machine.CtoBSystemCoors(_wafer.GetCurrentLine(CurrentLine != 0 ? CurrentLine - 1 : 0).start).Y - _machine.CameraBladeOffset
+                case Diagram.goCameraPointXYZ:
+                    Machine.SetVelocity(Velocity.Service);
+                    await Machine.Z.MoveAxisInPosAsync(Machine.ZBladeTouch - Wafer.Thickness - BladeTransferGapZ);
+                    await Machine.MoveInPosXYAsync(new netDxf.Vector2(
+                        Machine.CameraChuckCenter.X,
+                        Machine.CtoBSystemCoors(Wafer.GetCurrentLine(CurrentLine!=0?CurrentLine-1:0).start).Y - Machine.CameraBladeOffset
                         ));
-                    await _machine.Z.MoveAxisInPosAsync(_machine.CameraFocus);
+                    await Machine.Z.MoveAxisInPosAsync(Machine.CameraFocus);
                     break;
-                case Diagram.GoOnWaferRightX:
+                case Diagram.goOnWaferRightX:
                     if (BladeInWafer) break;
-                    _machine.SetVelocity(Velocity.Service);
-                    await _machine.X.MoveAxisInPosAsync(_wafer.GetNearestCut(_machine.Y.ActualPosition - _machine.CameraChuckCenter.Y).EndPoint.X);
+                    Machine.SetVelocity(Velocity.Service);
+                    await Machine.X.MoveAxisInPosAsync(Wafer.GetNearestCut(Machine.Y.ActualPosition - Machine.CameraChuckCenter.Y).EndPoint.X);
                     break;
-                case Diagram.GoOnWaferLeftX:
+                case Diagram.goOnWaferLeftX:
                     if (BladeInWafer) break;
-                    _machine.SetVelocity(Velocity.Service);
-                    await _machine.X.MoveAxisInPosAsync(_wafer.GetNearestCut(_machine.Y.ActualPosition - _machine.CameraChuckCenter.Y).StartPoint.X);
+                    Machine.SetVelocity(Velocity.Service);
+                    await Machine.X.MoveAxisInPosAsync(Wafer.GetNearestCut(Machine.Y.ActualPosition - Machine.CameraChuckCenter.Y).StartPoint.X);
                     break;
-                case Diagram.GoWaferCenterXy:
+                case Diagram.goWaferCenterXY:
                     if (BladeInWafer) break;
-                    _machine.SetVelocity(Velocity.Service);
-
-                    await _machine.MoveInPosXyAsync(_machine.CameraChuckCenter);
+                    Machine.SetVelocity(Velocity.Service);                  
+                    
+                    await Machine.MoveInPosXYAsync(Machine.CameraChuckCenter);
                     break;
-                case Diagram.GoNextCutY:
+                case Diagram.goNextCutY:
                     if (BladeInWafer) break;
-                    _machine.SetVelocity(Velocity.Service);
-                    await _machine.Y.MoveAxisInPosAsync(_machine.CtoBSystemCoors(_wafer.GetCurrentLine(CurrentLine).start).Y);
+                    Machine.SetVelocity(Velocity.Service);
+                    await Machine.Y.MoveAxisInPosAsync(Machine.CtoBSystemCoors(Wafer.GetCurrentLine(CurrentLine).start).Y);
                     break;
-                case Diagram.GoNextCutXy:
-                    // if (BladeInWafer) break;
-                    _machine.SetVelocity(Velocity.Service);
-                    target = _machine.CtoBSystemCoors(_wafer.GetCurrentLine(CurrentLine).start);
-                    target.X -= _blade.XGap(_wafer.Thickness);
-                    await _machine.MoveInPosXyAsync(target);
+                case Diagram.goNextCutXY:
+                   // if (BladeInWafer) break;
+                    Machine.SetVelocity(Velocity.Service);
+                    target = Machine.CtoBSystemCoors(Wafer.GetCurrentLine(CurrentLine).start);
+                    target.X -= Blade.XGap(Wafer.Thickness);
+                    await Machine.MoveInPosXYAsync(target);
                     break;
-                case Diagram.GoTransferingHeightZ:
-                    _machine.SetVelocity(Velocity.Service);
-                    await _machine.Z.MoveAxisInPosAsync(_machine.ZBladeTouch - _wafer.Thickness - _bladeTransferGapZ);
+                case Diagram.goTransferingHeightZ:
+                    Machine.SetVelocity(Velocity.Service);
+                    await Machine.Z.MoveAxisInPosAsync(Machine.ZBladeTouch - Wafer.Thickness - BladeTransferGapZ);
                     break;
-                case Diagram.GoDockHeightZ:
-                    _machine.SetVelocity(Velocity.Service);
-                    await _machine.Z.MoveAxisInPosAsync(1);
+                case Diagram.goDockHeightZ:
+                    Machine.SetVelocity(Velocity.Service);
+                    await Machine.Z.MoveAxisInPosAsync(1);
                     break;
-                case Diagram.GoNextDirection:
+                case Diagram.goNextDirection:
                     if (InProcess & SideDone /*| ProcessStatus == Status.Learning*/) //if the blade isn't in the wafer
                     {
-                        _machine.SetVelocity(Velocity.Service);
+                        Machine.SetVelocity(Velocity.Service);
                         //CutsRotate = true;
                         await MoveNextDirAsync();
                         //CutsRotate = false;
                         SideDone = false;
                         CurrentLine = 0;
                         SideCounter++;
-                        if (SideCounter == _wafer.DirectionsCount)
+                        if (SideCounter == Wafer.DirectionsCount)
                         {
-                            InProcess = false;
+                            InProcess = false;                            
                         }
                     }
                     break;
-                case Diagram.GoCameraPointLearningXyz:
-                    _machine.SetVelocity(Velocity.Service);
-                    await _machine.Z.MoveAxisInPosAsync(_machine.ZBladeTouch - _wafer.Thickness - _bladeTransferGapZ);
+                case Diagram.goCameraPointLearningXYZ:
+                    Machine.SetVelocity(Velocity.Service);
+                    await Machine.Z.MoveAxisInPosAsync(Machine.ZBladeTouch - Wafer.Thickness - BladeTransferGapZ);
 
-                    var y = _wafer.GetNearestCut(0).StartPoint.Y;
-                    var point = _machine.CtoCSystemCoors(new Vector2(0, _wafer.GetNearestCut(0).StartPoint.Y));
-
-                    await _machine.MoveInPosXyAsync(point);
-                    await _machine.Z.MoveAxisInPosAsync(/*Machine.CameraFocus*/3.5);
+                    var y = Wafer.GetNearestCut(0).StartPoint.Y;
+                    var point = Machine.CtoCSystemCoors(new Vector2(0, Wafer.GetNearestCut(0).StartPoint.Y));
+                   
+                    await Machine.MoveInPosXYAsync(point);
+                    await Machine.Z.MoveAxisInPosAsync(/*Machine.CameraFocus*/3.5);
                     break;
                 default:
                     break;
             }
         }
+
         private async Task TakeThePhotoAsync()
         {
-            _machine.GetSnapShot = false;
-            await ProcElementDispatcherAsync(Diagram.GoTransferingHeightZ);
-            await ProcElementDispatcherAsync(Diagram.GoCameraPointXyz);
-            _machine.SwitchOnBlowing = true;
+            Machine.GetSnapShot = false;
+            await ProcElementDispatcherAsync(Diagram.goTransferingHeightZ);            
+            await ProcElementDispatcherAsync(Diagram.goCameraPointXYZ);
+            Machine.SwitchOnBlowing = true;            
             Thread.Sleep(100);
-            _machine.GetSnapShot = true;
-            _machine.SwitchOnBlowing = false;
+            Machine.GetSnapShot = true;
+            Machine.SwitchOnBlowing = false;
         }
+
         public async Task StartPauseProc()
         {
             switch (ProcessStatus)
             {
                 case Status.StartLearning:
-                    await ProcElementDispatcherAsync(Diagram.GoCameraPointLearningXyz);
+                    await ProcElementDispatcherAsync(Diagram.goCameraPointLearningXYZ);
                     ProcessStatus = Status.Learning;
                     break;
                 case Status.Learning:
-                    _wafer.AddToCurrentDirectionIndexShift = _machine.CoSystemCurrentCoors.Y - _wafer.GetNearestCut(_machine.CoSystemCurrentCoors.Y).StartPoint.Y;
-                    _wafer.SetCurrentDirectionAngle = _machine.U.ActualPosition;
-                    if (_wafer.NextDir())
+                    Wafer.AddToCurrentDirectionIndexShift = Machine.COSystemCurrentCoors.Y - Wafer.GetNearestCut(Machine.COSystemCurrentCoors.Y).StartPoint.Y;
+                    Wafer.SetCurrentDirectionAngle = Machine.U.ActualPosition;
+                    if (Wafer.NextDir())
                     {
-                        _machine.SetVelocity(Velocity.Service);
+                        Machine.SetVelocity(Velocity.Service);
                         await MoveNextDirAsync(false);
-                        await ProcElementDispatcherAsync(Diagram.GoCameraPointLearningXyz);
+                        await ProcElementDispatcherAsync(Diagram.goCameraPointLearningXYZ);
                     }
                     else
                     {
-                        ProcessStatus = Status.Working;
-
-                        _traces = new List<TracePath>();
-
-                        DoProcessAsync(_baseProcess);
+                        ProcessStatus = Status.Working;                        
+                        
+                        traces = new List<TracePath>();
+                        
+                        DoProcessAsync(BaseProcess);
                     }
                     break;
                 case Status.Working:
@@ -511,17 +511,17 @@ namespace DicingBlade.Classes
                     CutWidthMarkerVisibility = Visibility.Visible;
                     ChangeScreensEvent(true);
                     ProcessStatus = Status.Correcting;
-                    _machine.GetSnapShot = false;
+                    Machine.GetSnapShot = false;
                     break;
                 case Status.Correcting:
-                    var result = MessageBox.Show($"Сместить следующие резы на {CutOffset} мм?", "", MessageBoxButton.OKCancel);
-                    if (result == MessageBoxResult.OK) _wafer.AddToCurrentDirectionIndexShift = CutOffset;
+                    var result  = MessageBox.Show($"Сместить следующие резы на {CutOffset} мм?","",MessageBoxButtons.OKCancel);
+                    if(result == DialogResult.OK) Wafer.AddToCurrentDirectionIndexShift = CutOffset;
                     ChangeScreensEvent(false);
                     ProcessStatus = Status.Working;
                     CutWidthMarkerVisibility = Visibility.Hidden;
                     CutOffset = 0;
                     PauseProcess = false;
-                    _machine.GetSnapShot = true;
+                    Machine.GetSnapShot = true;
                     break;
                 default:
                     break;

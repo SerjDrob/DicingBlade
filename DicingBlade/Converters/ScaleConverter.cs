@@ -1,53 +1,49 @@
-﻿
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
-using System.Windows;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Data;
+using System.Globalization;
 
-namespace DicingBlade.Converters
+namespace DicingBlade.Classes
 {
-    internal class ScaleConverter : IMultiValueConverter
+    class ScaleConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            var actualHeight = System.Convert.ToDouble(values[0]);
-            var actualWidth = System.Convert.ToDouble(values[1]);
-            var wh = 0.0;
-            var res = 1.0;
+            double actualHeight = System.Convert.ToDouble(values[0]);
+            double actualWidth = System.Convert.ToDouble(values[1]);
+            double wh = 0;
+            double res = 1;
+            double t = 0;
             try
             {
-                var shapeX = System.Convert.ToDouble(values[2]);
-                var shapeY = System.Convert.ToDouble(values[3]);
-
-                if (shapeX > shapeY)
+                double shapeX = System.Convert.ToDouble(values[2]);
+                double shapeY = System.Convert.ToDouble(values[3]); 
+                
+                if (shapeX > shapeY) 
                 {
                     res = shapeX;
                     wh = actualWidth;
                 }
-                else
+                else 
                 {
                     res = shapeY;
                     wh = actualHeight;
                 }
             }
-            catch
-            {
-                // WTF
-            }
-
-            var tmp = wh / (1.4 * res);
-
+            catch { }
             if (values.Length == 5)
             {
-                var value = values[4];
-                if (value != DependencyProperty.UnsetValue && value is IConvertible convertible)
-                {
-                    var t = System.Convert.ToDouble(convertible);
-                    return t / tmp;
-                }
+                t = System.Convert.ToDouble(values[4]);
+                return t /( wh / (1.4 * res));
             }
-
-            return tmp;
+            else
+            {
+                return wh / (1.4 * res);
+            }
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

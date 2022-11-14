@@ -1,10 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Data;
+using System.Globalization;
 
-namespace DicingBlade.Converters
+namespace DicingBlade.Classes
 {
-    internal class CrossPositionConverter : IMultiValueConverter
+    class CrossPositionConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
@@ -13,15 +18,18 @@ namespace DicingBlade.Converters
                 double length = System.Convert.ToDouble(values[0]);
                 int pointNum = System.Convert.ToInt32(values[1]);
                 double lengthRatio = System.Convert.ToDouble(parameter);
-                return pointNum switch
+                switch (pointNum)
                 {
-                    1 => length * (1 - lengthRatio) / 2,
-                    2 => length * (1 + lengthRatio) / 2,
-                    _ => 0,
-                };
+                    case 1: return length * (1 - lengthRatio) / 2;
+                    case 2: return length * (1 + lengthRatio) / 2;
+                    default:
+                        return 0;
+                }
             }
-
-            return System.Convert.ToDouble(values[0]) / 2;
+            else
+            {
+                return System.Convert.ToDouble(values[0]) / 2;
+            }
 
         }
 

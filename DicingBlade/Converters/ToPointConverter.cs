@@ -1,22 +1,28 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Data;
+using System.Globalization;
+using System.Windows;
 
-namespace DicingBlade.Converters
+namespace DicingBlade.Classes
 {
-    internal class ToPointConverter : IMultiValueConverter
+    class ToPointConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
-        {
+        {            
             double x = 0;
             double y = 0;
             try
             {
                 x = System.Convert.ToDouble(values[0]);
-                y = System.Convert.ToDouble(values[1]);
+                y = System.Convert.ToDouble(values[1]);                
             }
             catch
-            {
+            {                
             }
             return new System.Windows.Point(x, y);
         }

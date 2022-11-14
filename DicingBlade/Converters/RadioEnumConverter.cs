@@ -1,14 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Data;
+using System.Windows.Documents;
 
-namespace DicingBlade.Converters
+namespace DicingBlade.Classes
 {
-    internal class RadioEnumConverter : IValueConverter
-    {
+    class RadioEnumConverter : IValueConverter
+    {        
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            int bit1, bit2;
+           int bit1, bit2;
             try
             {
                 bit1 = System.Convert.ToInt32(value);
@@ -23,7 +28,7 @@ namespace DicingBlade.Converters
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return parameter;
+            return parameter;            
         }
     }
 }
