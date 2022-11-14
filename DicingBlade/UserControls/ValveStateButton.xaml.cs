@@ -45,6 +45,18 @@ namespace DicingBlade.UserControls
 
 
 
+        public Brush MyBackground
+        {
+            get { return (Brush)GetValue(MyBackgroundProperty); }
+            set { SetValue(MyBackgroundProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for MyBackground.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty MyBackgroundProperty =
+            DependencyProperty.Register("MyBackground", typeof(Brush), typeof(ValveStateButton), new PropertyMetadata(null));
+
+
+
 
         public string ValveName
         {
@@ -127,21 +139,5 @@ namespace DicingBlade.UserControls
         public static readonly DependencyProperty SensorIsOnProperty =
             DependencyProperty.Register("SensorIsOn", typeof(bool), typeof(ValveStateButton), new PropertyMetadata(false));
 
-
-
-
-
-        private void ToggleButton_Click(object sender, RoutedEventArgs e)
-        {
-            var tg = sender as ToggleButton;
-            if ((bool)tg.IsChecked)
-            {
-                ValveIsOn = true;
-            }
-            else
-            {
-                ValveIsOn = false;
-            }
-        }
     }
 }

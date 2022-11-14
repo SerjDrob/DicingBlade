@@ -1,11 +1,11 @@
-﻿using System;
+﻿using netDxf;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Serialization;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using netDxf;
+using System.Xml.Serialization;
 
 namespace DicingBlade.Classes
 {
@@ -52,7 +52,7 @@ namespace DicingBlade.Classes
 
         public static void SerializeObjectJson(this object obj, string filename)
         {
-            var json = JsonSerializer.Serialize( obj);
+            var json = JsonSerializer.Serialize(obj);
             File.WriteAllText(filename, json);
         }
 
@@ -62,11 +62,17 @@ namespace DicingBlade.Classes
             return await JsonSerializer.DeserializeAsync<T>(file).ConfigureAwait(false);
         }
 
-        public static T DeSerializeObjectJson<T>(string filename)
+        public static T DeSerializeObjectJson<T>(string filename) where T : new()
         {
             var file = File.ReadAllText(filename);
-
-            return JsonSerializer.Deserialize<T>(file);
+            try
+            {
+                return JsonSerializer.Deserialize<T>(file);
+            }
+            catch (Exception)
+            {
+                return new T();
+            }
         }
 
         /// <summary>
@@ -80,7 +86,7 @@ namespace DicingBlade.Classes
         }
         public static int SetBit(this int variable, int pos)
         {
-           var res = variable | 1 << pos;
+            var res = variable | 1 << pos;
             return res;
         }
         public static int ResetBit(this int variable, int pos)
@@ -94,7 +100,7 @@ namespace DicingBlade.Classes
             return arr.Where(n => n.num == @enum).Select(v => v.val).First();
         }
 
-        public static int FindIndex<T>(this IEnumerable<T> items, Func<T,bool> predicate)
+        public static int FindIndex<T>(this IEnumerable<T> items, Func<T, bool> predicate)
         {
             if (items is null)
             {
