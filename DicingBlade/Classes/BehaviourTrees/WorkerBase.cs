@@ -8,6 +8,10 @@ namespace DicingBlade.Classes.BehaviourTrees
     public abstract class WorkerBase
     {
         protected string _name = "1";
+<<<<<<< HEAD
+=======
+        protected bool _isCancelled = false;
+>>>>>>> f35eadf0edd342b27dc7f8cc1541b538b9c2c4d0
         public virtual void GiveMeName(bool ascribe, string name)
         {
             if (ascribe)
@@ -23,7 +27,14 @@ namespace DicingBlade.Classes.BehaviourTrees
         private event Action ActionBeforeWork;
         public virtual WorkerBase SetActionBeforeWork(Action action)
         {
+<<<<<<< HEAD
             ActionBeforeWork += action;
+=======
+            if (!_isCancelled)
+            {
+                ActionBeforeWork?.Invoke();
+            }
+>>>>>>> f35eadf0edd342b27dc7f8cc1541b538b9c2c4d0
             return this;
         }
         public virtual async Task<bool> DoWork()

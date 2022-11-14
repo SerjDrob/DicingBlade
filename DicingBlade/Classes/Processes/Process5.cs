@@ -7,13 +7,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+<<<<<<< HEAD:DicingBlade/Classes/Processes/Process5.cs
 using System.Windows.Media;
 
+=======
+using DicingBlade.ViewModels;
+
+
+>>>>>>> f35eadf0edd342b27dc7f8cc1541b538b9c2c4d0:DicingBlade/Classes/Process5.cs
 namespace DicingBlade.Classes.BehaviourTrees
 {
     [AddINotifyPropertyChangedInterface]
     class Process5 : IMessager
-    {
+    {        
         private IMachine _machine;
         private Wafer2D _wafer;
         private TempWafer2D _tempWafer2D;
@@ -22,7 +28,11 @@ namespace DicingBlade.Classes.BehaviourTrees
         private double _yActual;
         private double _zActual;
         private double _uActual;
+<<<<<<< HEAD:DicingBlade/Classes/Processes/Process5.cs
         private double _bladeTransferGapZ = 4;
+=======
+        private double _bladeTransferGapZ = 4;       
+>>>>>>> f35eadf0edd342b27dc7f8cc1541b538b9c2c4d0:DicingBlade/Classes/Process5.cs
         private bool _spindleWorking;
         private double _zRatio = 0;
         private double _feedSpeed;
@@ -33,6 +43,7 @@ namespace DicingBlade.Classes.BehaviourTrees
         private ITechnology _technology;
         private CheckCutControl _checkCut;
         private List<Task> _localTasks = new();
+<<<<<<< HEAD:DicingBlade/Classes/Processes/Process5.cs
         public Visibility CutWidthMarkerVisibility { get; set; } = Visibility.Hidden;
         public event Action<string> OnProcessStatusChanged;
         public event EventHandler<Stat> OnProcStatusChanged;
@@ -41,6 +52,16 @@ namespace DicingBlade.Classes.BehaviourTrees
             Cancelled,
             End
         }
+=======
+        public enum Stat
+        {
+            Cancelled,
+            End
+        }
+        public Visibility CutWidthMarkerVisibility { get; set; } = Visibility.Hidden;
+        public event Action<string> OnProcessStatusChanged;
+        public event EventHandler<Stat> OnProcStatusChanged;        
+>>>>>>> f35eadf0edd342b27dc7f8cc1541b538b9c2c4d0:DicingBlade/Classes/Process5.cs
         public event Action<bool> BladeTracingEvent;
         public event Action OnControlPointAppeared;
         public event Action<bool> ChangeScreensEvent;
@@ -48,7 +69,11 @@ namespace DicingBlade.Classes.BehaviourTrees
         /// first parameter: angle
         /// second parameter: time
         /// </summary>
+<<<<<<< HEAD:DicingBlade/Classes/Processes/Process5.cs
         public event Action<double, double> GetRotationEvent;
+=======
+        public event Action<double,double> GetRotationEvent;
+>>>>>>> f35eadf0edd342b27dc7f8cc1541b538b9c2c4d0:DicingBlade/Classes/Process5.cs
         public event Action<object, ProcParams> OnProcParamsChanged;
         public event Action<string, int> ThrowMessage;
         public double CutOffset { get; set; } = 0;
@@ -85,13 +110,20 @@ namespace DicingBlade.Classes.BehaviourTrees
 
             _checkCut.Set(technology.StartControlNum, technology.ControlPeriod);
             TuneBT();
+<<<<<<< HEAD:DicingBlade/Classes/Processes/Process5.cs
             _rootSequence.DoWork().ContinueWith(t =>
             {
                 if (t.Result) OnProcStatusChanged?.Invoke(this, Stat.End);
+=======
+            _rootSequence.DoWork().ContinueWith(t=> 
+            {
+                if (t.Result) OnProcStatusChanged?.Invoke(this,Stat.End) ; 
+>>>>>>> f35eadf0edd342b27dc7f8cc1541b538b9c2c4d0:DicingBlade/Classes/Process5.cs
             });
         }
         private void TuneBT()
         {
+<<<<<<< HEAD:DicingBlade/Classes/Processes/Process5.cs
             _singleCutSequence = new Sequence()
                .Hire(new Leaf(GoTransferingHeightZAsync))
                .Hire(new Leaf(GoCurPositionCutXy))
@@ -105,6 +137,8 @@ namespace DicingBlade.Classes.BehaviourTrees
 
 
 
+=======
+>>>>>>> f35eadf0edd342b27dc7f8cc1541b538b9c2c4d0:DicingBlade/Classes/Process5.cs
             var learnLeaf1 = new Leaf(StartLearningAsync).WaitForMe();
             var learnLeaf2 = new Leaf(LearningAsync);
             var learnLeaf3 = new Leaf(MovingNextDirAsync).SetBlock(_learningMoveNextDirBlock)
@@ -120,9 +154,15 @@ namespace DicingBlade.Classes.BehaviourTrees
             var workingLeaf6 = new Leaf(GoTransferingHeightZAsync);
             var workingLeaf7 = new Leaf(GoNextDirectionAsync).SetBlock(_workingGoNextDirectionBlock.BlockMe())
                                                              .SetActionBeforeWork(BeforeGoNextDirectionAsync);
+<<<<<<< HEAD:DicingBlade/Classes/Processes/Process5.cs
 
 
 
+=======
+
+
+
+>>>>>>> f35eadf0edd342b27dc7f8cc1541b538b9c2c4d0:DicingBlade/Classes/Process5.cs
             var inspectLeaf1 = new Leaf(TakeThePhotoAsync).SetBlock(_inspectLeafBlock.BlockMe())
                                                           .SetActionBeforeWork(BeforeTakeThePhotoAsync);
 
@@ -161,6 +201,7 @@ namespace DicingBlade.Classes.BehaviourTrees
                 .SetBlock(_workingTickerBlock);
 
             _rootSequence
+<<<<<<< HEAD:DicingBlade/Classes/Processes/Process5.cs
                  .Hire(learningTicker)
                  .Hire(workingTicker);
         }
@@ -177,6 +218,13 @@ namespace DicingBlade.Classes.BehaviourTrees
         }
 
         public async Task DoSingleCut() => await AwaitTaskAsync(_singleCutSequence.DoWork());
+=======
+                 .Hire(learningTicker)                 
+                 .Hire(workingTicker);
+        }
+
+        
+>>>>>>> f35eadf0edd342b27dc7f8cc1541b538b9c2c4d0:DicingBlade/Classes/Process5.cs
         public void RefresfTechnology(ITechnology technology)
         {
             _feedSpeed = technology.FeedSpeed;
@@ -189,7 +237,11 @@ namespace DicingBlade.Classes.BehaviourTrees
         }
         public async Task WaitProcDoneAsync()
         {
+<<<<<<< HEAD:DicingBlade/Classes/Processes/Process5.cs
             await Task.WhenAll(_localTasks).ConfigureAwait(false);
+=======
+            await Task.WhenAll(_localTasks);          
+>>>>>>> f35eadf0edd342b27dc7f8cc1541b538b9c2c4d0:DicingBlade/Classes/Process5.cs
         }
         public async Task StartPauseProc()
         {
@@ -209,6 +261,7 @@ namespace DicingBlade.Classes.BehaviourTrees
                     _inspectSequenceBlock.UnBlockMe();
                     OnProcessStatusChanged?.Invoke("Пауза");
                 }
+<<<<<<< HEAD:DicingBlade/Classes/Processes/Process5.cs
             }
 
         }
@@ -248,6 +301,46 @@ namespace DicingBlade.Classes.BehaviourTrees
             {
                 _inspectLeafBlock.BlockMe();
             }
+=======
+            }
+        }
+        void BeforeMovingNextDirAsync()
+        {
+            if (_wafer.IsLastSide)
+            {
+                _learningMoveNextDirBlock.BlockMe();
+                _learningTickerBlock.BlockMe();
+            }
+        }
+        void BeforeGoNextDirectionAsync()
+        {
+            if (_wafer.LastCutOfTheSide)
+            {
+                if (_wafer.IsLastSide)
+                {
+                    _workingGoNextDirectionBlock.UnBlockMe();
+                }
+                else
+                {
+                    _workingTickerBlock.BlockMe();
+                }
+            }
+            else
+            {
+                _workingGoNextDirectionBlock.BlockMe();
+            }
+        }
+        void BeforeTakeThePhotoAsync()
+        {
+            if (_checkCut.Check & !_inspectSequenceBlock.NotBlocked)
+            {
+                _inspectLeafBlock.UnBlockMe();
+            }
+            else
+            {
+                _inspectLeafBlock.BlockMe();
+            }
+>>>>>>> f35eadf0edd342b27dc7f8cc1541b538b9c2c4d0:DicingBlade/Classes/Process5.cs
         }
 
         #region Functions for behaviour tree
@@ -294,7 +387,11 @@ namespace DicingBlade.Classes.BehaviourTrees
             _machine.SetVelocity(Velocity.Service);
             var z = _machine.TranslateSpecCoor(Place.ZBladeTouch, _wafer.Thickness + _bladeTransferGapZ, Ax.Z);
             AwaitTaskAsync(_machine.MoveAxInPosAsync(Ax.Z, z)).Wait();
+<<<<<<< HEAD:DicingBlade/Classes/Processes/Process5.cs
 
+=======
+            
+>>>>>>> f35eadf0edd342b27dc7f8cc1541b538b9c2c4d0:DicingBlade/Classes/Process5.cs
             var y = -_machine.TranslateSpecCoor(Place.BladeChuckCenter, _yActual, Ax.Y);
             y = _machine.TranslateSpecCoor(Place.CameraChuckCenter, -y, Ax.Y);
             AwaitTaskAsync(_machine.MoveGpInPosAsync(Groups.XY, new double[] { _inspectX, y }, true)).Wait();
@@ -318,7 +415,11 @@ namespace DicingBlade.Classes.BehaviourTrees
             MoveNextDirAsync();
             _procParamsEventArgs.currentShift = _wafer.CurrentShift;
             _procParamsEventArgs.currentSideAngle = _wafer.CurrentSideAngle;
+<<<<<<< HEAD:DicingBlade/Classes/Processes/Process5.cs
             OnProcParamsChanged?.Invoke(this, _procParamsEventArgs);
+=======
+            OnProcParamsChanged?.Invoke(this, _procParamsEventArgs);           
+>>>>>>> f35eadf0edd342b27dc7f8cc1541b538b9c2c4d0:DicingBlade/Classes/Process5.cs
         }
         private void GoTransferingHeightZAsync()
         {
@@ -376,12 +477,21 @@ namespace DicingBlade.Classes.BehaviourTrees
             _wafer.TeachSideShift(y);
             _procParamsEventArgs.currentShift = _wafer.CurrentShift;
             OnProcParamsChanged?.Invoke(this, _procParamsEventArgs);
+<<<<<<< HEAD:DicingBlade/Classes/Processes/Process5.cs
             _wafer.TeachSideAngle(_uActual);
         }
         private void MovingNextDirAsync()
         {
             if (_wafer.IncrementSide())
             {
+=======
+            _wafer.TeachSideAngle(_uActual);            
+        }        
+        private void MovingNextDirAsync()
+        {
+            if (_wafer.IncrementSide())
+            {                
+>>>>>>> f35eadf0edd342b27dc7f8cc1541b538b9c2c4d0:DicingBlade/Classes/Process5.cs
                 _machine.SetVelocity(Velocity.Service);
                 MoveNextDirAsync(false);
                 _procParamsEventArgs.currentShift = _wafer.CurrentShift;
@@ -413,6 +523,7 @@ namespace DicingBlade.Classes.BehaviourTrees
             _machine.SetVelocity(Velocity.Service);
             AwaitTaskAsync(_machine.MoveAxInPosAsync(Ax.Z, _machine.GetFeature(MFeatures.ZBladeTouch) - _wafer.Thickness - _bladeTransferGapZ)).Wait();
             var y = _wafer.GetNearestY(0);
+<<<<<<< HEAD:DicingBlade/Classes/Processes/Process5.cs
             var arr = _machine.TranslateActualCoors(Place.CameraChuckCenter, new (Ax, double)[] { (Ax.X, 0), (Ax.Y, -y) });
             var point = new double[] { arr.GetVal(Ax.X), arr.GetVal(Ax.Y) };
             AwaitTaskAsync(_machine.MoveGpInPosAsync(Groups.XY, point)).Wait();
@@ -427,6 +538,22 @@ namespace DicingBlade.Classes.BehaviourTrees
             //    _wafer.SetChanges(wf.IndexH, wf.IndexW, wf.Thickness, new Rectangle2D(wf.Height, wf.Width));
             //}
         }
+=======
+            var arr = _machine.TranslateActualCoors(Place.CameraChuckCenter, new (Ax, double)[] { (Ax.X, 0), (Ax.Y, -y) });           
+            var point = new double[] { arr.GetVal(Ax.X), arr.GetVal(Ax.Y) };
+            AwaitTaskAsync(_machine.MoveGpInPosAsync(Groups.XY, point)).Wait();
+            AwaitTaskAsync(_machine.MoveAxesInPlaceAsync(Place.ZFocus)).Wait();            
+        }
+#endregion
+        public void SubstrateChanged(object obj, SettingsChangedEventArgs eventArgs)
+        {
+            //if (eventArgs.Settings is IWafer & (int)(ProcessStatus & (Status.Working | Status.Correcting | Status.MovingNextDir | Status.Ending)) == 0)
+            //{
+            //    var wf = (IWafer)eventArgs.Settings;
+            //    _wafer.SetChanges(wf.IndexH, wf.IndexW, wf.Thickness, new Rectangle2D(wf.Height, wf.Width));
+            //}
+        }
+>>>>>>> f35eadf0edd342b27dc7f8cc1541b538b9c2c4d0:DicingBlade/Classes/Process5.cs
         private void _machine_OnSensorStateChanged(Sensors sensor, bool state)
         {
             if (state)
@@ -499,11 +626,19 @@ namespace DicingBlade.Classes.BehaviourTrees
         }
         public async Task EmergencyScript()
         {
+<<<<<<< HEAD:DicingBlade/Classes/Processes/Process5.cs
             _rootSequence?.CancellAction(true);
+=======
+            _rootSequence?.CancellAction(true);          
+>>>>>>> f35eadf0edd342b27dc7f8cc1541b538b9c2c4d0:DicingBlade/Classes/Process5.cs
             _machine.Stop(Ax.X);
             await _machine.MoveAxInPosAsync(Ax.Z, 0);
             _machine.StopSpindle();
         }
+<<<<<<< HEAD:DicingBlade/Classes/Processes/Process5.cs
 
+=======
+        
+>>>>>>> f35eadf0edd342b27dc7f8cc1541b538b9c2c4d0:DicingBlade/Classes/Process5.cs
     }
 }

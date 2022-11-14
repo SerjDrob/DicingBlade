@@ -630,7 +630,11 @@ namespace DicingBlade.Classes
         public double CutOffset { get; set; } = 0;
 
         private double _bladeTransferGapZ /*{ get; set; }*/ = 3;
+<<<<<<< HEAD
         private bool IsCutting { get; set; } = false;
+=======
+        private bool IsCutting { get; set; } = false;   
+>>>>>>> f35eadf0edd342b27dc7f8cc1541b538b9c2c4d0
         public bool SideDone { get; private set; } = false;
         private bool BladeInWafer => _zActual > _machine.GetGeometry(Place.ZBladeTouch, Ax.Z) - _wafer.Thickness - _bladeTransferGapZ;
         public int CurrentLine { get; private set; }

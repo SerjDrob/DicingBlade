@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 ﻿//#define Proc5
+=======
+﻿#define Proc5
+>>>>>>> f35eadf0edd342b27dc7f8cc1541b538b9c2c4d0
 using Advantech.Motion;
 using DicingBlade.Classes;
 using DicingBlade.Classes.BehaviourTrees;
@@ -518,7 +522,11 @@ namespace DicingBlade.ViewModels
             //test key
             if (key.Key == Key.LeftCtrl)
             {
+<<<<<<< HEAD
                 _machine.MoveAxInPosAsync(Ax.Y, 5, true);
+=======
+
+>>>>>>> f35eadf0edd342b27dc7f8cc1541b538b9c2c4d0
             }
 
             if (key.Key == Key.Multiply)
@@ -585,7 +593,10 @@ namespace DicingBlade.ViewModels
                         blade.Thickness = 0.11;
                         Substrate.ResetWafer();
                         Process5 = new Process5(_machine, Substrate, blade, _technology);
+<<<<<<< HEAD
                         _exceptionsAgregator.RegisterMessager(Process5);
+=======
+>>>>>>> f35eadf0edd342b27dc7f8cc1541b538b9c2c4d0
                         Process5.GetRotationEvent += SetRotation;
                         Process5.ChangeScreensEvent += ChangeScreensRegime;
                         Process5.BladeTracingEvent += Process_BladeTracingEvent;
@@ -831,13 +842,22 @@ namespace DicingBlade.ViewModels
 #if Proc5
                 if (Process5 is not null)
                 {
+<<<<<<< HEAD
                     await Process5?.EmergencyScript();
                     await Process5.WaitProcDoneAsync();
+=======
+                    Process5?.EmergencyScript();
+                    Process5.WaitProcDoneAsync().Wait();
+>>>>>>> f35eadf0edd342b27dc7f8cc1541b538b9c2c4d0
                     Process5 = null;
                     Substrate = null;
                     ResetWaferView();
                     AjustWaferTechnology();
+<<<<<<< HEAD
                     MessageBox.Show("Процесс экстренно прерван оператором.", "Процесс", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+=======
+                    //MessageBox.Show("Процесс экстренно прерван оператором.", "Процесс", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+>>>>>>> f35eadf0edd342b27dc7f8cc1541b538b9c2c4d0
 
                 }
 #else

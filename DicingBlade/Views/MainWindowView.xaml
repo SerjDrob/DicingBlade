@@ -342,7 +342,11 @@
                         </GroupBox>
                         <GroupBox Header="СОЖ">
                             <uc:Indicator Width="150" Height="30" CurrentLevel="{Binding Flow}" MinLevel="0" MaxLevel="2" Units="л/мин" NoLessLevel="1"/>
+<<<<<<< HEAD
                         </GroupBox>
+=======
+                        </GroupBox>                        
+>>>>>>> f35eadf0edd342b27dc7f8cc1541b538b9c2c4d0
                     </StackPanel>
                     <GroupBox Header="Процесс"  Grid.Row="1">
                         <StackPanel>
@@ -361,6 +365,7 @@
                                 <Setter Property="SensorOnColor"  Value="{StaticResource SignalGreen}"/>
                                 <Setter Property="Margin" Value="1"/>
                                 <Setter Property="FontFamily" Value="Noto Sans"/>
+<<<<<<< HEAD
                                 <!--<Setter Property="MyBackground" Value="#2E8364"/>-->
                             </Style>
                         </StackPanel.Resources>
@@ -368,6 +373,15 @@
                         <uc:ValveStateButton ValveName="ВОДА" ValveIsOn="{Binding CoolantValveView}" SensorIsOn="{Binding CoolantSensorView}"/>
                         <uc:ValveStateButton ValveName="ВАКУУМ" ValveIsOn="{Binding ChuckVacuumValveView}" SensorIsOn="{Binding ChuckVacuumSensorView}"/>
                         <uc:ValveStateButton ValveName="ОБДУВ" ValveIsOn="{Binding BlowingValveView}" SensorIsOn="{Binding AirSensorView}"/>
+=======
+                                <!--<Setter Property="MyBackground" Value="#2E8364"/>-->                                
+                            </Style>
+                        </StackPanel.Resources>                        
+                        <uc:ValveStateButton ValveName="ОХЛАЖДЕНИЕ ШПИНДЕЛЯ" ValveIsOn="{Binding SpindleCoolantSensorView}" SensorIsOn="{Binding SpindleCoolantSensorView}"/>
+                        <uc:ValveStateButton ValveName="ВОДА" ValveIsOn="{Binding CoolantValveView}" SensorIsOn="{Binding CoolantSensorView}"/>
+                        <uc:ValveStateButton ValveName="ВАКУУМ" ValveIsOn="{Binding ChuckVacuumValveView}" SensorIsOn="{Binding ChuckVacuumSensorView}"/>
+                        <uc:ValveStateButton ValveName="ОБДУВ" ValveIsOn="{Binding BlowingValveView}" SensorIsOn="{Binding AirSensorView}"/>                   
+>>>>>>> f35eadf0edd342b27dc7f8cc1541b538b9c2c4d0
                     </StackPanel>
                     <GroupBox Header="Перемещение" Grid.Row="1" Grid.Column="2" VerticalAlignment="Top">
                         <DockPanel>
