@@ -11,6 +11,10 @@ using netDxf.Entities;
 using netDxf.Entities;
 using netDxf;
 using Newtonsoft.Json;
+using DicingBlade.Properties;
+using DicingBlade.ViewModels;
+using System.Diagnostics;
+using System.Collections.ObjectModel;
 
 namespace DicingBlade.Classes
 {
@@ -77,6 +81,28 @@ namespace DicingBlade.Classes
         public static Vector2 SplitZ(this Vector3 vector) 
         {
             return new Vector2(vector.X, vector.Y);
+        }        
+    }
+    internal static class ExtensionMethods
+    {
+
+        internal static void SerializeObject(this object obj, string filePath)
+        {
+            var json = JsonConvert.SerializeObject(obj);
+            using var writer = new StreamWriter(filePath, false);
+            var l = new TextWriterTraceListener(writer);
+            l.WriteLine(json);
+            l.Flush();
+        }
+        internal static T? DeserilizeObject<T>(string filePath)
+        {
+            var obj = JsonConvert.DeserializeObject(File.ReadAllText(filePath), typeof(T));
+            return (T?)obj;
+        }
+
+        internal static ObservableCollection<T> ToObservableCollection<T>(this IEnumerable<T> en)
+        {
+            return new ObservableCollection<T>(en);
         }
     }
 }
